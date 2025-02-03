@@ -1,0 +1,70 @@
+spring:
+  servlet:
+    multipart:
+      max-file-size: 30MB
+      max-request-size: 30MB
+      enabled: true
+  data:
+    web:
+      pageable:
+        max-page-size: 100000
+
+  datasource:
+    url: jdbc:mysql://192.168.0.6:3306/p4thdb
+    username: p4th
+    password: p4th12!@
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      maximum-pool-size : 10
+      connectionTimeout : 120000
+      idleTimeout : 1800000
+      maxLifetime: 28797000       # 28797초 (MySQL wait_timeout보다 3초 짧게 설정)
+      dataSourceProperties:
+        cachePrepStmts: true
+        prepStmtCacheSize: 250
+        prepStmtCacheSqlLimit: 2048
+        useServerPrepStmts: true
+        rewriteBatchedStatements: true
+        cacheResultSetMetadata: true
+
+  jpa:
+    database: mysql
+    show-sql: false
+    generate-ddl: false
+    hibernate:
+      ddl-auto: none
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+
+    properties:
+      hibernate:
+        format_sql: true
+  mvc:
+    view:
+      prefix: /WEB-INF/views/
+      suffix: .jsp
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    display-request-duration: true
+    operations-sorter: method
+  api-docs:
+    path: /api-docs
+  show-actuator: true
+
+#    paths-to-match:
+#      - /v1/**
+mybatis:
+  mapper-locations: classpath:mapper/*.xml
+  configuration:
+    map-underscore-to-camel-case: true
+
+logging:
+  level:
+    com.zaxxer.hikari.HikariConfig: INFO
+    com.zaxxer.hikari: INFO
+
+p4th:
+  jwt:
+    secret: "p4th_Secret_Key_20250203_p4th_Secret_Key_20250203"

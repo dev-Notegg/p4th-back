@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.p4th.backend.mapper.UserMapper">
+
+    <!-- 회원가입 -->
+    <insert id="insertUser">
+        INSERT INTO user_info
+        (
+            user_id,
+            login_id,
+            password,
+            nickname,
+            user_type,
+            pass_code,
+            account_status,
+            last_login_ip,
+            created_by
+        )
+        VALUES
+            (
+                #{userId},
+                #{loginId},
+                #{password},
+                #{nickname},
+                #{userType},
+                #{passCode},
+                #{accountStatus},
+                #{lastLoginIp},
+                #{loginId}
+            )
+    </insert>
+
+    <!-- loginId로 회원 조회 -->
+    <select id="selectByLoginId" resultType="com.p4th.backend.domain.User">
+        SELECT
+            user_id AS userId,
+            login_id AS loginId,
+            password,
+            nickname,
+            user_type AS userType,
+            pass_code AS passCode,
+            account_status AS accountStatus,
+            last_login_ip AS lastLoginIp,
+            access_token AS accessToken,
+            refresh_token AS refreshToken
+        FROM user_info
+        WHERE login_id = #{loginId}
+          AND account_status = 'ACTIVE'
+    </select>
+
+    <!-- 토큰 업데이트 -->
+    <update id="updateTokens">
+        UPDATE user_info
+        SET
+            access_token = #{accessToken},
+            refresh_token = #{refreshToken}
+        WHERE user_id = #{userId}
+    </update>
+
+    <!-- 마지막 로그인 ip/시간 -->
+    <update id="updateLastLoginInfo">
+        UPDATE user_info
+        SET
+            last_login_ip = #{lastLoginIp},
+            last_login_at = NOW()
+        WHERE user_id = #{userId}
+    </update>
+</mapper>
