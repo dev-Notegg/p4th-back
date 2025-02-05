@@ -2,6 +2,7 @@ package com.p4th.backend.controller;
 
 import com.p4th.backend.common.exception.ErrorResponse;
 import com.p4th.backend.domain.User;
+import com.p4th.backend.dto.SignupRequestDto;
 import com.p4th.backend.service.AuthService;
 import com.p4th.backend.service.AuthService.RefreshTokenResult;
 import com.p4th.backend.service.AuthService.SignUpResult;
@@ -27,17 +28,18 @@ public class AuthController {
     private final AuthService authService;
     private final JwtProvider jwtProvider;
 
-    /**
-     * 회원가입: 아이디, 비밀번호, 닉네임을 받아 회원가입 후 로그인ID와 패쓰코드를 반환한다.
-     */
-    @Operation(summary = "회원가입", description = "아이디, 비밀번호, 닉네임을 받아 회원가입을 진행하며, 가입 완료 후 로그인ID와 패쓰코드를 반환한다.")
+    @Operation(summary = "회원가입", description = "로그인ID, 비밀번호, 닉네임을 받아 회원가입을 진행하며, 가입 완료 후 로그인ID와 패쓰코드를 반환한다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "회원가입 성공"),
             @ApiResponse(responseCode = "400", description = "입력 데이터 오류 또는 중복된 아이디/닉네임",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @PostMapping("/signup")
-    public SignUpResponse signUp(@RequestBody User user) {
+    public SignUpResponse signUp(@RequestBody SignupRequestDto request) {
+        User user = new User();
+        user.setLoginId(request.getLoginId());
+        user.setPassword(request.getPassword());
+        user.setNickname(request.getNickname());
         SignUpResult result = authService.signUp(user);
         SignUpResponse response = new SignUpResponse();
         response.setLoginId(result.getLoginId());
@@ -45,7 +47,6 @@ public class AuthController {
         return response;
     }
 
-    // 아이디 중복 확인 API
     @Operation(summary = "아이디 중복 확인", description = "전달된 loginId를 기반으로 중복 여부를 확인한다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "중복 확인 성공",
@@ -59,7 +60,6 @@ public class AuthController {
         return response;
     }
 
-    // 닉네임 중복 확인 API
     @Operation(summary = "닉네임 중복 확인", description = "전달된 nickname을 기반으로 중복 여부를 확인한다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "중복 확인 성공",
@@ -73,9 +73,6 @@ public class AuthController {
         return response;
     }
 
-    /**
-     * 로그인: 아이디와 비밀번호를 요청 본문(JSON)으로 받아 로그인 후 토큰 및 사용자 정보를 반환한다.
-     */
     @Operation(summary = "로그인", description = "로그인 시, 요청 본문에 로그인ID와 비밀번호를 담아 전송하며, 성공 시 엑세스 토큰, 리프레쉬 토큰 및 사용자 정보를 반환한다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "로그인 성공",
@@ -95,9 +92,6 @@ public class AuthController {
         return response;
     }
 
-    /**
-     * 아이디 찾기: 패쓰코드를 받아 해당 사용자의 로그인 아이디를 반환한다.
-     */
     @Operation(summary = "아이디 찾기", description = "패쓰코드를 입력받아 해당 사용자의 로그인 아이디를 반환하는 API이다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "아이디 찾기 성공",
@@ -113,9 +107,6 @@ public class AuthController {
         return response;
     }
 
-    /**
-     * 비밀번호 찾기: 아이디와 패쓰코드를 입력받아 임시 비밀번호를 발급하는 API이다.
-     */
     @Operation(summary = "비밀번호 찾기", description = "아이디와 패쓰코드를 입력받아 임시 비밀번호를 발급하는 API이다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "임시 비밀번호 발급 성공",
@@ -131,9 +122,6 @@ public class AuthController {
         return response;
     }
 
-    /**
-     * 토큰 갱신: 리프레쉬 토큰 페이로드에서 회원 ID를 추출하여 새로운 엑세스 토큰(및 필요한 경우 리프레쉬 토큰)을 발급한다.
-     */
     @Operation(summary = "토큰 갱신", description = "로그인 시 받은 리프레쉬 토큰을 페이로드에서 추출한 회원 ID를 사용하여 새로운 엑세스 토큰과 (필요 시) 리프레쉬 토큰을 발급하는 API이다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "토큰 갱신 성공",
