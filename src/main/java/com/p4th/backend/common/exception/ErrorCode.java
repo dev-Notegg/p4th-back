@@ -5,19 +5,17 @@ import org.springframework.http.HttpStatus;
 
 @Getter
 public enum ErrorCode {
-
-    // 예시) 회원가입/로그인 관련
-    PHONE_DUPLICATED(HttpStatus.CONFLICT, 10201, "PHONE_DUPLICATED"),
-    USER_NOT_FOUND(HttpStatus.BAD_REQUEST, 10202, "USER_NOT_FOUND"),
-    INVALID_PASSWORD(HttpStatus.BAD_REQUEST, 10203, "INVALID_PASSWORD"),
+    // 회원가입/로그인 관련
+    USER_NOT_FOUND(HttpStatus.BAD_REQUEST, 10202, "사용자를 찾을 수 없습니다."),
+    INVALID_PASSWORD(HttpStatus.BAD_REQUEST, 10203, "비밀번호가 올바르지 않습니다."),
+    INVALID_PASSCODE(HttpStatus.BAD_REQUEST, 10204, "패쓰코드가 올바르지 않습니다."),
 
     // JWT, 인증 관련
-    AUTHENTICATION_FAILED(HttpStatus.UNAUTHORIZED, 10100, "AUTHENTICATION_FAILED"),
-    ;
+    AUTHENTICATION_FAILED(HttpStatus.UNAUTHORIZED, 10100, "인증에 실패하였습니다.");
 
     private final HttpStatus httpStatus;
-    private final int code;          // 내부 비즈니스 에러코드
-    private final String message;    // 메시지
+    private final int code;
+    private final String message;
 
     ErrorCode(HttpStatus httpStatus, int code, String message) {
         this.httpStatus = httpStatus;

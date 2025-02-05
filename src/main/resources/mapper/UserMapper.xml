@@ -51,6 +51,40 @@
           AND account_status = 'ACTIVE'
     </select>
 
+    <!-- userId로 회원 조회 (토큰 갱신 등에서 사용) -->
+    <select id="selectByUserId" resultType="com.p4th.backend.domain.User">
+        SELECT
+            user_id AS userId,
+            login_id AS loginId,
+            password,
+            nickname,
+            user_type AS userType,
+            pass_code AS passCode,
+            account_status AS accountStatus,
+            last_login_ip AS lastLoginIp,
+            access_token AS accessToken,
+            refresh_token AS refreshToken
+        FROM user_info
+        WHERE user_id = #{userId}
+    </select>
+
+    <!-- passCode로 회원 조회 (아이디 찾기) -->
+    <select id="selectByPassCode" resultType="com.p4th.backend.domain.User">
+        SELECT
+            user_id AS userId,
+            login_id AS loginId,
+            password,
+            nickname,
+            user_type AS userType,
+            pass_code AS passCode,
+            account_status AS accountStatus,
+            last_login_ip AS lastLoginIp,
+            access_token AS accessToken,
+            refresh_token AS refreshToken
+        FROM user_info
+        WHERE pass_code = #{passCode}
+    </select>
+
     <!-- 토큰 업데이트 -->
     <update id="updateTokens">
         UPDATE user_info
@@ -60,7 +94,7 @@
         WHERE user_id = #{userId}
     </update>
 
-    <!-- 마지막 로그인 ip/시간 -->
+    <!-- 마지막 로그인 ip/시간 업데이트 -->
     <update id="updateLastLoginInfo">
         UPDATE user_info
         SET
@@ -68,4 +102,28 @@
             last_login_at = NOW()
         WHERE user_id = #{userId}
     </update>
+
+    <!-- 비밀번호 업데이트 (비밀번호 찾기 시 임시 비밀번호 저장) -->
+    <update id="updatePassword">
+        UPDATE user_info
+        SET
+            password = #{password}
+        WHERE user_id = #{userId}
+    </update>
+
+    <select id="selectByNickname" resultType="com.p4th.backend.domain.User">
+        SELECT
+            user_id AS userId,
+            login_id AS loginId,
+            password,
+            nickname,
+            user_type AS userType,
+            pass_code AS passCode,
+            account_status AS accountStatus,
+            last_login_ip AS lastLoginIp,
+            access_token AS accessToken,
+            refresh_token AS refreshToken
+        FROM user_info
+        WHERE nickname = #{nickname}
+    </select>
 </mapper>

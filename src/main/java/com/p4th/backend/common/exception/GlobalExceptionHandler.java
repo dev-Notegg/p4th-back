@@ -10,16 +10,12 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(CustomException.class)
     public ResponseEntity<ErrorResponse> handleCustomException(CustomException ex) {
         ErrorCode code = ex.getErrorCode();
-
-        // ErrorResponse 생성
         ErrorResponse body = ErrorResponse.builder()
                 .errorCode(code.getCode())
                 .errorMessage(code.getMessage())
-                .status(code.getHttpStatus().name())  // e.g. "CONFLICT", "BAD_REQUEST"
+                .status(code.getHttpStatus().name())
                 .build();
 
-        return ResponseEntity
-                .status(code.getHttpStatus())  // e.g. 409, 400, 401...
-                .body(body);
+        return ResponseEntity.status(code.getHttpStatus()).body(body);
     }
 }
