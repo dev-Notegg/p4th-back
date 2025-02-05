@@ -13,10 +13,7 @@
             login_id,
             password,
             nickname,
-            user_type,
             pass_code,
-            account_status,
-            last_login_ip,
             created_by
         )
         VALUES
@@ -25,10 +22,7 @@
                 #{loginId},
                 #{password},
                 #{nickname},
-                #{userType},
                 #{passCode},
-                #{accountStatus},
-                #{lastLoginIp},
                 #{loginId}
             )
     </insert>

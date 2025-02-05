@@ -13,7 +13,6 @@ public class User {
     private String passCode;       // 계정 복구용
     private int membershipLevel;   // 회원 등급
     private int adminRole;         // 관리자 등급
-    private String userType;       // 'USER','ADMIN'
     private String accountStatus;  // 'ACTIVE','WITHDRAWN','SUSPENDED'
     private String lastLoginIp;
     private String accessToken;

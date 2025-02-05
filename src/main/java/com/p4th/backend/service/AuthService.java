@@ -24,8 +24,6 @@ public class AuthService {
     public SignUpResult signUp(User user) {
         user.setUserId(UUID.randomUUID().toString());
         user.setPassword(PasswordUtil.encode(user.getPassword()));
-        user.setUserType("USER");
-        user.setAccountStatus("ACTIVE");
         String passCode = PassCodeUtil.generatePassCode();
         user.setPassCode(passCode);
         userMapper.insertUser(user);
@@ -40,7 +38,6 @@ public class AuthService {
 
     // 닉네임 중복 체크: 해당 nickname이 이미 존재하면 false, 아니면 true 반환
     public boolean checkNicknameAvailable(String nickname) {
-        // UserMapper에 selectByNickname 메서드가 구현되어 있어야 합니다.
         User user = userMapper.selectByNickname(nickname);
         return user == null;
     }
