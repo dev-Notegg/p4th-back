@@ -2,6 +2,7 @@ package com.p4th.backend.controller;
 
 import com.p4th.backend.common.exception.ErrorResponse;
 import com.p4th.backend.domain.User;
+import com.p4th.backend.common.CommonResponse;
 import com.p4th.backend.dto.SignupRequestDto;
 import com.p4th.backend.service.AuthService;
 import com.p4th.backend.service.AuthService.RefreshTokenResult;
@@ -17,7 +18,6 @@ import jakarta.validation.Valid;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -35,7 +35,7 @@ public class AuthController {
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @PostMapping("/signup")
-    public SignUpResponse signUp(@RequestBody SignupRequestDto request) {
+    public CommonResponse<SignUpResponse> signUp(@RequestBody SignupRequestDto request) {
         User user = new User();
         user.setLoginId(request.getLoginId());
         user.setPassword(request.getPassword());
@@ -44,7 +44,7 @@ public class AuthController {
         SignUpResponse response = new SignUpResponse();
         response.setLoginId(result.getLoginId());
         response.setPassCode(result.getPassCode());
-        return response;
+        return CommonResponse.success(response);
     }
 
     @Operation(summary = "아이디 중복 확인", description = "전달된 loginId를 기반으로 중복 여부를 확인한다.")
@@ -53,11 +53,11 @@ public class AuthController {
                     content = @Content(schema = @Schema(implementation = CheckResponse.class)))
     })
     @GetMapping("/check-login-id")
-    public CheckResponse checkLoginId(@RequestParam String loginId) {
+    public CommonResponse<CheckResponse> checkLoginId(@RequestParam String loginId) {
         boolean available = authService.checkLoginIdAvailable(loginId);
         CheckResponse response = new CheckResponse();
         response.setAvailable(available);
-        return response;
+        return CommonResponse.success(response);
     }
 
     @Operation(summary = "닉네임 중복 확인", description = "전달된 nickname을 기반으로 중복 여부를 확인한다.")
@@ -66,11 +66,11 @@ public class AuthController {
                     content = @Content(schema = @Schema(implementation = CheckResponse.class)))
     })
     @GetMapping("/check-nickname")
-    public CheckResponse checkNickname(@RequestParam String nickname) {
+    public CommonResponse<CheckResponse> checkNickname(@RequestParam String nickname) {
         boolean available = authService.checkNicknameAvailable(nickname);
         CheckResponse response = new CheckResponse();
         response.setAvailable(available);
-        return response;
+        return CommonResponse.success(response);
     }
 
     @Operation(summary = "로그인", description = "로그인 시, 요청 본문에 로그인ID와 비밀번호를 담아 전송하며, 성공 시 엑세스 토큰, 리프레쉬 토큰 및 사용자 정보를 반환한다.")
@@ -81,15 +81,15 @@ public class AuthController {
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @PostMapping("/login")
-    public LoginResponse login(@RequestBody LoginRequest requestDto,
-                               HttpServletRequest request) {
+    public CommonResponse<LoginResponse> login(@RequestBody LoginRequest requestDto,
+                                               HttpServletRequest request) {
         User user = authService.login(requestDto.getLoginId(), requestDto.getPassword(), request.getRemoteAddr());
         LoginResponse response = new LoginResponse();
         response.setUserId(user.getUserId());
         response.setLoginId(user.getLoginId());
         response.setAccessToken(user.getAccessToken());
         response.setRefreshToken(user.getRefreshToken());
-        return response;
+        return CommonResponse.success(response);
     }
 
     @Operation(summary = "아이디 찾기", description = "패쓰코드를 입력받아 해당 사용자의 로그인 아이디를 반환하는 API이다.")
@@ -100,11 +100,11 @@ public class AuthController {
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @PostMapping("/find-id")
-    public FindIdResponse findId(@RequestBody FindIdRequest request) {
+    public CommonResponse<FindIdResponse> findId(@RequestBody FindIdRequest request) {
         String loginId = authService.findId(request.getPassCode());
         FindIdResponse response = new FindIdResponse();
         response.setLoginId(loginId);
-        return response;
+        return CommonResponse.success(response);
     }
 
     @Operation(summary = "비밀번호 찾기", description = "아이디와 패쓰코드를 입력받아 임시 비밀번호를 발급하는 API이다.")
@@ -115,14 +115,14 @@ public class AuthController {
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @PostMapping("/find-password")
-    public FindPasswordResponse findPassword(@RequestBody FindPasswordRequest request) {
+    public CommonResponse<FindPasswordResponse> findPassword(@RequestBody FindPasswordRequest request) {
         String tempPassword = authService.findPassword(request.getLoginId(), request.getPassCode());
         FindPasswordResponse response = new FindPasswordResponse();
         response.setPassword(tempPassword);
-        return response;
+        return CommonResponse.success(response);
     }
 
-    @Operation(summary = "토큰 갱신", description = "로그인 시 받은 리프레쉬 토큰을 페이로드에서 추출한 회원 ID를 사용하여 새로운 엑세스 토큰과 (필요 시) 리프레쉬 토큰을 발급하는 API이다.")
+    @Operation(summary = "토큰 갱신", description = "리프레쉬 토큰을 사용하여 새로운 엑세스 토큰(및 필요시 리프레쉬 토큰)을 발급하는 API이다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "토큰 갱신 성공",
                     content = @Content(schema = @Schema(implementation = RefreshTokenResponse.class))),
@@ -132,15 +132,14 @@ public class AuthController {
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @PostMapping("/v1/token")
-    public ResponseEntity<RefreshTokenResponse> updateToken(@Valid @RequestBody RefreshTokenRequest request) {
-        // 리프레쉬 토큰의 페이로드에서 회원 ID 추출
+    public CommonResponse<RefreshTokenResponse> updateToken(@Valid @RequestBody RefreshTokenRequest request) {
         String memberId = jwtProvider.getUserIdFromToken(request.getRefreshToken());
         RefreshTokenResult result = authService.refreshTokenForMember(memberId, request.getRefreshToken());
         RefreshTokenResponse response = new RefreshTokenResponse();
         response.setAccessToken(result.getAccessToken());
         response.setRefreshToken(result.getRefreshToken());
         response.setUser(new UserDto(result.getUser()));
-        return ResponseEntity.ok(response);
+        return CommonResponse.success(response);
     }
 
     // --------------------- 내부 DTO 클래스 ---------------------

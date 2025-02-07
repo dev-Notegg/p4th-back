@@ -11,7 +11,13 @@ public enum ErrorCode {
     INVALID_PASSCODE(HttpStatus.BAD_REQUEST, 10204, "패쓰코드가 올바르지 않습니다."),
 
     // JWT, 인증 관련
-    AUTHENTICATION_FAILED(HttpStatus.UNAUTHORIZED, 10100, "인증에 실패하였습니다.");
+    AUTHENTICATION_FAILED(HttpStatus.UNAUTHORIZED, 10100, "인증에 실패하였습니다."),
+
+    // S3 업로드 실패
+    S3_UPLOAD_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, 50100, "S3 업로드에 실패하였습니다."),
+
+    // 내부 서버 오류 (일반적인 처리)
+    INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, 50000, "내부 서버 오류가 발생하였습니다.");
 
     private final HttpStatus httpStatus;
     private final int code;
