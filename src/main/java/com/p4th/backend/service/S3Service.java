@@ -71,7 +71,7 @@ public class S3Service {
      * S3 URL을 CDN URL로 변환
      */
     public String convertCdnUrl(String url) {
-        return url.replace("p4th.kr.object.ncloudstorage.com", "4pth.gcdn.ntruss.com");
+        return url.replace("p4th.kr.object.ncloudstorage.com", "p4th.gcdn.ntruss.com");
     }
 
     /**
@@ -83,16 +83,12 @@ public class S3Service {
 
         // CDN URL이 저장되어 있다면, S3의 원본 도메인으로 변환
         String originalUrl = fileUrl;
-        if (fileUrl.contains("4pth.gcdn.ntruss.com")) {
-            originalUrl = fileUrl.replace("4pth.gcdn.ntruss.com", "4pth.kr.object.ncloudstorage.com");
+        if (fileUrl.contains("p4th.gcdn.ntruss.com")) {
+            originalUrl = fileUrl.replace("p4th.gcdn.ntruss.com", "p4th.kr.object.ncloudstorage.com");
         }
 
-        // S3의 원본 URL 형식: "https://kr.object.ncloudstorage.com/{bucket}/..."
+        // S3의 원본 URL 형식: "https://p4th.kr.object.ncloudstorage.com/{bucket}/..."
         String prefix = s3Config.getEndPoint() + "/" + s3Config.getBucketName() + "/";
-        if (!originalUrl.startsWith(prefix)) {
-            throw new IllegalArgumentException("URL 형식이 올바르지 않습니다: " + originalUrl);
-        }
-
         String key = originalUrl.substring(prefix.length());
         amazonS3.deleteObject(s3Config.getBucketName(), key);
     }
