@@ -11,13 +11,10 @@ import com.p4th.backend.mapper.UserMapper;
 import com.p4th.backend.dto.PageResponse;
 import com.p4th.backend.common.exception.CustomException;
 import com.p4th.backend.common.exception.ErrorCode;
-import com.amazonaws.services.s3.AmazonS3;
-import com.p4th.backend.config.S3Config;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 
@@ -29,8 +26,7 @@ public class PostService {
     private final PostAttachmentMapper postAttachmentMapper;
     private final CommentMapper commentMapper;
     private final UserMapper userMapper;
-    private final AmazonS3 amazonS3;
-    private final S3Config s3Config;
+    private final S3Service s3Service;
 
     public PageResponse<Post> getPostsByBoard(String boardId, int page, int size) {
         int offset = page * size;
@@ -60,8 +56,8 @@ public class PostService {
 
     /**
      * 게시글 작성 및 첨부파일 업로드를 한 번에 처리한다.
-     * 작성 시, 사용자 정보(UserMapper를 이용해 조회)에서 loginId를 가져와 저장하고,
-     * created_by, updated_by 필드에 사용자 ID(user_info.userId)를 설정한다.
+     * 작성 시, UserMapper를 이용해 사용자 정보를 조회하여 loginId를 설정하고,
+     * created_by, updated_by 필드에 user_info.userId를 설정한다.
      *
      * @param boardId     게시판 ID
      * @param userId      작성자 ID (user_info.userId)
@@ -83,11 +79,9 @@ public class PostService {
         post.setPostId(postId);
         post.setBoardId(boardId);
         post.setUserId(userId);
-        post.setLoginId(user.getLoginId());  // user_info.login_id 사용
+        post.setLoginId(user.getLoginId());
         post.setTitle(title);
         post.setContent(content);
-        post.setCreatedBy(user.getUserId());
-        post.setUpdatedBy(user.getUserId());
         int inserted = postMapper.insertPost(post);
         if (inserted != 1) {
             throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR, "게시글 등록 실패");
@@ -96,13 +90,9 @@ public class PostService {
         if (attachments != null && !attachments.isEmpty()) {
             for (MultipartFile file : attachments) {
                 String attachmentId = UUID.randomUUID().toString();
-                String key = "posts/" + postId + "/" + attachmentId + "_" + file.getOriginalFilename();
-                try {
-                    amazonS3.putObject(s3Config.getBucketName(), key, file.getInputStream(), null);
-                } catch (IOException e) {
-                    throw new CustomException(ErrorCode.S3_UPLOAD_FAILED, e.getMessage());
-                }
-                String fileUrl = s3Config.getEndPoint() + "/" + s3Config.getBucketName() + "/" + key;
+                String keyDir = "posts/" + postId; // posts 폴더 내에 postId 폴더 생성
+                String fileName = attachmentId + "_" + file.getOriginalFilename();
+                String fileUrl = s3Service.upload(file, keyDir, fileName);
                 PostAttachment attachment = new PostAttachment();
                 attachment.setAttachmentId(attachmentId);
                 attachment.setPostId(postId);
@@ -121,8 +111,8 @@ public class PostService {
     }
 
     /**
-     * 게시글 수정 시, 게시글 본문 업데이트와 함께 첨부파일 목록 전체를 새롭게 등록한다.
-     * 즉, 기존 첨부파일은 모두 삭제하고, 클라이언트가 전송한 첨부파일 목록으로 교체한다.
+     * 게시글 수정 시, 게시글 본문 업데이트와 함께 기존 첨부파일을 모두 삭제한 후,
+     * 클라이언트가 전송한 첨부파일 목록으로 교체한다.
      *
      * @param postId         수정할 게시글 ID
      * @param request        수정 요청 DTO (boardId, userId, title, content 포함)
@@ -147,10 +137,7 @@ public class PostService {
         List<PostAttachment> existingAttachments = postAttachmentMapper.getAttachmentsByPost(postId);
         if (existingAttachments != null && !existingAttachments.isEmpty()) {
             for (PostAttachment attachment : existingAttachments) {
-                String fileUrl = attachment.getFileUrl();
-                String prefix = s3Config.getEndPoint() + "/" + s3Config.getBucketName() + "/";
-                String key = fileUrl.substring(prefix.length());
-                amazonS3.deleteObject(s3Config.getBucketName(), key);
+                s3Service.deleteByFileUrl(attachment.getFileUrl());
                 int deleted = postAttachmentMapper.deleteAttachment(attachment.getAttachmentId());
                 if (deleted != 1) {
                     throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR, "기존 첨부파일 삭제 실패");
@@ -161,14 +148,9 @@ public class PostService {
         if (newAttachments != null && !newAttachments.isEmpty()) {
             for (MultipartFile file : newAttachments) {
                 String attachmentId = UUID.randomUUID().toString();
-                String folder = "posts/";
-                String key = folder + postId + "/" + attachmentId + "_" + file.getOriginalFilename();
-                try {
-                    amazonS3.putObject(s3Config.getBucketName(), key, file.getInputStream(), null);
-                } catch (IOException e) {
-                    throw new CustomException(ErrorCode.S3_UPLOAD_FAILED, e.getMessage());
-                }
-                String fileUrl = s3Config.getEndPoint() + "/" + s3Config.getBucketName() + "/" + key;
+                String keyDir = "posts/" + postId;
+                String fileName = attachmentId + "_" + file.getOriginalFilename();
+                String fileUrl = s3Service.upload(file, keyDir, fileName);
                 PostAttachment attachment = new PostAttachment();
                 attachment.setAttachmentId(attachmentId);
                 attachment.setPostId(postId);
@@ -186,14 +168,11 @@ public class PostService {
     }
 
     public void deletePost(String postId) {
-        // 게시글 삭제 시, 관련 첨부파일도 모두 삭제 처리
+        // 게시글 삭제 시, 관련 첨부파일 모두 삭제 처리
         List<PostAttachment> attachments = postAttachmentMapper.getAttachmentsByPost(postId);
         if (attachments != null && !attachments.isEmpty()) {
             for (PostAttachment attachment : attachments) {
-                String fileUrl = attachment.getFileUrl();
-                String prefix = s3Config.getEndPoint() + "/" + s3Config.getBucketName() + "/";
-                String key = fileUrl.substring(prefix.length());
-                amazonS3.deleteObject(s3Config.getBucketName(), key);
+                s3Service.deleteByFileUrl(attachment.getFileUrl());
                 int deleted = postAttachmentMapper.deleteAttachment(attachment.getAttachmentId());
                 if (deleted != 1) {
                     throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR, "첨부파일 삭제 실패");
