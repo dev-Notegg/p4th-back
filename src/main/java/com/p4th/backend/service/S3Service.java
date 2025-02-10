@@ -84,7 +84,7 @@ public class S3Service {
         // CDN URL이 저장되어 있다면, S3의 원본 도메인으로 변환
         String originalUrl = fileUrl;
         if (fileUrl.contains("4pth.gcdn.ntruss.com")) {
-            originalUrl = fileUrl.replace("4pth.gcdn.ntruss.com", "kr.object.ncloudstorage.com");
+            originalUrl = fileUrl.replace("4pth.gcdn.ntruss.com", "4pth.kr.object.ncloudstorage.com");
         }
 
         // S3의 원본 URL 형식: "https://kr.object.ncloudstorage.com/{bucket}/..."
