@@ -5,7 +5,7 @@
 <mapper namespace="com.p4th.backend.mapper.PostMapper">
 
     <select id="getPostsByBoard" resultType="com.p4th.backend.domain.Post">
-        SELECT post_id, board_id, user_id, writer_login_id, title, content, view_count, comment_count, created_at
+        SELECT post_id, board_id, user_id, login_id, title, content, view_count, comment_count, created_at
         FROM post
         WHERE board_id = #{boardId}
         ORDER BY created_at DESC
@@ -18,21 +18,22 @@
     </select>
 
     <select id="getPostDetail" resultType="com.p4th.backend.domain.Post">
-        SELECT post_id, board_id, user_id, writer_login_id, title, content, view_count, comment_count, created_at
+        SELECT post_id, board_id, user_id, login_id, title, content, view_count, comment_count, created_at
         FROM post
         WHERE post_id = #{postId}
     </select>
 
     <insert id="insertPost">
-        INSERT INTO post (post_id, board_id, user_id, writer_login_id, title, content)
-        VALUES (#{postId}, #{boardId}, #{userId}, #{writerLoginId}, #{title}, #{content})
+        INSERT INTO post (post_id, board_id, user_id, login_id, title, content, created_by)
+        VALUES (#{postId}, #{boardId}, #{userId}, #{loginId}, #{title}, #{content}, #{userId})
     </insert>
 
     <update id="updatePost">
         UPDATE post
         SET board_id = #{boardId},
             title = #{title},
-            content = #{content}
+            content = #{content},
+            updated_by = #{userId}
         WHERE post_id = #{postId}
     </update>
 

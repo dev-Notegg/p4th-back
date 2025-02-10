@@ -10,8 +10,8 @@
     </select>
 
     <insert id="insertAttachment">
-        INSERT INTO post_attachment (attachment_id, post_id, file_name, file_url, attach_type, file_size)
-        VALUES (#{attachmentId}, #{postId}, #{fileName}, #{fileUrl}, #{attachType}, #{fileSize})
+        INSERT INTO post_attachment (attachment_id, post_id, file_name, file_url, attach_type, file_size, created_by)
+        VALUES (#{attachmentId}, #{postId}, #{fileName}, #{fileUrl}, #{attachType}, #{fileSize}, #{createdBy})
     </insert>
 
     <delete id="deleteAttachment">

@@ -23,7 +23,7 @@
                 #{password},
                 #{nickname},
                 #{passCode},
-                #{loginId}
+                #{userId}
             )
     </insert>
 
@@ -90,7 +90,8 @@
         UPDATE user_info
         SET
             access_token = #{accessToken},
-            refresh_token = #{refreshToken}
+            refresh_token = #{refreshToken},
+            updated_by = 'system'
         WHERE user_id = #{userId}
     </update>
 
@@ -99,7 +100,8 @@
         UPDATE user_info
         SET
             last_login_ip = #{lastLoginIp},
-            last_login_at = NOW()
+            last_login_at = NOW(),
+            updated_by = #{userId}
         WHERE user_id = #{userId}
     </update>
 
@@ -107,7 +109,8 @@
     <update id="updatePassword">
         UPDATE user_info
         SET
-            password = #{password}
+            password = #{password},
+            updated_by = #{userId}
         WHERE user_id = #{userId}
     </update>
 

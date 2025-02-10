@@ -13,4 +13,6 @@ public class Category {
     private int mainExposure;
     private int isNotice;
     private List<Board> boards;
+    private String createdBy;
+    private String updatedBy;
 }

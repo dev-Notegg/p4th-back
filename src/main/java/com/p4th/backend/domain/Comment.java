@@ -12,5 +12,6 @@ public class Comment {
     private String userId;
     private String content;
     private String loginId;
-    private String createdAt;
+    private String createdBy;
+    private String updatedBy;
 }

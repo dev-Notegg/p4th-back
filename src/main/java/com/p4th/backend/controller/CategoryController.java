@@ -2,7 +2,6 @@ package com.p4th.backend.controller;
 
 import com.p4th.backend.common.exception.ErrorResponse;
 import com.p4th.backend.domain.Category;
-import com.p4th.backend.common.CommonResponse;
 import com.p4th.backend.service.CategoryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -11,6 +10,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -30,9 +30,9 @@ public class CategoryController {
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @GetMapping
-    public CommonResponse<List<Category>> getAllCategories() {
+    public ResponseEntity<List<Category>> getAllCategories() {
         List<Category> categories = categoryService.getAllCategories();
-        return CommonResponse.success(categories);
+        return ResponseEntity.ok().body(categories);
     }
 
     @Operation(summary = "특정 카테고리에 속한 게시판 목록 조회", description = "특정 카테고리 ID를 입력받아 해당 카테고리 정보와 게시판 목록을 반환합니다.")
@@ -42,8 +42,8 @@ public class CategoryController {
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @GetMapping("/{categoryId}/boards")
-    public CommonResponse<Category> getBoardsByCategory(@PathVariable String categoryId) {
+    public ResponseEntity<Category> getBoardsByCategory(@PathVariable String categoryId) {
         Category category = categoryService.getBoardsByCategory(categoryId);
-        return CommonResponse.success(category);
+        return ResponseEntity.ok().body(category);
     }
 }

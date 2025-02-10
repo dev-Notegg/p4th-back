@@ -1,7 +1,6 @@
 package com.p4th.backend.controller;
 
 import com.p4th.backend.domain.Post;
-import com.p4th.backend.common.CommonResponse;
 import com.p4th.backend.dto.PageResponse;
 import com.p4th.backend.service.PostService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -12,6 +11,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
@@ -31,12 +31,12 @@ public class PostController {
                     content = @Content(schema = @Schema(implementation = com.p4th.backend.dto.ErrorResponse.class)))
     })
     @GetMapping
-    public CommonResponse<PageResponse<Post>> getPostsByBoard(
+    public ResponseEntity<PageResponse<Post>> getPostsByBoard(
             @RequestParam("board_id") String boardId,
             @RequestParam int page,
             @RequestParam int size) {
         PageResponse<Post> result = postService.getPostsByBoard(boardId, page, size);
-        return CommonResponse.success(result);
+        return ResponseEntity.ok().body(result);
     }
 
     @Operation(summary = "게시글 상세 조회", description = "postId를 입력받아 게시글 상세 정보를 조회합니다.")
@@ -46,9 +46,9 @@ public class PostController {
                     content = @Content(schema = @Schema(implementation = com.p4th.backend.dto.ErrorResponse.class)))
     })
     @GetMapping("/{postId}")
-    public CommonResponse<Post> getPostDetail(@PathVariable("postId") String postId) {
+    public ResponseEntity<Post> getPostDetail(@PathVariable("postId") String postId) {
         Post post = postService.getPostDetail(postId);
-        return CommonResponse.success(post);
+        return ResponseEntity.ok().body(post);
     }
 
     @Operation(summary = "게시글 등록(첨부파일 포함)", description = "게시글 작성 및 첨부파일 업로드를 한 번에 처리합니다. 게시글 생성 후 생성된 게시글 ID를 반환합니다.")
@@ -58,7 +58,7 @@ public class PostController {
                     content = @Content(schema = @Schema(implementation = com.p4th.backend.dto.ErrorResponse.class)))
     })
     @PostMapping(value = "/register", consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
-    public CommonResponse<CreatePostResponse> registerPost(
+    public ResponseEntity<CreatePostResponse> registerPost(
             @RequestParam String boardId,
             @RequestParam String userId,
             @RequestParam String title,
@@ -66,7 +66,7 @@ public class PostController {
             @RequestPart(value = "files", required = false) List<MultipartFile> files) {
         String postId = postService.registerPostWithAttachments(boardId, userId, title, content, files);
         CreatePostResponse response = new CreatePostResponse(postId);
-        return CommonResponse.success(response);
+        return ResponseEntity.ok().body(response);
     }
 
     @Operation(summary = "게시글 수정(첨부파일 포함)", description = "게시글 수정 API. 본문 수정과 함께 신규 첨부파일 추가 및 삭제할 첨부파일 ID 목록을 전달하여 업데이트합니다.")
@@ -76,7 +76,7 @@ public class PostController {
                     content = @Content(schema = @Schema(implementation = com.p4th.backend.dto.ErrorResponse.class)))
     })
     @PutMapping(value = "/with-attachments/{postId}", consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
-    public CommonResponse<UpdatePostResponse> updatePostWithAttachments(
+    public ResponseEntity<UpdatePostResponse> updatePostWithAttachments(
             @PathVariable("postId") String postId,
             @RequestParam String boardId,
             @RequestParam String userId,
@@ -91,7 +91,7 @@ public class PostController {
         updateRequest.setContent(content);
         postService.updatePostWithAttachments(postId, updateRequest, newFiles, removeAttachmentIds);
         UpdatePostResponse response = new UpdatePostResponse(postId);
-        return CommonResponse.success(response);
+        return ResponseEntity.ok().body(response);
     }
 
     @Operation(summary = "게시글 삭제", description = "게시글 삭제 API")
@@ -101,10 +101,10 @@ public class PostController {
                     content = @Content(schema = @Schema(implementation = com.p4th.backend.dto.ErrorResponse.class)))
     })
     @DeleteMapping("/{postId}")
-    public CommonResponse<DeletePostResponse> deletePost(@PathVariable("postId") String postId) {
+    public ResponseEntity<DeletePostResponse> deletePost(@PathVariable("postId") String postId) {
         postService.deletePost(postId);
         DeletePostResponse response = new DeletePostResponse(true);
-        return CommonResponse.success(response);
+        return ResponseEntity.ok().body(response);
     }
 
     // 내부 DTO 클래스

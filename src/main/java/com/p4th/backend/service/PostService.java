@@ -3,9 +3,11 @@ package com.p4th.backend.service;
 import com.p4th.backend.controller.PostController;
 import com.p4th.backend.domain.Post;
 import com.p4th.backend.domain.PostAttachment;
+import com.p4th.backend.domain.User;
 import com.p4th.backend.mapper.CommentMapper;
 import com.p4th.backend.mapper.PostAttachmentMapper;
 import com.p4th.backend.mapper.PostMapper;
+import com.p4th.backend.mapper.UserMapper;
 import com.p4th.backend.dto.PageResponse;
 import com.p4th.backend.common.exception.CustomException;
 import com.p4th.backend.common.exception.ErrorCode;
@@ -27,6 +29,7 @@ public class PostService {
     private final PostMapper postMapper;
     private final PostAttachmentMapper postAttachmentMapper;
     private final CommentMapper commentMapper;
+    private final UserMapper userMapper;
     private final AmazonS3 amazonS3;
     private final S3Config s3Config;
 
@@ -60,7 +63,7 @@ public class PostService {
      * 게시글 작성 및 첨부파일 업로드를 한 번에 처리한다.
      *
      * @param boardId     게시판 ID
-     * @param userId      작성자 ID
+     * @param userId      작성자 ID (user_info.userId)
      * @param title       게시글 제목
      * @param content     게시글 내용
      * @param attachments 첨부파일 목록 (없을 수 있음)
@@ -68,13 +71,18 @@ public class PostService {
      */
     @Transactional
     public String registerPostWithAttachments(String boardId, String userId, String title, String content, List<MultipartFile> attachments) {
+        // 사용자 정보 조회
+        User user = userMapper.selectByUserId(userId);
+        if(user == null) {
+            throw new CustomException(ErrorCode.USER_NOT_FOUND, "사용자 정보를 찾을 수 없습니다.");
+        }
         // 게시글 생성
         Post post = new Post();
         String postId = UUID.randomUUID().toString();
         post.setPostId(postId);
         post.setBoardId(boardId);
         post.setUserId(userId);
-        post.setWriterLoginId(userId); // 실제 사용자 정보에 따라 수정 가능
+        post.setLoginId(user.getLoginId());
         post.setTitle(title);
         post.setContent(content);
         int inserted = postMapper.insertPost(post);
@@ -99,6 +107,7 @@ public class PostService {
                 attachment.setFileUrl(fileUrl);
                 attachment.setAttachType("IMAGE");
                 attachment.setFileSize(file.getSize());
+                attachment.setCreatedBy(userId);
                 int insertedAttachment = postAttachmentMapper.insertAttachment(attachment);
                 if (insertedAttachment != 1) {
                     throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR, "첨부파일 등록 실패");
@@ -170,6 +179,7 @@ public class PostService {
                 attachment.setFileUrl(fileUrl);
                 attachment.setAttachType("IMAGE");
                 attachment.setFileSize(file.getSize());
+                attachment.setCreatedBy(request.getUserId());
                 int insertedAttachment = postAttachmentMapper.insertAttachment(attachment);
                 if (insertedAttachment != 1) {
                     throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR, "새 첨부파일 등록 실패");

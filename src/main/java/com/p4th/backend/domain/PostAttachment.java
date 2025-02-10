@@ -12,4 +12,6 @@ public class PostAttachment {
     private String fileUrl;
     private String attachType;
     private long fileSize;
+    private String createdBy;
+    private String updatedBy;
 }

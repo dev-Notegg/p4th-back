@@ -11,4 +11,6 @@ public class Board {
     private String boardName;
     private int boardLevel;
     private int sortOrder;
+    private String createdBy;
+    private String updatedBy;
 }
