@@ -180,8 +180,13 @@ public class PostService {
         if (existing == null) {
             throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR, "게시글을 찾을 수 없습니다.");
         }
+        // 본인 작성 여부 확인
         if (!existing.getUserId().equals(requesterUserId)) {
-            throw new CustomException(ErrorCode.UNAUTHORIZED_ACCESS, "본인이 작성한 게시글만 삭제할 수 있습니다.");
+            // 본인이 작성한 게시글이 아니라면, 요청자가 관리자(admin_role == 1)인지 확인
+            User requester = userMapper.selectByUserId(requesterUserId);
+            if (requester == null || requester.getAdminRole() != 1) {
+                throw new CustomException(ErrorCode.UNAUTHORIZED_ACCESS, "본인이 작성한 게시글만 삭제할 수 있습니다.");
+            }
         }
         List<PostAttachment> attachments = postAttachmentMapper.getAttachmentsByPost(postId);
         if (attachments != null && !attachments.isEmpty()) {

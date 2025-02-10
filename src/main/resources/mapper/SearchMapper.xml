@@ -8,6 +8,7 @@
             p.post_id AS postId,
             p.board_id AS boardId,
             p.user_id AS userId,
+            u.nickname AS nickname,
             p.title AS title,
             c.category_name AS category,
             b.board_name AS boardName,
@@ -19,7 +20,10 @@
         FROM post p
                  LEFT JOIN board b ON p.board_id = b.board_id
                  LEFT JOIN category c ON b.category_id = c.category_id
-        WHERE p.title LIKE #{query} OR p.content LIKE #{query} OR p.user_id LIKE #{query}
+                 LEFT JOIN user_info u ON p.user_id = u.user_id
+        WHERE p.title LIKE #{query}
+           OR p.content LIKE #{query}
+           OR u.nickname LIKE #{query}
         ORDER BY p.created_at DESC
     </select>
 </mapper>
