@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.p4th.backend.mapper.BannerMapper">
+
+    <select id="getBanners" resultType="com.p4th.backend.domain.Banner">
+        SELECT
+            banner_id,
+            banner_name,
+            image_url,
+            link_url,
+            display_yn,
+            seq,
+            start_date,
+            end_date
+        FROM banner
+        ORDER BY seq
+    </select>
+
+</mapper>

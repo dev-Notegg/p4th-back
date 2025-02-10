@@ -48,7 +48,10 @@ public class PostService {
         return response;
     }
 
+    @Transactional
     public Post getPostDetail(String postId) {
+        // 조회수 1증가
+        postMapper.incrementViewCount(postId);
         Post post = postMapper.getPostDetail(postId);
         if (post != null) {
             post.setAttachments(postAttachmentMapper.getAttachmentsByPost(postId));
@@ -79,7 +82,7 @@ public class PostService {
         // 게시글 생성
         Post post = new Post();
         String postId = ULIDUtil.getULID();
-        post.setPostId(ULIDUtil.getULID());
+        post.setPostId(postId);
         post.setBoardId(boardId);
         post.setUserId(userId);
         post.setTitle(title);
@@ -180,13 +183,10 @@ public class PostService {
         if (existing == null) {
             throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR, "게시글을 찾을 수 없습니다.");
         }
-        // 본인 작성 여부 확인
-        if (!existing.getUserId().equals(requesterUserId)) {
-            // 본인이 작성한 게시글이 아니라면, 요청자가 관리자(admin_role == 1)인지 확인
-            User requester = userMapper.selectByUserId(requesterUserId);
-            if (requester == null || requester.getAdminRole() != 1) {
-                throw new CustomException(ErrorCode.UNAUTHORIZED_ACCESS, "본인이 작성한 게시글만 삭제할 수 있습니다.");
-            }
+        // 관리자 권한(예: admin_role == 1)이거나 본인 게시글일 때 삭제 가능
+        User requester = userMapper.selectByUserId(requesterUserId);
+        if (!existing.getUserId().equals(requesterUserId) && (requester == null || requester.getAdminRole() != 1)) {
+            throw new CustomException(ErrorCode.UNAUTHORIZED_ACCESS, "본인이 작성한 게시글만 삭제할 수 있습니다.");
         }
         List<PostAttachment> attachments = postAttachmentMapper.getAttachmentsByPost(postId);
         if (attachments != null && !attachments.isEmpty()) {

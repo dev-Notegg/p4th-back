@@ -7,6 +7,7 @@ public class PopularPostResponse {
     private String postId;
     private String boardId;
     private String userId;
+    private String nickname;
     private String title;
     private String category; // 카테고리명
     private String boardName; // 게시판명

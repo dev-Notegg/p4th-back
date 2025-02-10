@@ -22,4 +22,6 @@ public interface PostMapper {
     int deletePost(@Param("postId") String postId);
 
     List<Post> getAllPosts();
+
+    void incrementViewCount(String postId);
 }
