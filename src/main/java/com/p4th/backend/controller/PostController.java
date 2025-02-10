@@ -69,7 +69,7 @@ public class PostController {
         return ResponseEntity.ok().body(response);
     }
 
-    @Operation(summary = "게시글 수정(첨부파일 포함)", description = "게시글 수정 API. 본문 수정과 함께 신규 첨부파일 추가 및 삭제할 첨부파일 ID 목록을 전달하여 업데이트합니다.")
+    @Operation(summary = "게시글 수정(첨부파일 포함)", description = "게시글 수정 API. 본문 수정과 함께 첨부파일 목록을 전송하면, 기존 첨부파일은 모두 삭제되고 신규 첨부파일로 교체됩니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "게시글 수정 성공"),
             @ApiResponse(responseCode = "400", description = "입력 데이터 오류",
@@ -82,14 +82,9 @@ public class PostController {
             @RequestParam String userId,
             @RequestParam String title,
             @RequestParam String content,
-            @RequestPart(value = "newFiles", required = false) List<MultipartFile> newFiles,
-            @RequestParam(value = "removeAttachmentIds", required = false) List<String> removeAttachmentIds) {
-        PostController.UpdatePostRequest updateRequest = new PostController.UpdatePostRequest();
-        updateRequest.setBoardId(boardId);
-        updateRequest.setUserId(userId);
-        updateRequest.setTitle(title);
-        updateRequest.setContent(content);
-        postService.updatePostWithAttachments(postId, updateRequest, newFiles, removeAttachmentIds);
+            @RequestPart(value = "newFiles", required = false) List<MultipartFile> newFiles) {
+        // 클라이언트는 기존 첨부파일 구분 없이, 신규 첨부파일 목록만 전송한다.
+        postService.updatePostWithAttachments(postId, new PostController.UpdatePostRequest(boardId, userId, title, content), newFiles);
         UpdatePostResponse response = new UpdatePostResponse(postId);
         return ResponseEntity.ok().body(response);
     }
@@ -122,6 +117,13 @@ public class PostController {
         private String userId;
         private String title;
         private String content;
+
+        public UpdatePostRequest(String boardId, String userId, String title, String content) {
+            this.boardId = boardId;
+            this.userId = userId;
+            this.title = title;
+            this.content = content;
+        }
     }
 
     @lombok.Data
