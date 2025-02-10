@@ -55,13 +55,13 @@ public class PostController {
         return ResponseEntity.ok().body(post);
     }
 
-    @Operation(summary = "게시글 등록(첨부파일 포함)", description = "게시글 작성 및 첨부파일 업로드를 한 번에 처리합니다. 토큰에서 회원ID를 추출하여 사용합니다.")
+    @Operation(summary = "게시글 등록", description = "게시글 작성 및 첨부파일 업로드를 한 번에 처리합니다. 토큰에서 회원ID를 추출하여 사용합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "게시글 등록 성공"),
             @ApiResponse(responseCode = "400", description = "입력 데이터 오류",
                     content = @Content(schema = @Schema(implementation = com.p4th.backend.dto.ErrorResponse.class)))
     })
-    @PostMapping(value = "/register", consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
+    @PostMapping(consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
     public ResponseEntity<CreatePostResponse> registerPost(
             @RequestParam String boardId,
             @RequestParam String title,
@@ -74,7 +74,7 @@ public class PostController {
         return ResponseEntity.ok().body(response);
     }
 
-    @Operation(summary = "게시글 수정(첨부파일 포함)", description = "게시글 수정 API. 토큰의 회원ID와 게시글 작성자가 일치해야 수정 가능합니다. 기존 첨부파일은 모두 삭제되고, 신규 첨부파일로 교체됩니다.")
+    @Operation(summary = "게시글 수정", description = "게시글 수정 API. 토큰의 회원ID와 게시글 작성자가 일치해야 수정 가능합니다. 기존 첨부파일은 모두 삭제되고, 신규 첨부파일로 교체됩니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "게시글 수정 성공"),
             @ApiResponse(responseCode = "400", description = "입력 데이터 오류",
@@ -82,7 +82,7 @@ public class PostController {
             @ApiResponse(responseCode = "403", description = "권한이 없습니다.",
                     content = @Content(schema = @Schema(implementation = com.p4th.backend.dto.ErrorResponse.class)))
     })
-    @PutMapping(value = "/with-attachments/{postId}", consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
+    @PutMapping(value = "/{postId}", consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
     public ResponseEntity<UpdatePostResponse> updatePostWithAttachments(
             @PathVariable("postId") String postId,
             @RequestParam String boardId,

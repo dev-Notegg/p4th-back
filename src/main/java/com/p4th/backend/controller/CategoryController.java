@@ -34,16 +34,4 @@ public class CategoryController {
         List<Category> categories = categoryService.getAllCategories();
         return ResponseEntity.ok().body(categories);
     }
-
-    @Operation(summary = "특정 카테고리에 속한 게시판 목록 조회", description = "특정 카테고리 ID를 입력받아 해당 카테고리 정보와 게시판 목록을 반환합니다.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "카테고리 내 게시판 조회 성공"),
-            @ApiResponse(responseCode = "400", description = "입력 데이터 오류 또는 기타 문제",
-                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
-    })
-    @GetMapping("/{categoryId}/boards")
-    public ResponseEntity<Category> getBoardsByCategory(@PathVariable String categoryId) {
-        Category category = categoryService.getBoardsByCategory(categoryId);
-        return ResponseEntity.ok().body(category);
-    }
 }
