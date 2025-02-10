@@ -71,7 +71,7 @@ public class S3Service {
      * S3 URL을 CDN URL로 변환
      */
     public String convertCdnUrl(String url) {
-        return url.replace("kr.object.ncloudstorage.com", "4pth.gcdn.ntruss.com");
+        return url.replace("p4th.kr.object.ncloudstorage.com", "4pth.gcdn.ntruss.com");
     }
 
     /**
