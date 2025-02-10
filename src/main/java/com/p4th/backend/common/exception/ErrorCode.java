@@ -16,8 +16,11 @@ public enum ErrorCode {
     // S3 업로드 실패
     S3_UPLOAD_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, 50100, "S3 업로드에 실패하였습니다."),
 
-    // 내부 서버 오류 (일반적인 처리)
-    INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, 50000, "내부 서버 오류가 발생하였습니다.");
+    // 내부 서버 오류
+    INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, 50000, "내부 서버 오류가 발생하였습니다."),
+
+    // 권한 없음
+    UNAUTHORIZED_ACCESS(HttpStatus.FORBIDDEN, 40300, "권한이 없습니다.");
 
     private final HttpStatus httpStatus;
     private final int code;

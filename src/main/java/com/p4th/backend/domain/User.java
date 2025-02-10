@@ -6,7 +6,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class User {
-    private String userId;         // CHAR(36) PK
+    private String userId;         // PK (회원ID)
     private String loginId;        // 아이디
     private String password;       // BCrypt 해시
     private String nickname;

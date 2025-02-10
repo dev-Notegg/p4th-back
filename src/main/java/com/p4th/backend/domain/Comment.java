@@ -11,7 +11,6 @@ public class Comment {
     private String parentCommentId;
     private String userId;
     private String content;
-    private String loginId;
     private String createdBy;
     private String updatedBy;
 }

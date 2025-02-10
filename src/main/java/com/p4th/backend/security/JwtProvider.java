@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 import com.p4th.backend.domain.User;
 
 import javax.annotation.PostConstruct;
+import jakarta.servlet.http.HttpServletRequest;
 import java.security.Key;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
@@ -42,7 +43,7 @@ public class JwtProvider {
 
         return Jwts.builder()
                 .setSubject(user.getUserId())
-                .claim("login_id", user.getLoginId())
+                .claim("user_id", user.getUserId())
                 .claim("nickname", user.getNickname())
                 .claim("membership_level", user.getMembershipLevel())
                 .claim("admin_role", user.getAdminRole())
@@ -84,5 +85,15 @@ public class JwtProvider {
                 .parseClaimsJws(token)
                 .getBody();
         return claims.getSubject();
+    }
+
+    // 추가: HttpServletRequest에서 Authorization 헤더를 분석하여 토큰에서 userId를 추출하는 메서드
+    public String resolveUserId(HttpServletRequest request) {
+        String bearerToken = request.getHeader("Authorization");
+        if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
+            String token = bearerToken.substring(7);
+            return getUserIdFromToken(token);
+        }
+        return null;
     }
 }

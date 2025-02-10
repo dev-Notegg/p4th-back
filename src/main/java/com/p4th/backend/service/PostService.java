@@ -4,8 +4,10 @@ import com.p4th.backend.controller.PostController;
 import com.p4th.backend.domain.Post;
 import com.p4th.backend.domain.PostAttachment;
 import com.p4th.backend.domain.User;
+import com.p4th.backend.dto.PopularPostResponse;
 import com.p4th.backend.mapper.CommentMapper;
 import com.p4th.backend.mapper.PostAttachmentMapper;
+import com.p4th.backend.mapper.PostHistoryLogMapper;
 import com.p4th.backend.mapper.PostMapper;
 import com.p4th.backend.mapper.UserMapper;
 import com.p4th.backend.dto.PageResponse;
@@ -27,6 +29,7 @@ public class PostService {
     private final CommentMapper commentMapper;
     private final UserMapper userMapper;
     private final S3Service s3Service;
+    private final PostHistoryLogMapper postHistoryLogMapper;
 
     public PageResponse<Post> getPostsByBoard(String boardId, int page, int size) {
         int offset = page * size;
@@ -79,7 +82,6 @@ public class PostService {
         post.setPostId(postId);
         post.setBoardId(boardId);
         post.setUserId(userId);
-        post.setLoginId(user.getLoginId());
         post.setTitle(title);
         post.setContent(content);
         int inserted = postMapper.insertPost(post);
@@ -121,14 +123,20 @@ public class PostService {
     @Transactional
     public void updatePostWithAttachments(String postId, PostController.UpdatePostRequest request,
                                           List<MultipartFile> newAttachments) {
-        // 게시글 내용 수정
+        // 권한 체크: 수정 요청자의 userId와 기존 게시글의 작성자 비교
+        Post existing = postMapper.getPostDetail(postId);
+        if (existing == null) {
+            throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR, "게시글을 찾을 수 없습니다.");
+        }
+        if (!existing.getUserId().equals(request.getUserId())) {
+            throw new CustomException(ErrorCode.UNAUTHORIZED_ACCESS, "본인이 작성한 게시글만 수정할 수 있습니다.");
+        }
         Post post = new Post();
         post.setPostId(postId);
         post.setBoardId(request.getBoardId());
         post.setUserId(request.getUserId());
         post.setTitle(request.getTitle());
         post.setContent(request.getContent());
-        post.setUpdatedBy(request.getUserId());
         int updated = postMapper.updatePost(post);
         if (updated != 1) {
             throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR, "게시글 수정 실패");
@@ -167,8 +175,14 @@ public class PostService {
         }
     }
 
-    public void deletePost(String postId) {
-        // 게시글 삭제 시, 관련 첨부파일 모두 삭제 처리
+    public void deletePost(String postId, String requesterUserId) {
+        Post existing = postMapper.getPostDetail(postId);
+        if (existing == null) {
+            throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR, "게시글을 찾을 수 없습니다.");
+        }
+        if (!existing.getUserId().equals(requesterUserId)) {
+            throw new CustomException(ErrorCode.UNAUTHORIZED_ACCESS, "본인이 작성한 게시글만 삭제할 수 있습니다.");
+        }
         List<PostAttachment> attachments = postAttachmentMapper.getAttachmentsByPost(postId);
         if (attachments != null && !attachments.isEmpty()) {
             for (PostAttachment attachment : attachments) {
@@ -183,5 +197,9 @@ public class PostService {
         if (deleted != 1) {
             throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR, "게시글 삭제 실패");
         }
+    }
+
+    public List<PopularPostResponse> getPopularPosts(String period) {
+        return postHistoryLogMapper.getPopularPostsByPeriod(period);
     }
 }

@@ -10,7 +10,6 @@ public class Post {
     private String postId;
     private String boardId;
     private String userId;
-    private String loginId;
     private String title;
     private String content;
     private int viewCount;

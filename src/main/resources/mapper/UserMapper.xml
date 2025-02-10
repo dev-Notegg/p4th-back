@@ -10,7 +10,6 @@
         INSERT INTO user_info
         (
             user_id,
-            login_id,
             password,
             nickname,
             pass_code,
@@ -19,7 +18,6 @@
         VALUES
             (
                 #{userId},
-                #{loginId},
                 #{password},
                 #{nickname},
                 #{passCode},
@@ -27,31 +25,9 @@
             )
     </insert>
 
-    <!-- loginId로 회원 조회 -->
-    <select id="selectByLoginId" resultType="com.p4th.backend.domain.User">
-        SELECT
-            user_id AS userId,
-            login_id AS loginId,
-            password,
-            nickname,
-            pass_code AS passCode,
-            membership_level AS membershipLevel,
-            admin_role AS adminRole,
-            warning_count AS warningCount,
-            account_status AS accountStatus,
-            last_login_ip AS lastLoginIp,
-            access_token AS accessToken,
-            refresh_token AS refreshToken
-        FROM user_info
-        WHERE login_id = #{loginId}
-          AND account_status = 'ACTIVE'
-    </select>
-
-    <!-- userId로 회원 조회 (토큰 갱신 등에서 사용) -->
     <select id="selectByUserId" resultType="com.p4th.backend.domain.User">
         SELECT
             user_id AS userId,
-            login_id AS loginId,
             password,
             nickname,
             pass_code AS passCode,
@@ -70,7 +46,6 @@
     <select id="selectByPassCode" resultType="com.p4th.backend.domain.User">
         SELECT
             user_id AS userId,
-            login_id AS loginId,
             password,
             nickname,
             pass_code AS passCode,
@@ -91,7 +66,7 @@
         SET
             access_token = #{accessToken},
             refresh_token = #{refreshToken},
-            updated_by = 'system'
+            updated_by = 'SYSTEM'
         WHERE user_id = #{userId}
     </update>
 
@@ -101,7 +76,7 @@
         SET
             last_login_ip = #{lastLoginIp},
             last_login_at = NOW(),
-            updated_by = #{userId}
+            updated_by = 'SYSTEM'
         WHERE user_id = #{userId}
     </update>
 
@@ -110,6 +85,7 @@
         UPDATE user_info
         SET
             password = #{password},
+            password_changed_at = NOW(),
             updated_by = #{userId}
         WHERE user_id = #{userId}
     </update>
@@ -117,7 +93,6 @@
     <select id="selectByNickname" resultType="com.p4th.backend.domain.User">
         SELECT
             user_id AS userId,
-            login_id AS loginId,
             password,
             nickname,
             pass_code AS passCode,

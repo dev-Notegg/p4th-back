@@ -20,4 +20,6 @@ public interface PostMapper {
     int updatePost(Post post);
 
     int deletePost(@Param("postId") String postId);
+
+    List<Post> getAllPosts();
 }
