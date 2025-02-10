@@ -11,6 +11,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 @Service
@@ -90,6 +92,8 @@ public class S3Service {
         // S3의 원본 URL 형식: "https://p4th.kr.object.ncloudstorage.com/{bucket}/..."
         String prefix = s3Config.getEndPoint() + "/" + s3Config.getBucketName() + "/";
         String key = originalUrl.substring(prefix.length());
+        // URL 인코딩되어 있을 수 있으므로 디코딩 처리
+        key = URLDecoder.decode(key, StandardCharsets.UTF_8);
         amazonS3.deleteObject(s3Config.getBucketName(), key);
     }
 }
