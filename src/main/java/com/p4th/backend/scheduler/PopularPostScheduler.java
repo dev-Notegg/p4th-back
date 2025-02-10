@@ -9,7 +9,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.UUID;
+import com.p4th.backend.util.ULIDUtil;
 
 @Component
 @RequiredArgsConstructor
@@ -28,7 +28,7 @@ public class PopularPostScheduler {
         for (Post post : posts) {
             float popularityScore = post.getViewCount() * 0.4f + post.getCommentCount() * 0.2f;
             PostHistoryLog log = new PostHistoryLog();
-            log.setHistoryId(UUID.randomUUID().toString());
+            log.setHistoryId(ULIDUtil.getULID());
             log.setPostId(post.getPostId());
             log.setPeriodType("DAILY");
             log.setPeriodStartDate(periodStart);
@@ -53,7 +53,7 @@ public class PopularPostScheduler {
         for (Post post : posts) {
             float popularityScore = post.getViewCount() * 0.4f + post.getCommentCount() * 0.2f;
             PostHistoryLog log = new PostHistoryLog();
-            log.setHistoryId(UUID.randomUUID().toString());
+            log.setHistoryId(ULIDUtil.getULID());
             log.setPostId(post.getPostId());
             log.setPeriodType("WEEKLY");
             log.setPeriodStartDate(periodStart);
@@ -77,7 +77,7 @@ public class PopularPostScheduler {
         for (Post post : posts) {
             float popularityScore = post.getViewCount() * 0.4f + post.getCommentCount() * 0.2f;
             PostHistoryLog log = new PostHistoryLog();
-            log.setHistoryId(UUID.randomUUID().toString());
+            log.setHistoryId(ULIDUtil.getULID());
             log.setPostId(post.getPostId());
             log.setPeriodType("MONTHLY");
             log.setPeriodStartDate(periodStart);

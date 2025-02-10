@@ -7,11 +7,10 @@ import com.p4th.backend.mapper.UserMapper;
 import com.p4th.backend.security.JwtProvider;
 import com.p4th.backend.util.PassCodeUtil;
 import com.p4th.backend.util.PasswordUtil;
+import com.p4th.backend.util.ULIDUtil;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -79,7 +78,7 @@ public class AuthService {
         if (user.getPassCode() == null || !user.getPassCode().equals(passCode)) {
             throw new CustomException(ErrorCode.INVALID_PASSCODE);
         }
-        String tempPassword = UUID.randomUUID().toString().substring(0, 8);
+        String tempPassword = ULIDUtil.getULID().substring(0, 12);
         user.setPassword(PasswordUtil.encode(tempPassword));
         userMapper.updatePassword(user);
         return tempPassword;

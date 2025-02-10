@@ -82,6 +82,8 @@ dependencies {
     implementation 'org.springframework.security:spring-security-crypto'
     // servlet
     implementation 'jakarta.servlet:jakarta.servlet-api:6.0.0'
+
+    implementation 'com.github.f4b6a3:ulid-creator:5.2.0'
 }
 
 

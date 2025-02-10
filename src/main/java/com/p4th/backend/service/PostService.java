@@ -13,12 +13,12 @@ import com.p4th.backend.mapper.UserMapper;
 import com.p4th.backend.dto.PageResponse;
 import com.p4th.backend.common.exception.CustomException;
 import com.p4th.backend.common.exception.ErrorCode;
+import com.p4th.backend.util.ULIDUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -78,8 +78,8 @@ public class PostService {
         }
         // 게시글 생성
         Post post = new Post();
-        String postId = UUID.randomUUID().toString();
-        post.setPostId(postId);
+        String postId = ULIDUtil.getULID();
+        post.setPostId(ULIDUtil.getULID());
         post.setBoardId(boardId);
         post.setUserId(userId);
         post.setTitle(title);
@@ -91,7 +91,7 @@ public class PostService {
         // 첨부파일 업로드 처리
         if (attachments != null && !attachments.isEmpty()) {
             for (MultipartFile file : attachments) {
-                String attachmentId = UUID.randomUUID().toString();
+                String attachmentId = ULIDUtil.getULID();
                 String keyDir = "posts/" + postId; // posts 폴더 내에 postId 폴더 생성
                 String fileName = attachmentId + "_" + file.getOriginalFilename();
                 String fileUrl = s3Service.upload(file, keyDir, fileName);
@@ -155,7 +155,7 @@ public class PostService {
         // 신규 첨부파일 추가 처리
         if (newAttachments != null && !newAttachments.isEmpty()) {
             for (MultipartFile file : newAttachments) {
-                String attachmentId = UUID.randomUUID().toString();
+                String attachmentId = ULIDUtil.getULID();
                 String keyDir = "posts/" + postId;
                 String fileName = attachmentId + "_" + file.getOriginalFilename();
                 String fileUrl = s3Service.upload(file, keyDir, fileName);
