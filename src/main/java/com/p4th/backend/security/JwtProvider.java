@@ -53,13 +53,16 @@ public class JwtProvider {
                 .compact();
     }
 
-    // 단순히 userId를 이용하여 Refresh Token 생성
-    public String generateRefreshToken(String userId) {
+    public String generateRefreshToken(User user) {
         long now = System.currentTimeMillis();
         Date expiry = new Date(now + REFRESH_TOKEN_EXPIRE_MS);
 
         return Jwts.builder()
-                .setSubject(userId)
+                .setSubject(user.getUserId())
+                .claim("user_id", user.getUserId())
+                .claim("nickname", user.getNickname())
+                .claim("membership_level", user.getMembershipLevel())
+                .claim("admin_role", user.getAdminRole())
                 .setIssuedAt(new Date(now))
                 .setExpiration(expiry)
                 .signWith(hmacKey, SignatureAlgorithm.HS256)

@@ -52,7 +52,7 @@ public class AuthService {
             throw new CustomException(ErrorCode.INVALID_PASSWORD);
         }
         String accessToken = jwtProvider.generateAccessToken(user);
-        String refreshToken = jwtProvider.generateRefreshToken(user.getUserId());
+        String refreshToken = jwtProvider.generateRefreshToken(user);
         user.setAccessToken(accessToken);
         user.setRefreshToken(refreshToken);
         userMapper.updateTokens(user);
@@ -95,7 +95,7 @@ public class AuthService {
         }
         if (!jwtProvider.validateToken(refreshToken)) {
             // 리프레쉬 토큰 만료: 새 리프레쉬 토큰과 엑세스 토큰 발급
-            String newRefreshToken = jwtProvider.generateRefreshToken(user.getUserId());
+            String newRefreshToken = jwtProvider.generateRefreshToken(user);
             String newAccessToken = jwtProvider.generateAccessToken(user);
             user.setAccessToken(newAccessToken);
             user.setRefreshToken(newRefreshToken);
