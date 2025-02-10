@@ -80,8 +80,20 @@ public class S3Service {
      */
     public void deleteByFileUrl(String fileUrl) {
         if (fileUrl == null) return;
+
+        // CDN URL이 저장되어 있다면, S3의 원본 도메인으로 변환
+        String originalUrl = fileUrl;
+        if (fileUrl.contains("4pth.gcdn.ntruss.com")) {
+            originalUrl = fileUrl.replace("4pth.gcdn.ntruss.com", "kr.object.ncloudstorage.com");
+        }
+
+        // S3의 원본 URL 형식: "https://kr.object.ncloudstorage.com/{bucket}/..."
         String prefix = s3Config.getEndPoint() + "/" + s3Config.getBucketName() + "/";
-        String key = fileUrl.substring(prefix.length());
+        if (!originalUrl.startsWith(prefix)) {
+            throw new IllegalArgumentException("URL 형식이 올바르지 않습니다: " + originalUrl);
+        }
+
+        String key = originalUrl.substring(prefix.length());
         amazonS3.deleteObject(s3Config.getBucketName(), key);
     }
 }
