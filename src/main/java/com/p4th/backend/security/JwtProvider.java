@@ -92,10 +92,16 @@ public class JwtProvider {
 
     // 추가: HttpServletRequest에서 Authorization 헤더를 분석하여 토큰에서 userId를 추출하는 메서드
     public String resolveUserId(HttpServletRequest request) {
-        String bearerToken = request.getHeader("Authorization");
-        if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
-            String token = bearerToken.substring(7);
-            return getUserIdFromToken(token);
+        String header = request.getHeader("Authorization");
+        if (header != null) {
+            header = header.trim();
+            // "Bearer " 접두사가 있으면 제거하고 토큰 추출
+            if (header.startsWith("Bearer ")) {
+                String token = header.substring("Bearer ".length()).trim();
+                return getUserIdFromToken(token);
+            }
+            // 만약 접두사가 없다면, 그대로 토큰으로 간주
+            return getUserIdFromToken(header);
         }
         return null;
     }

@@ -86,10 +86,10 @@ public class AuthService {
     }
 
     /**
-     * 토큰 갱신: 컨트롤러에서 추출한 memberId와 전달받은 리프레쉬 토큰을 이용하여 토큰 갱신을 수행한다.
+     * 토큰 갱신: 컨트롤러에서 추출한 userId와 전달받은 리프레쉬 토큰을 이용하여 토큰 갱신을 수행한다.
      */
-    public LoginResult refreshTokenForMember(String memberId, String refreshToken) {
-        User user = userMapper.selectByUserId(memberId);
+    public LoginResult refreshTokenForMember(String userId, String refreshToken) {
+        User user = userMapper.selectByUserId(userId);
         if (user == null) {
             throw new CustomException(ErrorCode.USER_NOT_FOUND);
         }

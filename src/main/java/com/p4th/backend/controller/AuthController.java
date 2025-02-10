@@ -134,8 +134,8 @@ public class AuthController {
     })
     @PostMapping("/v1/token")
     public ResponseEntity<LoginResponse> updateToken(@Valid @RequestBody RefreshTokenRequest request) {
-        String memberId = jwtProvider.getUserIdFromToken(request.getRefreshToken());
-        LoginResult result = authService.refreshTokenForMember(memberId, request.getRefreshToken());
+        String userId = jwtProvider.getUserIdFromToken(request.getRefreshToken());
+        LoginResult result = authService.refreshTokenForMember(userId, request.getRefreshToken());
         LoginResponse response = new LoginResponse();
         response.setAccessToken(result.getAccessToken());
         response.setRefreshToken(result.getRefreshToken());
