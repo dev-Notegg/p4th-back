@@ -1,17 +1,19 @@
 package com.p4th.backend.domain;
 
-import jakarta.persistence.FetchType;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Entity
+@Table(name = "post")
 @Getter
 @Setter
 public class Post {
+    @Id
+    @Column(name = "post_id")
     private String postId;
     private String boardId;
     private String userId;
@@ -24,13 +26,13 @@ public class Post {
     private String createdBy;
     private String updatedBy;
 
+    @OneToMany(mappedBy = "post", fetch = FetchType.LAZY)
     private List<PostAttachment> attachments;
+    @OneToMany(mappedBy = "comment", fetch = FetchType.LAZY)
     private List<Comment> comments;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "board_id", insertable = false, updatable = false)
     private Board board;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", insertable = false, updatable = false)
     private User user;

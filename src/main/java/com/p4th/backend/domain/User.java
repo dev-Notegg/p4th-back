@@ -1,11 +1,16 @@
 package com.p4th.backend.domain;
 
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
+@Entity
+@Table(name = "user_info")
 public class User {
+    @Id
+    @Column(name = "user_id")
     private String userId;         // PK (회원ID)
     private String loginId;        // 아이디
     private String password;       // BCrypt 해시

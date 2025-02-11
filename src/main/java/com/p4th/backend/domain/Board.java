@@ -1,14 +1,16 @@
 package com.p4th.backend.domain;
 
-import jakarta.persistence.FetchType;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
+@Entity
+@Table(name = "board")
 public class Board {
+    @Id
+    @Column(name = "board_id")
     private String boardId;
     private String categoryId;
     private String boardName;
