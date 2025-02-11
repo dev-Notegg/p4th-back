@@ -10,11 +10,13 @@ import com.p4th.backend.mapper.PostAttachmentMapper;
 import com.p4th.backend.mapper.PostHistoryLogMapper;
 import com.p4th.backend.mapper.PostMapper;
 import com.p4th.backend.mapper.UserMapper;
-import com.p4th.backend.dto.PageResponse;
 import com.p4th.backend.common.exception.CustomException;
 import com.p4th.backend.common.exception.ErrorCode;
+import com.p4th.backend.repository.PostRepository;
 import com.p4th.backend.util.ULIDUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -30,22 +32,10 @@ public class PostService {
     private final UserMapper userMapper;
     private final S3Service s3Service;
     private final PostHistoryLogMapper postHistoryLogMapper;
+    private final PostRepository postRepository;
 
-    public PageResponse<Post> getPostsByBoard(String boardId, int page, int size) {
-        int offset = page * size;
-        List<Post> posts = postMapper.getPostsByBoard(boardId, size, offset);
-        int totalElements = postMapper.countPostsByBoard(boardId);
-        int totalPages = (int) Math.ceil((double) totalElements / size);
-
-        PageResponse<Post> response = new PageResponse<>();
-        response.setContent(posts);
-        PageResponse.Pageable pageable = new PageResponse.Pageable();
-        pageable.setPageNumber(page);
-        pageable.setPageSize(size);
-        response.setPageable(pageable);
-        response.setTotalElements(totalElements);
-        response.setTotalPages(totalPages);
-        return response;
+    public Page<Post> getPostsByBoard(String boardId, Pageable pageable) {
+        return postRepository.findByBoardId(boardId, pageable);
     }
 
     @Transactional

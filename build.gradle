@@ -84,6 +84,7 @@ dependencies {
     implementation 'jakarta.servlet:jakarta.servlet-api:6.0.0'
 
     implementation 'com.github.f4b6a3:ulid-creator:5.2.0'
+    implementation 'org.springdoc:springdoc-openapi-ui:1.6.14'
 }
 
 

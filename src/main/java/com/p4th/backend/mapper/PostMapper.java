@@ -7,10 +7,6 @@ import java.util.List;
 
 @Mapper
 public interface PostMapper {
-    List<Post> getPostsByBoard(@Param("boardId") String boardId,
-                               @Param("size") int size,
-                               @Param("offset") int offset);
-
     int countPostsByBoard(@Param("boardId") String boardId);
 
     Post getPostDetail(@Param("postId") String postId);

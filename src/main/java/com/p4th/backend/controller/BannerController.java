@@ -21,7 +21,7 @@ public class BannerController {
 
     private final BannerService bannerService;
 
-    @Operation(summary = "배너 목록 조회", description = "관리자 페이지에서 등록한 배너 목록을 조회합니다.")
+    @Operation(summary = "배너 목록 조회", description = "관리자 페이지에서 등록한 배너 목록을 조회한다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "배너 목록 조회 성공",
                     content = @Content(schema = @Schema(implementation = Banner.class))),
