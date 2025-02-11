@@ -47,14 +47,19 @@ spring:
 springdoc:
   swagger-ui:
     path: /swagger-ui.html
+    groups-order: DESC
+    operationsSorter: method
+    disable-swagger-default-url: true
     display-request-duration: true
-    operations-sorter: method
   api-docs:
     path: /api-docs
   show-actuator: true
+  default-consumes-media-type: application/json
+  default-produces-media-type: application/json
+  paths-to-match:
+    - /v1/**
+  default-flat-param-object: true
 
-#    paths-to-match:
-#      - /v1/**
 mybatis:
   mapper-locations: classpath:mapper/*.xml
   configuration:
