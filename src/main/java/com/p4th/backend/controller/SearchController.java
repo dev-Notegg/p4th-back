@@ -3,6 +3,7 @@ package com.p4th.backend.controller;
 import com.p4th.backend.dto.SearchResponse;
 import com.p4th.backend.service.SearchService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -28,7 +29,8 @@ public class SearchController {
                     content = @Content(schema = @Schema(implementation = com.p4th.backend.dto.ErrorResponse.class)))
     })
     @GetMapping
-    public ResponseEntity<SearchResponse> search(@RequestParam("query") String query) {
+    public ResponseEntity<SearchResponse> search(
+            @Parameter(name = "query", description = "검색어", required = true) @RequestParam("query") String query) {
         SearchResponse response = searchService.search(query);
         return ResponseEntity.ok().body(response);
     }

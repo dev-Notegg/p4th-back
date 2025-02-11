@@ -4,7 +4,9 @@ import com.p4th.backend.domain.Post;
 import com.p4th.backend.dto.PageResponse;
 import com.p4th.backend.dto.PopularPostResponse;
 import com.p4th.backend.service.PostService;
+import com.p4th.backend.security.JwtProvider;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -26,7 +28,7 @@ import java.util.List;
 public class PostController {
 
     private final PostService postService;
-    private final com.p4th.backend.security.JwtProvider jwtProvider;
+    private final JwtProvider jwtProvider;
 
     @Operation(summary = "게시글 목록 조회", description = "board_id, page, size를 사용하여 게시글 목록을 조회합니다.")
     @ApiResponses(value = {
@@ -36,9 +38,9 @@ public class PostController {
     })
     @GetMapping
     public ResponseEntity<PageResponse<Post>> getPostsByBoard(
-            @RequestParam("board_id") String boardId,
-            @RequestParam int page,
-            @RequestParam int size) {
+            @Parameter(name = "board_id", description = "게시판 ID", required = true) @RequestParam("board_id") String boardId,
+            @Parameter(name = "page", description = "페이지 번호", required = true) @RequestParam int page,
+            @Parameter(name = "size", description = "페이지 사이즈", required = true) @RequestParam int size) {
         PageResponse<Post> result = postService.getPostsByBoard(boardId, page, size);
         return ResponseEntity.ok().body(result);
     }
@@ -50,7 +52,8 @@ public class PostController {
                     content = @Content(schema = @Schema(implementation = com.p4th.backend.dto.ErrorResponse.class)))
     })
     @GetMapping("/{postId}")
-    public ResponseEntity<Post> getPostDetail(@PathVariable("postId") String postId) {
+    public ResponseEntity<Post> getPostDetail(
+            @Parameter(name = "postId", description = "게시글 ID", required = true) @PathVariable("postId") String postId) {
         Post post = postService.getPostDetail(postId);
         return ResponseEntity.ok().body(post);
     }
@@ -63,10 +66,10 @@ public class PostController {
     })
     @PostMapping(consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
     public ResponseEntity<CreatePostResponse> registerPost(
-            @RequestParam String boardId,
-            @RequestParam String title,
-            @RequestParam String content,
-            @RequestPart(value = "files", required = false) List<MultipartFile> files,
+            @Parameter(name = "boardId", description = "게시판 ID", required = true) @RequestParam String boardId,
+            @Parameter(name = "title", description = "게시글 제목", required = true) @RequestParam String title,
+            @Parameter(name = "content", description = "게시글 내용", required = true) @RequestParam String content,
+            @Parameter(name = "files", description = "첨부 파일 리스트") @RequestPart(value = "files", required = false) List<MultipartFile> files,
             HttpServletRequest request) {
         String userId = jwtProvider.resolveUserId(request);
         String postId = postService.registerPostWithAttachments(boardId, userId, title, content, files);
@@ -84,11 +87,11 @@ public class PostController {
     })
     @PutMapping(value = "/{postId}", consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
     public ResponseEntity<UpdatePostResponse> updatePostWithAttachments(
-            @PathVariable("postId") String postId,
-            @RequestParam String boardId,
-            @RequestParam String title,
-            @RequestParam String content,
-            @RequestPart(value = "newFiles", required = false) List<MultipartFile> newFiles,
+            @Parameter(name = "postId", description = "게시글 ID", required = true) @PathVariable("postId") String postId,
+            @Parameter(name = "boardId", description = "게시판 ID", required = true) @RequestParam String boardId,
+            @Parameter(name = "title", description = "게시글 제목", required = true) @RequestParam String title,
+            @Parameter(name = "content", description = "게시글 내용", required = true) @RequestParam String content,
+            @Parameter(name = "newFiles", description = "첨부 파일 리스트") @RequestPart(value = "newFiles", required = false) List<MultipartFile> newFiles,
             HttpServletRequest request) {
         String userId = jwtProvider.resolveUserId(request);
         postService.updatePostWithAttachments(postId, new UpdatePostRequest(boardId, userId, title, content), newFiles);
@@ -105,8 +108,9 @@ public class PostController {
                     content = @Content(schema = @Schema(implementation = com.p4th.backend.dto.ErrorResponse.class)))
     })
     @DeleteMapping("/{postId}")
-    public ResponseEntity<DeletePostResponse> deletePost(@PathVariable("postId") String postId,
-                                                         HttpServletRequest request) {
+    public ResponseEntity<DeletePostResponse> deletePost(
+            @Parameter(name = "postId", description = "게시글 ID", required = true) @PathVariable("postId") String postId,
+            HttpServletRequest request) {
         String userId = jwtProvider.resolveUserId(request);
         postService.deletePost(postId, userId);
         DeletePostResponse response = new DeletePostResponse(true);
@@ -121,7 +125,9 @@ public class PostController {
                     content = @Content(schema = @Schema(implementation = com.p4th.backend.dto.ErrorResponse.class)))
     })
     @GetMapping("/popular")
-    public ResponseEntity<List<PopularPostResponse>> getPopularPosts(@RequestParam(value = "period", defaultValue = "DAILY") String period) {
+    public ResponseEntity<List<PopularPostResponse>> getPopularPosts(
+            @Parameter(name = "period", description = "조회 기간 (DAILY, WEEKLY, MONTHLY)", example = "DAILY")
+            @RequestParam(value = "period", defaultValue = "DAILY") String period) {
         List<PopularPostResponse> popularPosts = postService.getPopularPosts(period);
         return ResponseEntity.ok().body(popularPosts);
     }

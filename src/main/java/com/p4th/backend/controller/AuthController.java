@@ -8,6 +8,7 @@ import com.p4th.backend.service.AuthService.LoginResult;
 import com.p4th.backend.service.AuthService.SignUpResult;
 import com.p4th.backend.security.JwtProvider;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -37,7 +38,9 @@ public class AuthController {
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @PostMapping("/signup")
-    public ResponseEntity<SignUpResponse> signUp(@RequestBody SignupRequestDto request) {
+    public ResponseEntity<SignUpResponse> signUp(
+            @Parameter(name = "SignupRequestDto", description = "회원가입 요청 DTO (userId, password, nickname)", required = true)
+            @RequestBody SignupRequestDto request) {
         User user = new User();
         user.setUserId(request.getUserId());
         user.setPassword(request.getPassword());
@@ -55,7 +58,9 @@ public class AuthController {
                     content = @Content(schema = @Schema(implementation = CheckResponse.class)))
     })
     @GetMapping("/check-user-id")
-    public ResponseEntity<CheckResponse> checkUserId(@RequestParam String userId) {
+    public ResponseEntity<CheckResponse> checkUserId(
+            @Parameter(name = "userId", description = "확인할 회원ID", required = true)
+            @RequestParam String userId) {
         boolean available = authService.checkUserIdAvailable(userId);
         CheckResponse response = new CheckResponse();
         response.setAvailable(available);
@@ -68,7 +73,9 @@ public class AuthController {
                     content = @Content(schema = @Schema(implementation = CheckResponse.class)))
     })
     @GetMapping("/check-nickname")
-    public ResponseEntity<CheckResponse> checkNickname(@RequestParam String nickname) {
+    public ResponseEntity<CheckResponse> checkNickname(
+            @Parameter(name = "nickname", description = "확인할 닉네임", required = true)
+            @RequestParam String nickname) {
         boolean available = authService.checkNicknameAvailable(nickname);
         CheckResponse response = new CheckResponse();
         response.setAvailable(available);
@@ -83,8 +90,10 @@ public class AuthController {
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @PostMapping("/login")
-    public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest requestDto,
-                                               HttpServletRequest request) {
+    public ResponseEntity<LoginResponse> login(
+            @Parameter(name = "LoginRequest", description = "로그인 요청 DTO (userId, password)", required = true)
+            @RequestBody LoginRequest requestDto,
+            HttpServletRequest request) {
         LoginResult result = authService.login(requestDto.getUserId(), requestDto.getPassword(), request.getRemoteAddr());
         LoginResponse response = new LoginResponse();
         response.setAccessToken(result.getAccessToken());
@@ -101,7 +110,9 @@ public class AuthController {
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @PostMapping("/find-id")
-    public ResponseEntity<FindIdResponse> findId(@RequestBody FindIdRequest request) {
+    public ResponseEntity<FindIdResponse> findId(
+            @Parameter(name = "passCode", description = "패쓰코드", required = true)
+            @RequestBody FindIdRequest request) {
         String userId = authService.findId(request.getPassCode());
         FindIdResponse response = new FindIdResponse();
         response.setUserId(userId);
@@ -116,7 +127,9 @@ public class AuthController {
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @PostMapping("/find-password")
-    public ResponseEntity<FindPasswordResponse> findPassword(@RequestBody FindPasswordRequest request) {
+    public ResponseEntity<FindPasswordResponse> findPassword(
+            @Parameter(name = "FindPasswordRequest", description = "비밀번호 찾기 요청 DTO (userId, passCode)", required = true)
+            @RequestBody FindPasswordRequest request) {
         String tempPassword = authService.findPassword(request.getUserId(), request.getPassCode());
         FindPasswordResponse response = new FindPasswordResponse();
         response.setPassword(tempPassword);
@@ -133,7 +146,9 @@ public class AuthController {
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @PostMapping("/v1/token")
-    public ResponseEntity<LoginResponse> updateToken(@Valid @RequestBody RefreshTokenRequest request) {
+    public ResponseEntity<LoginResponse> updateToken(
+            @Parameter(name = "RefreshTokenRequest", description = "토큰 갱신 요청 DTO (refreshToken)", required = true)
+            @Valid @RequestBody RefreshTokenRequest request) {
         String userId = jwtProvider.getUserIdFromToken(request.getRefreshToken());
         LoginResult result = authService.refreshTokenForMember(userId, request.getRefreshToken());
         LoginResponse response = new LoginResponse();
