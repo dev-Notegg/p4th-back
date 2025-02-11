@@ -28,7 +28,7 @@ public class Post {
 
     @OneToMany(mappedBy = "post", fetch = FetchType.LAZY)
     private List<PostAttachment> attachments;
-    @OneToMany(mappedBy = "comment", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "post", fetch = FetchType.LAZY)
     private List<Comment> comments;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "board_id", insertable = false, updatable = false)

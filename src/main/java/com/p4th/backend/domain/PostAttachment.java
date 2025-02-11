@@ -19,4 +19,8 @@ public class PostAttachment {
     private long fileSize;
     private String createdBy;
     private String updatedBy;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "post_id", insertable = false, updatable = false)
+    private Post post;
 }
