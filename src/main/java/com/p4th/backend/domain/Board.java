@@ -10,7 +10,6 @@ import lombok.Setter;
 @Table(name = "board")
 public class Board {
     @Id
-    @Column(name = "board_id")
     private String boardId;
     private String categoryId;
     private String boardName;

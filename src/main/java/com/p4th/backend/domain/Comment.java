@@ -10,7 +10,6 @@ import lombok.Setter;
 @Table(name = "comment")
 public class Comment {
     @Id
-    @Column(name = "comment_id")
     private String commentId;
     private String postId;
     private String parentCommentId;

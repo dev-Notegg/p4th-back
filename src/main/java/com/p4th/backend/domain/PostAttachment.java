@@ -10,7 +10,6 @@ import lombok.Setter;
 @Table(name = "post_attachment")
 public class PostAttachment {
     @Id
-    @Column(name = "attachment_id")
     private String attachmentId;
     private String postId;
     private String fileName;

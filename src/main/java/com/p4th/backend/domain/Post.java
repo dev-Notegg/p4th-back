@@ -13,7 +13,6 @@ import java.util.List;
 @Setter
 public class Post {
     @Id
-    @Column(name = "post_id")
     private String postId;
     private String boardId;
     private String userId;

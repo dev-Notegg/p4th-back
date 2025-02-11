@@ -11,7 +11,6 @@ import java.util.List;
 @Table(name = "category")
 public class Category {
     @Id
-    @Column(name = "category_id")
     private String categoryId;
     private String categoryName;
     private int sortOrder;

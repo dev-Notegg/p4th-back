@@ -10,7 +10,6 @@ import lombok.Setter;
 @Table(name = "user_info")
 public class User {
     @Id
-    @Column(name = "user_id")
     private String userId;         // PK (회원ID)
     private String loginId;        // 아이디
     private String password;       // BCrypt 해시
