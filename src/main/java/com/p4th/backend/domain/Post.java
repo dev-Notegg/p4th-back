@@ -14,7 +14,9 @@ import java.util.List;
 public class Post {
     @Id
     private String postId;
+    @Column(name = "board_id")
     private String boardId;
+    @Column(name = "user_id")
     private String userId;
     private String nickname;
     private String title;
@@ -29,6 +31,7 @@ public class Post {
     private List<PostAttachment> attachments;
     @OneToMany(mappedBy = "post", fetch = FetchType.LAZY)
     private List<Comment> comments;
+    // 연관관계 (읽기 전용)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "board_id", insertable = false, updatable = false)
     private Board board;

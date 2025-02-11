@@ -16,8 +16,8 @@ public class Category {
     private int sortOrder;
     private int mainExposure;
     private int isNotice;
-    @OneToMany(mappedBy = "category", fetch = FetchType.LAZY)
-    private List<Board> boards;
     private String createdBy;
     private String updatedBy;
+    @OneToMany(mappedBy = "category", fetch = FetchType.LAZY)
+    private List<Board> boards;
 }

@@ -11,6 +11,7 @@ import lombok.Setter;
 public class PostAttachment {
     @Id
     private String attachmentId;
+    @Column(name = "post_id")
     private String postId;
     private String fileName;
     private String fileUrl;
@@ -18,7 +19,7 @@ public class PostAttachment {
     private long fileSize;
     private String createdBy;
     private String updatedBy;
-
+    // 연관관계 (읽기 전용)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id", insertable = false, updatable = false)
     private Post post;
