@@ -2,6 +2,9 @@ package com.p4th.backend.controller;
 
 import com.p4th.backend.domain.Post;
 import com.p4th.backend.dto.PopularPostResponse;
+import com.p4th.backend.dto.PostResponseDto;
+import com.p4th.backend.dto.PostAttachmentDto;
+import com.p4th.backend.dto.PostListDto;
 import com.p4th.backend.service.PostService;
 import com.p4th.backend.security.JwtProvider;
 import io.swagger.v3.oas.annotations.Operation;
@@ -24,6 +27,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Tag(name = "게시글 API", description = "게시글 관련 API")
 @RestController
@@ -41,25 +45,27 @@ public class PostController {
                     content = @Content(schema = @Schema(implementation = com.p4th.backend.dto.ErrorResponse.class)))
     })
     @GetMapping
-    public ResponseEntity<Page<Post>> getPostsByBoard(
+    public ResponseEntity<Page<PostListDto>> getPostsByBoard(
             @Parameter(name = "board_id", description = "게시판 ID", required = true)
             @RequestParam("board_id") String boardId,
-            @ParameterObject @PageableDefault(sort = "createAt", direction = Sort.Direction.DESC) Pageable pageable) {
-        Page<Post> result = postService.getPostsByBoard(boardId, pageable);
-        return ResponseEntity.ok(result);
+            @ParameterObject
+            @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+        return ResponseEntity.ok(postService.getPostsByBoard(boardId, pageable));
     }
 
     @Operation(summary = "게시글 상세 조회", description = "postId를 입력받아 게시글 상세 정보를 조회한다.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "게시글 상세 조회 성공"),
+            @ApiResponse(responseCode = "200", description = "게시글 상세 조회 성공",
+                    content = @Content(schema = @Schema(implementation = PostResponseDto.class))),
             @ApiResponse(responseCode = "400", description = "입력 데이터 오류",
                     content = @Content(schema = @Schema(implementation = com.p4th.backend.dto.ErrorResponse.class)))
     })
     @GetMapping("/{postId}")
-    public ResponseEntity<Post> getPostDetail(
+    public ResponseEntity<PostResponseDto> getPostDetail(
             @Parameter(name = "postId", description = "게시글 ID", required = true) @PathVariable("postId") String postId) {
         Post post = postService.getPostDetail(postId);
-        return ResponseEntity.ok().body(post);
+        PostResponseDto responseDto = convertToDto(post);
+        return ResponseEntity.ok(responseDto);
     }
 
     @Operation(summary = "게시글 등록", description = "게시글 작성 및 첨부파일 업로드를 한 번에 처리한다. 토큰에서 회원ID를 추출하여 사용한다.")
@@ -174,5 +180,34 @@ public class PostController {
         public DeletePostResponse(boolean deleted) {
             this.deleted = deleted;
         }
+    }
+
+    private PostResponseDto convertToDto(Post post) {
+        PostResponseDto dto = new PostResponseDto();
+        dto.setPostId(post.getPostId());
+        dto.setBoardId(post.getBoardId());
+        dto.setUserId(post.getUserId());
+        dto.setNickname(post.getNickname());
+        dto.setTitle(post.getTitle());
+        dto.setContent(post.getContent());
+        dto.setViewCount(post.getViewCount());
+        dto.setCommentCount(post.getCommentCount());
+        dto.setCreatedAt(post.getCreatedAt());
+        dto.setCreatedBy(post.getCreatedBy());
+
+        if (post.getAttachments() != null) {
+            List<PostAttachmentDto> attachmentDtos = post.getAttachments().stream().map(attachment -> {
+                PostAttachmentDto attDto = new PostAttachmentDto();
+                attDto.setAttachmentId(attachment.getAttachmentId());
+                attDto.setPostId(attachment.getPostId());
+                attDto.setFileName(attachment.getFileName());
+                attDto.setFileUrl(attachment.getFileUrl());
+                attDto.setAttachType(attachment.getAttachType());
+                attDto.setFileSize(attachment.getFileSize());
+                return attDto;
+            }).collect(Collectors.toList());
+            dto.setAttachments(attachmentDtos);
+        }
+        return dto;
     }
 }

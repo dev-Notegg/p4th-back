@@ -8,6 +8,10 @@ spring:
     web:
       pageable:
         max-page-size: 100000
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+    date-format: "yyyy-MM-dd HH:mm:ss"
 
   datasource:
     url: jdbc:mysql://192.168.0.6:3306/p4thdb

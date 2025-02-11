@@ -5,6 +5,7 @@ import com.p4th.backend.domain.Post;
 import com.p4th.backend.domain.PostAttachment;
 import com.p4th.backend.domain.User;
 import com.p4th.backend.dto.PopularPostResponse;
+import com.p4th.backend.dto.PostListDto;
 import com.p4th.backend.mapper.CommentMapper;
 import com.p4th.backend.mapper.PostAttachmentMapper;
 import com.p4th.backend.mapper.PostHistoryLogMapper;
@@ -34,8 +35,10 @@ public class PostService {
     private final PostHistoryLogMapper postHistoryLogMapper;
     private final PostRepository postRepository;
 
-    public Page<Post> getPostsByBoard(String boardId, Pageable pageable) {
-        return postRepository.findByBoardId(boardId, pageable);
+    @Transactional(readOnly = true)
+    public Page<PostListDto> getPostsByBoard(String boardId, Pageable pageable) {
+        Page<Post> posts = postRepository.findByBoardId(boardId, pageable);
+        return posts.map(PostListDto::from);
     }
 
     @Transactional

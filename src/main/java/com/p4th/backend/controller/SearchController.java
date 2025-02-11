@@ -37,7 +37,7 @@ public class SearchController {
     public ResponseEntity<Page<SearchResponse.SearchResult>> search(
             @Parameter(name = "query", description = "검색어", required = true)
             @RequestParam("query") String query,
-            @ParameterObject @PageableDefault(sort = "createAt", direction = Sort.Direction.DESC) Pageable pageable) {
+            @ParameterObject @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
         Page<SearchResponse.SearchResult> response = searchService.search(query, pageable);
         return ResponseEntity.ok().body(response);
     }
@@ -55,7 +55,7 @@ public class SearchController {
             @PathVariable("boardId") String boardId,
             @Parameter(name = "query", description = "검색어", required = true)
             @RequestParam("query") String query,
-            @ParameterObject @PageableDefault(sort = "createAt", direction = Sort.Direction.DESC) Pageable pageable) {
+            @ParameterObject @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
         Page<SearchResponse.SearchResult> response = searchService.searchInBoard(boardId, query, pageable);
         return ResponseEntity.ok().body(response);
     }

@@ -13,6 +13,6 @@ public class CommonResponse {
     @Builder.Default
     private String id = ULIDUtil.getULID();
     @Builder.Default
-    private LocalDateTime createAt = LocalDateTime.now(ZoneId.of("Asia/Seoul"));
+    private LocalDateTime createdAt = LocalDateTime.now(ZoneId.of("Asia/Seoul"));
     private Object data;
 }
