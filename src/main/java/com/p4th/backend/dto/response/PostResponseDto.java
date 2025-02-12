@@ -49,6 +49,7 @@ public class PostResponseDto {
                 return attDto;
             }).collect(Collectors.toList());
         }
+        dto.comments = post.getComments();
         return dto;
     }
 }
