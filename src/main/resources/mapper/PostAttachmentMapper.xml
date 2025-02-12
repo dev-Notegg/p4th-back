@@ -4,7 +4,8 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.p4th.backend.mapper.PostAttachmentMapper">
     <select id="getAttachmentsByPost" resultType="com.p4th.backend.domain.PostAttachment">
-        SELECT attachment_id, post_id, file_name, file_url, attach_type, file_size
+        SELECT attachment_id, post_id, file_name, file_url, attach_type, file_size,
+               created_by, created_at
         FROM post_attachment
         WHERE post_id = #{postId}
     </select>
@@ -20,7 +21,8 @@
     </delete>
 
     <select id="getAttachmentById" resultType="com.p4th.backend.domain.PostAttachment">
-        SELECT attachment_id, post_id, file_name, file_url, attach_type, file_size
+        SELECT attachment_id, post_id, file_name, file_url, attach_type, file_size,
+               created_by, created_at
         FROM post_attachment
         WHERE attachment_id = #{attachmentId}
     </select>

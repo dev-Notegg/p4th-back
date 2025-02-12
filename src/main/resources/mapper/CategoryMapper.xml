@@ -6,14 +6,17 @@
 
     <!-- 전체 카테고리 목록 조회 -->
     <select id="getAllCategories" resultType="com.p4th.backend.domain.Category">
-        SELECT category_id, category_name, sort_order, main_exposure, is_notice
+        SELECT category_id, category_name, sort_order, main_exposure, is_notice,
+               created_by, created_at, updated_by, updated_at
         FROM category
         ORDER BY sort_order
     </select>
 
     <!-- 특정 카테고리에 해당하는 게시판 조회 -->
     <select id="getBoardsByCategory" resultType="com.p4th.backend.domain.Board">
-        SELECT board_id, category_id, board_name, board_level, sort_order
+        SELECT board_id, category_id, board_name, board_level, sort_order,
+               recommend_yn, status, status_changed_at,
+               created_by, created_at, updated_by, updated_at
         FROM board
         WHERE category_id = #{categoryId}
         ORDER BY sort_order
@@ -21,7 +24,8 @@
 
     <!-- 특정 카테고리 조회 -->
     <select id="getCategoryById" resultType="com.p4th.backend.domain.Category">
-        SELECT category_id, category_name, sort_order, main_exposure, is_notice
+        SELECT category_id, category_name, sort_order, main_exposure, is_notice,
+               created_by, created_at, updated_by, updated_at
         FROM category
         WHERE category_id = #{categoryId}
     </select>

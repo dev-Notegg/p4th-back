@@ -29,15 +29,21 @@
         SELECT
             user_id AS userId,
             password,
-            nickname,
+            password_changed_at AS passwordChangedAt,
             pass_code AS passCode,
+            nickname,
             membership_level AS membershipLevel,
             admin_role AS adminRole,
             warning_count AS warningCount,
             account_status AS accountStatus,
+            account_status_changed_at AS accountStatusChangedAt,
             last_login_ip AS lastLoginIp,
             access_token AS accessToken,
-            refresh_token AS refreshToken
+            refresh_token AS refreshToken,
+            created_by AS createdBy,
+            created_at AS createdAt,
+            updated_by AS updatedBy,
+            updated_at AS updatedAt
         FROM user_info
         WHERE user_id = #{userId}
     </select>
@@ -45,17 +51,7 @@
     <!-- passCode로 회원 조회 (아이디 찾기) -->
     <select id="selectByPassCode" resultType="com.p4th.backend.domain.User">
         SELECT
-            user_id AS userId,
-            password,
-            nickname,
-            pass_code AS passCode,
-            membership_level AS membershipLevel,
-            admin_role AS adminRole,
-            warning_count AS warningCount,
-            account_status AS accountStatus,
-            last_login_ip AS lastLoginIp,
-            access_token AS accessToken,
-            refresh_token AS refreshToken
+            user_id AS userId
         FROM user_info
         WHERE pass_code = #{passCode}
     </select>
@@ -93,16 +89,7 @@
     <select id="selectByNickname" resultType="com.p4th.backend.domain.User">
         SELECT
             user_id AS userId,
-            password,
-            nickname,
-            pass_code AS passCode,
-            membership_level AS membershipLevel,
-            admin_role AS adminRole,
-            warning_count AS warningCount,
-            account_status AS accountStatus,
-            last_login_ip AS lastLoginIp,
-            access_token AS accessToken,
-            refresh_token AS refreshToken
+            nickname
         FROM user_info
         WHERE nickname = #{nickname}
     </select>

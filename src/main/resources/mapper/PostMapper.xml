@@ -17,10 +17,15 @@
             u.nickname AS nickname,
             p.title AS title,
             p.content AS content,
+            p.pinned_yn AS pinnedYn,
+            p.status AS status,
+            p.status_changed_at AS statusChangedAt,
             p.view_count AS viewCount,
             p.comment_count AS commentCount,
             p.created_at AS createdAt,
-            p.created_by AS createdBy
+            p.created_by AS createdBy,
+            p.updated_at AS updatedAt,
+            p.updated_by AS updatedBy
         FROM post p
                  LEFT JOIN user_info u ON p.user_id = u.user_id
         WHERE p.post_id = #{postId}
@@ -79,6 +84,5 @@
     <select id="getAllPosts" resultType="com.p4th.backend.domain.Post">
         SELECT post_id, board_id, user_id, title, content, view_count, comment_count, created_at
         FROM post
-        WHERE status = 'NORMAL'
     </select>
 </mapper>
