@@ -26,7 +26,7 @@ public class CategoryController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "카테고리 목록 조회 성공"),
             @ApiResponse(responseCode = "400", description = "입력 데이터 오류 또는 기타 문제",
-                    content = @Content(schema = @Schema(implementation = com.p4th.backend.dto.ErrorResponse.class)))
+                    content = @Content(schema = @Schema(implementation = com.p4th.backend.dto.response.ErrorResponse.class)))
     })
     @GetMapping
     public ResponseEntity<List<Category>> getAllCategories() {

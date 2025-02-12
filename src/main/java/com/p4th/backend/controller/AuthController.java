@@ -1,8 +1,13 @@
 package com.p4th.backend.controller;
 
 import com.p4th.backend.common.exception.ErrorResponse;
-import com.p4th.backend.domain.User;
-import com.p4th.backend.dto.SignupRequestDto;
+import com.p4th.backend.dto.request.SignupRequestDto;
+import com.p4th.backend.dto.response.UserDto;
+import com.p4th.backend.dto.request.FindIdRequest;
+import com.p4th.backend.dto.request.FindPasswordRequest;
+import com.p4th.backend.dto.request.LoginRequest;
+import com.p4th.backend.dto.request.RefreshTokenRequest;
+import com.p4th.backend.dto.response.*;
 import com.p4th.backend.service.AuthService;
 import com.p4th.backend.service.AuthService.LoginResult;
 import com.p4th.backend.service.AuthService.SignUpResult;
@@ -16,7 +21,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
-import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -41,14 +45,8 @@ public class AuthController {
     public ResponseEntity<SignUpResponse> signUp(
             @Parameter(name = "SignupRequestDto", description = "회원가입 요청 DTO (userId, password, nickname)", required = true)
             @RequestBody SignupRequestDto request) {
-        User user = new User();
-        user.setUserId(request.getUserId());
-        user.setPassword(request.getPassword());
-        user.setNickname(request.getNickname());
-        SignUpResult result = authService.signUp(user);
-        SignUpResponse response = new SignUpResponse();
-        response.setUserId(result.getUserId());
-        response.setPassCode(result.getPassCode());
+        SignUpResult result = authService.signUp(request.getUserId(), request.getPassword(), request.getNickname());
+        SignUpResponse response = new SignUpResponse(result.getUserId(), result.getPassCode());
         return ResponseEntity.ok().body(response);
     }
 
@@ -92,13 +90,10 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(
             @Parameter(name = "LoginRequest", description = "로그인 요청 DTO (userId, password)", required = true)
-            @RequestBody LoginRequest requestDto,
-            HttpServletRequest request) {
-        LoginResult result = authService.login(requestDto.getUserId(), requestDto.getPassword(), request.getRemoteAddr());
-        LoginResponse response = new LoginResponse();
-        response.setAccessToken(result.getAccessToken());
-        response.setRefreshToken(result.getRefreshToken());
-        response.setUser(new UserDto(result.getUser()));
+            @RequestBody LoginRequest request,
+            HttpServletRequest httpRequest) {
+        LoginResult result = authService.login(request.getUserId(), request.getPassword(), httpRequest.getRemoteAddr());
+        LoginResponse response = new LoginResponse(result.getAccessToken(), result.getRefreshToken(), new UserDto(result.getUser()));
         return ResponseEntity.ok().body(response);
     }
 
@@ -114,8 +109,7 @@ public class AuthController {
             @Parameter(name = "passCode", description = "패쓰코드", required = true)
             @RequestBody FindIdRequest request) {
         String userId = authService.findId(request.getPassCode());
-        FindIdResponse response = new FindIdResponse();
-        response.setUserId(userId);
+        FindIdResponse response = new FindIdResponse(userId);
         return ResponseEntity.ok().body(response);
     }
 
@@ -131,8 +125,7 @@ public class AuthController {
             @Parameter(name = "FindPasswordRequest", description = "비밀번호 찾기 요청 DTO (userId, passCode)", required = true)
             @RequestBody FindPasswordRequest request) {
         String tempPassword = authService.findPassword(request.getUserId(), request.getPassCode());
-        FindPasswordResponse response = new FindPasswordResponse();
-        response.setPassword(tempPassword);
+        FindPasswordResponse response = new FindPasswordResponse(tempPassword);
         return ResponseEntity.ok().body(response);
     }
 
@@ -151,77 +144,7 @@ public class AuthController {
             @Valid @RequestBody RefreshTokenRequest request) {
         String userId = jwtProvider.getUserIdFromToken(request.getRefreshToken());
         LoginResult result = authService.refreshTokenForMember(userId, request.getRefreshToken());
-        LoginResponse response = new LoginResponse();
-        response.setAccessToken(result.getAccessToken());
-        response.setRefreshToken(result.getRefreshToken());
-        response.setUser(new UserDto(result.getUser()));
+        LoginResponse response = new LoginResponse(result.getAccessToken(), result.getRefreshToken(), new UserDto(result.getUser()));
         return ResponseEntity.ok().body(response);
-    }
-
-    // --------------------- 내부 DTO 클래스 ---------------------
-
-    @Data
-    public static class SignUpResponse {
-        private String userId;
-        private String passCode;
-    }
-
-    @Data
-    public static class LoginRequest {
-        private String userId;
-        private String password;
-    }
-
-    @Data
-    public static class LoginResponse {
-        private String accessToken;
-        private String refreshToken;
-        private UserDto user;
-    }
-
-    @Data
-    public static class FindIdRequest {
-        private String passCode;
-    }
-
-    @Data
-    public static class FindIdResponse {
-        private String userId;
-    }
-
-    @Data
-    public static class FindPasswordRequest {
-        private String userId;
-        private String passCode;
-    }
-
-    @Data
-    public static class FindPasswordResponse {
-        private String password;
-    }
-
-    @Data
-    public static class RefreshTokenRequest {
-        private String refreshToken;
-    }
-
-    @Data
-    public static class UserDto {
-        private String userId;
-        private String nickname;
-        private int membershipLevel;
-        private int adminRole;
-
-        public UserDto(User user) {
-            this.userId = user.getUserId();
-            this.nickname = user.getNickname();
-            this.membershipLevel = user.getMembershipLevel();
-            this.adminRole = user.getAdminRole();
-        }
-    }
-
-    @Data
-    public static class CheckResponse {
-        private boolean available;
     }
 }

@@ -20,7 +20,7 @@ public class Board {
     private String boardName;
     private int boardLevel;
     private int sortOrder;
-    private int recommend_yn;
+    private int recommendYn;
     private String createdBy;
     private LocalDateTime createdAt;
     private String updatedBy;

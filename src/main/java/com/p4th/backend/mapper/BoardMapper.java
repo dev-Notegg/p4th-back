@@ -1,7 +1,7 @@
 package com.p4th.backend.mapper;
 
 import com.p4th.backend.domain.Board;
-import com.p4th.backend.dto.PopularBoardResponse;
+import com.p4th.backend.dto.response.PopularBoardResponse;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 

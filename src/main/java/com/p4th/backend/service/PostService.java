@@ -1,11 +1,10 @@
 package com.p4th.backend.service;
 
-import com.p4th.backend.controller.PostController;
 import com.p4th.backend.domain.Post;
 import com.p4th.backend.domain.PostAttachment;
 import com.p4th.backend.domain.User;
-import com.p4th.backend.dto.PopularPostResponse;
-import com.p4th.backend.dto.PostListDto;
+import com.p4th.backend.dto.response.PopularPostResponse;
+import com.p4th.backend.dto.response.PostListDto;
 import com.p4th.backend.mapper.CommentMapper;
 import com.p4th.backend.mapper.PostAttachmentMapper;
 import com.p4th.backend.mapper.PostHistoryLogMapper;
@@ -113,31 +112,23 @@ public class PostService {
         return postId;
     }
 
-    /**
-     * 게시글 수정 시, 게시글 본문 업데이트와 함께 기존 첨부파일을 모두 삭제한 후,
-     * 클라이언트가 전송한 첨부파일 목록으로 교체한다.
-     *
-     * @param postId         수정할 게시글 ID
-     * @param request        수정 요청 DTO (boardId, userId, title, content 포함)
-     * @param newAttachments 새로 전송된 첨부파일 목록 (없을 수 있음)
-     */
+
     @Transactional
-    public void updatePostWithAttachments(String postId, PostController.UpdatePostRequest request,
-                                          List<MultipartFile> newAttachments) {
+    public void updatePostWithAttachments(String postId, String boardId, String userId, String title, String content, List<MultipartFile> newAttachments) {
         // 권한 체크: 수정 요청자의 userId와 기존 게시글의 작성자 비교
         Post existing = postMapper.getPostDetail(postId);
         if (existing == null) {
             throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR, "게시글을 찾을 수 없습니다.");
         }
-        if (!existing.getUserId().equals(request.getUserId())) {
+        if (!existing.getUserId().equals(userId)) {
             throw new CustomException(ErrorCode.UNAUTHORIZED_ACCESS, "본인이 작성한 게시글만 수정할 수 있습니다.");
         }
         Post post = new Post();
         post.setPostId(postId);
-        post.setBoardId(request.getBoardId());
-        post.setUserId(request.getUserId());
-        post.setTitle(request.getTitle());
-        post.setContent(request.getContent());
+        post.setBoardId(boardId);
+        post.setUserId(userId);
+        post.setTitle(title);
+        post.setContent(content);
         int updated = postMapper.updatePost(post);
         if (updated != 1) {
             throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR, "게시글 수정 실패");
@@ -172,7 +163,7 @@ public class PostService {
                 attachment.setFileUrl(fileUrl);
                 attachment.setAttachType(attachType);
                 attachment.setFileSize(file.getSize());
-                attachment.setCreatedBy(request.getUserId());
+                attachment.setCreatedBy(userId);
                 int insertedAttachment = postAttachmentMapper.insertAttachment(attachment);
                 if (insertedAttachment != 1) {
                     throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR, "새 첨부파일 등록 실패");

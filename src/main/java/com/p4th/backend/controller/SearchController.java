@@ -1,6 +1,6 @@
 package com.p4th.backend.controller;
 
-import com.p4th.backend.dto.SearchResponse;
+import com.p4th.backend.dto.response.SearchResponse;
 import com.p4th.backend.service.SearchService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -31,7 +31,7 @@ public class SearchController {
             @ApiResponse(responseCode = "200", description = "검색 성공",
                     content = @Content(schema = @Schema(implementation = SearchResponse.class))),
             @ApiResponse(responseCode = "400", description = "검색어가 없거나 오류 발생",
-                    content = @Content(schema = @Schema(implementation = com.p4th.backend.dto.ErrorResponse.class)))
+                    content = @Content(schema = @Schema(implementation = com.p4th.backend.dto.response.ErrorResponse.class)))
     })
     @GetMapping
     public ResponseEntity<Page<SearchResponse.SearchResult>> search(
@@ -47,7 +47,7 @@ public class SearchController {
             @ApiResponse(responseCode = "200", description = "게시판 내 검색 성공",
                     content = @Content(schema = @Schema(implementation = SearchResponse.class))),
             @ApiResponse(responseCode = "400", description = "검색어가 없거나 오류 발생",
-                    content = @Content(schema = @Schema(implementation = com.p4th.backend.dto.ErrorResponse.class)))
+                    content = @Content(schema = @Schema(implementation = com.p4th.backend.dto.response.ErrorResponse.class)))
     })
     @GetMapping("/board/{boardId}")
     public ResponseEntity<Page<SearchResponse.SearchResult>> boardSearch(

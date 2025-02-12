@@ -20,13 +20,15 @@ public class AuthService {
     private final JwtProvider jwtProvider;
 
     // 회원가입: 입력받은 userId를 사용 (PK)
-    public SignUpResult signUp(User user) {
-        user.setUserId(user.getUserId());
-        user.setPassword(PasswordUtil.encode(user.getPassword()));
+    public SignUpResult signUp(String userId, String password, String nickname) {
+        User user = new User();
+        user.setUserId(userId);
+        user.setPassword(PasswordUtil.encode(password));
         String passCode = PassCodeUtil.generatePassCode();
         user.setPassCode(passCode);
+        user.setNickname(nickname);
         userMapper.insertUser(user);
-        return new SignUpResult(user.getUserId(), passCode);
+        return new SignUpResult(userId, passCode);
     }
 
     // 회원ID 중복 체크
@@ -57,7 +59,7 @@ public class AuthService {
         userMapper.updateTokens(user);
         user.setLastLoginIp(clientIp);
         userMapper.updateLastLoginInfo(user);
-        return new LoginResult(user.getAccessToken(), user.getRefreshToken(), user);
+        return new LoginResult(accessToken, refreshToken, user);
     }
 
     // 아이디 찾기: passCode 기준 조회 후 userId 반환

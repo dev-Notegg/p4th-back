@@ -1,7 +1,7 @@
 package com.p4th.backend.controller;
 
-import com.p4th.backend.dto.BoardResponseDto;
-import com.p4th.backend.dto.PopularBoardResponse;
+import com.p4th.backend.dto.response.BoardResponseDto;
+import com.p4th.backend.dto.response.PopularBoardResponse;
 import com.p4th.backend.service.BoardService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -28,7 +28,7 @@ public class BoardController {
             @ApiResponse(responseCode = "200", description = "인기 게시판 목록 조회 성공",
                     content = @Content(schema = @Schema(implementation = PopularBoardResponse.class))),
             @ApiResponse(responseCode = "400", description = "입력 데이터 오류",
-                    content = @Content(schema = @Schema(implementation = com.p4th.backend.dto.ErrorResponse.class)))
+                    content = @Content(schema = @Schema(implementation = com.p4th.backend.dto.response.ErrorResponse.class)))
     })
     @GetMapping("/popular")
     public ResponseEntity<List<PopularBoardResponse>> getPopularBoards() {
@@ -41,7 +41,7 @@ public class BoardController {
             @ApiResponse(responseCode = "200", description = "카테고리 내 게시판 조회 성공",
                     content = @Content(schema = @Schema(implementation = BoardResponseDto.class))),
             @ApiResponse(responseCode = "400", description = "입력 데이터 오류 또는 기타 문제",
-                    content = @Content(schema = @Schema(implementation = com.p4th.backend.dto.ErrorResponse.class)))
+                    content = @Content(schema = @Schema(implementation = com.p4th.backend.dto.response.ErrorResponse.class)))
     })
     @GetMapping("/{categoryId}")
     public ResponseEntity<List<BoardResponseDto>> getBoardsByCategory(

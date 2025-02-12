@@ -18,19 +18,18 @@ public class PopularPostScheduler {
     private final PostMapper postMapper;
     private final PostHistoryLogMapper postHistoryLogMapper;
 
-    // DAILY: 매일 00:05에 실행 (전날 기준)
-    @Scheduled(cron = "0 5 0 * * *")
-    public void scheduleDailyPopularity() {
+    private float calculatePopularity(Post post) {
+        return post.getViewCount() * 0.4f + post.getCommentCount() * 0.2f;
+    }
+
+    private void processPopularity(String periodType, String periodStart, String periodEnd) {
         List<Post> posts = postMapper.getAllPosts();
-        LocalDate yesterday = LocalDate.now().minusDays(1);
-        String periodStart = yesterday.toString();
-        String periodEnd = yesterday.toString();
         for (Post post : posts) {
-            float popularityScore = post.getViewCount() * 0.4f + post.getCommentCount() * 0.2f;
+            float popularityScore = calculatePopularity(post);
             PostHistoryLog log = new PostHistoryLog();
             log.setHistoryId(ULIDUtil.getULID());
             log.setPostId(post.getPostId());
-            log.setPeriodType("DAILY");
+            log.setPeriodType(periodType);
             log.setPeriodStartDate(periodStart);
             log.setPeriodEndDate(periodEnd);
             log.setViewCount(post.getViewCount());
@@ -39,54 +38,29 @@ public class PopularPostScheduler {
             log.setCreatedBy("SYSTEM");
             postHistoryLogMapper.insertHistoryLog(log);
         }
+    }
+
+    // DAILY: 매일 00:05에 실행 (전날 기준)
+    @Scheduled(cron = "0 5 0 * * *")
+    public void scheduleDailyPopularity() {
+        LocalDate yesterday = LocalDate.now().minusDays(1);
+        processPopularity("DAILY", yesterday.toString(), yesterday.toString());
     }
 
     // WEEKLY: 매주 월요일 00:05에 실행 (전 주 기준)
     @Scheduled(cron = "0 5 0 * * MON")
     public void scheduleWeeklyPopularity() {
-        List<Post> posts = postMapper.getAllPosts();
         LocalDate today = LocalDate.now();
-        LocalDate monday = today.with(java.time.DayOfWeek.MONDAY).minusWeeks(1); // 전 주 월요일
-        LocalDate sunday = monday.plusDays(6); // 전 주 일요일
-        String periodStart = monday.toString();
-        String periodEnd = sunday.toString();
-        for (Post post : posts) {
-            float popularityScore = post.getViewCount() * 0.4f + post.getCommentCount() * 0.2f;
-            PostHistoryLog log = new PostHistoryLog();
-            log.setHistoryId(ULIDUtil.getULID());
-            log.setPostId(post.getPostId());
-            log.setPeriodType("WEEKLY");
-            log.setPeriodStartDate(periodStart);
-            log.setPeriodEndDate(periodEnd);
-            log.setViewCount(post.getViewCount());
-            log.setCommentCount(post.getCommentCount());
-            log.setPopularityScore(popularityScore);
-            log.setCreatedBy("SYSTEM");
-            postHistoryLogMapper.insertHistoryLog(log);
-        }
+        LocalDate monday = today.with(java.time.DayOfWeek.MONDAY).minusWeeks(1);
+        LocalDate sunday = monday.plusDays(6);
+        processPopularity("WEEKLY", monday.toString(), sunday.toString());
     }
 
     // MONTHLY: 매월 1일 00:05에 실행 (전월 기준)
     @Scheduled(cron = "0 5 0 1 * *")
     public void scheduleMonthlyPopularity() {
-        List<Post> posts = postMapper.getAllPosts();
         LocalDate firstDayOfLastMonth = LocalDate.now().minusMonths(1).withDayOfMonth(1);
         LocalDate lastDayOfLastMonth = firstDayOfLastMonth.withDayOfMonth(firstDayOfLastMonth.lengthOfMonth());
-        String periodStart = firstDayOfLastMonth.toString();
-        String periodEnd = lastDayOfLastMonth.toString();
-        for (Post post : posts) {
-            float popularityScore = post.getViewCount() * 0.4f + post.getCommentCount() * 0.2f;
-            PostHistoryLog log = new PostHistoryLog();
-            log.setHistoryId(ULIDUtil.getULID());
-            log.setPostId(post.getPostId());
-            log.setPeriodType("MONTHLY");
-            log.setPeriodStartDate(periodStart);
-            log.setPeriodEndDate(periodEnd);
-            log.setViewCount(post.getViewCount());
-            log.setCommentCount(post.getCommentCount());
-            log.setPopularityScore(popularityScore);
-            log.setCreatedBy("SYSTEM");
-            postHistoryLogMapper.insertHistoryLog(log);
-        }
+        processPopularity("MONTHLY", firstDayOfLastMonth.toString(), lastDayOfLastMonth.toString());
     }
 }

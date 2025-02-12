@@ -6,12 +6,32 @@
 
     <insert id="insertHistoryLog" parameterType="com.p4th.backend.domain.PostHistoryLog">
         INSERT INTO post_history_log
-        (history_id, post_id, period_type, period_start_date, period_end_date, view_count, comment_count, popularity_score, created_by)
+        (
+            history_id,
+            post_id,
+            period_type,
+            period_start_date,
+            period_end_date,
+            view_count,
+            comment_count,
+            popularity_score,
+            created_by
+        )
         VALUES
-            (#{historyId}, #{postId}, #{periodType}, #{periodStartDate}, #{periodEndDate}, #{viewCount}, #{commentCount}, #{popularityScore}, #{createdBy})
+            (
+                #{historyId},
+                #{postId},
+                #{periodType},
+                #{periodStartDate},
+                #{periodEndDate},
+                #{viewCount},
+                #{commentCount},
+                #{popularityScore},
+                #{createdBy}
+            )
     </insert>
 
-    <select id="getPopularPostsByPeriod" resultType="com.p4th.backend.dto.PopularPostResponse" parameterType="string">
+    <select id="getPopularPostsByPeriod" resultType="com.p4th.backend.dto.response.PopularPostResponse" parameterType="string">
         SELECT
             p.post_id AS postId,
             p.board_id AS boardId,

@@ -26,7 +26,7 @@ public class BannerController {
             @ApiResponse(responseCode = "200", description = "배너 목록 조회 성공",
                     content = @Content(schema = @Schema(implementation = Banner.class))),
             @ApiResponse(responseCode = "400", description = "입력 데이터 오류",
-                    content = @Content(schema = @Schema(implementation = com.p4th.backend.dto.ErrorResponse.class)))
+                    content = @Content(schema = @Schema(implementation = com.p4th.backend.dto.response.ErrorResponse.class)))
     })
     @GetMapping
     public ResponseEntity<List<Banner>> getBanners() {

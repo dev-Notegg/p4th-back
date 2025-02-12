@@ -6,8 +6,18 @@
 
     <select id="getBanners" resultType="com.p4th.backend.domain.Banner">
         SELECT
-            banner_id, banner_name, image_url, link_url, display_yn, seq, start_date, end_date,
-            created_by, created_at, updated_by, updated_at
+            banner_id,
+            banner_name,
+            image_url,
+            link_url,
+            display_yn,
+            seq,
+            start_date,
+            end_date,
+            created_by,
+            created_at,
+            updated_by,
+            updated_at
         FROM banner
         ORDER BY seq
     </select>

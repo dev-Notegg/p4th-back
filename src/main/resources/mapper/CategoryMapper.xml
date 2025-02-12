@@ -6,16 +6,32 @@
 
     <!-- 전체 카테고리 목록 조회 -->
     <select id="getAllCategories" resultType="com.p4th.backend.domain.Category">
-        SELECT category_id, category_name, sort_order, main_exposure, is_notice,
-               created_by, created_at, updated_by, updated_at
+        SELECT
+            category_id,
+            category_name,
+            sort_order,
+            main_exposure,
+            is_notice,
+            created_by,
+            created_at,
+            updated_by,
+            updated_at
         FROM category
         ORDER BY sort_order
     </select>
 
     <!-- 특정 카테고리 조회 -->
     <select id="getCategoryById" resultType="com.p4th.backend.domain.Category">
-        SELECT category_id, category_name, sort_order, main_exposure, is_notice,
-               created_by, created_at, updated_by, updated_at
+        SELECT
+            category_id,
+            category_name,
+            sort_order,
+            main_exposure,
+            is_notice,
+            created_by,
+            created_at,
+            updated_by,
+            updated_at
         FROM category
         WHERE category_id = #{categoryId}
     </select>

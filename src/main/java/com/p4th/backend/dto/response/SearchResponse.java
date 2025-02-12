@@ -1,6 +1,7 @@
-package com.p4th.backend.dto;
+package com.p4th.backend.dto.response;
 
 import lombok.Data;
+
 import java.util.List;
 
 @Data
@@ -15,8 +16,8 @@ public class SearchResponse {
         private String userId;
         private String nickname;
         private String title;
-        private String category;      // 카테고리명
-        private String boardName;     // 게시판명
+        private String category;
+        private String boardName;
         private int viewCount;
         private int commentCount;
         private String imageUrl;

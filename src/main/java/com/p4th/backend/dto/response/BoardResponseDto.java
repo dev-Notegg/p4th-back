@@ -1,6 +1,7 @@
-package com.p4th.backend.dto;
+package com.p4th.backend.dto.response;
 
 import lombok.Data;
+
 import java.time.LocalDateTime;
 
 @Data
@@ -10,7 +11,7 @@ public class BoardResponseDto {
     private String boardName;
     private int boardLevel;
     private int sortOrder;
-    private int recommend_yn;
+    private int recommendYn;
     private String createdBy;
     private LocalDateTime createdAt;
     private String updatedBy;

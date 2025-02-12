@@ -5,7 +5,8 @@
 <mapper namespace="com.p4th.backend.mapper.PostMapper">
 
     <select id="countPostsByBoard" resultType="int">
-        SELECT COUNT(*) FROM post
+        SELECT COUNT(*)
+        FROM post
         WHERE board_id = #{boardId}
     </select>
 
@@ -32,13 +33,30 @@
     </select>
 
     <insert id="insertPost">
-        INSERT INTO post (post_id, board_id, user_id, title, content, created_by)
-        VALUES (#{postId}, #{boardId}, #{userId}, #{title}, #{content}, #{userId})
+        INSERT INTO post
+        (
+            post_id,
+            board_id,
+            user_id,
+            title,
+            content,
+            created_by
+        )
+        VALUES
+            (
+                #{postId},
+                #{boardId},
+                #{userId},
+                #{title},
+                #{content},
+                #{userId}
+            )
     </insert>
 
     <update id="updatePost">
         UPDATE post
-        SET board_id = #{boardId},
+        SET
+            board_id = #{boardId},
             title = #{title},
             content = #{content},
             updated_by = #{userId}
@@ -58,7 +76,7 @@
     </update>
 
     <!-- 인기 게시글 조회 -->
-    <select id="getPopularPosts" resultType="com.p4th.backend.dto.PopularPostResponse">
+    <select id="getPopularPosts" resultType="com.p4th.backend.dto.response.PopularPostResponse">
         SELECT
             p.post_id AS postId,
             p.board_id AS boardId,
@@ -82,7 +100,16 @@
     </select>
 
     <select id="getAllPosts" resultType="com.p4th.backend.domain.Post">
-        SELECT post_id, board_id, user_id, title, content, view_count, comment_count, created_at
+        SELECT
+            post_id,
+            board_id,
+            user_id,
+            title,
+            content,
+            view_count,
+            comment_count,
+            created_at
         FROM post
     </select>
+
 </mapper>
