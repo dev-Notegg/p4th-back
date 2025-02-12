@@ -1,6 +1,7 @@
 package com.p4th.backend.dto.response;
 
 import com.p4th.backend.domain.Post;
+import com.p4th.backend.util.RelativeTimeFormatter;
 import lombok.Data;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -50,7 +51,7 @@ public class PostListDto {
         dto.imageUrl = extractFirstImageUrl(unescapedContent);
 
         if (post.getCreatedAt() != null) {
-            dto.createdAt = post.getCreatedAt().format(formatter);
+            dto.createdAt = RelativeTimeFormatter.formatRelativeTime(post.getCreatedAt());
         }
         return dto;
     }

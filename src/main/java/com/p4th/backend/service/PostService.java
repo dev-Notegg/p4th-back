@@ -11,12 +11,16 @@ import com.p4th.backend.mapper.UserMapper;
 import com.p4th.backend.common.exception.CustomException;
 import com.p4th.backend.common.exception.ErrorCode;
 import com.p4th.backend.repository.PostRepository;
+import com.p4th.backend.util.RelativeTimeFormatter;
 import com.p4th.backend.util.ULIDUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Service
@@ -29,6 +33,7 @@ public class PostService {
     private final S3Service s3Service;
     private final PostHistoryLogMapper postHistoryLogMapper;
     private final PostRepository postRepository;
+    private static final DateTimeFormatter originalFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     @Transactional(readOnly = true)
     public Page<PostListDto> getPostsByBoard(String boardId, Pageable pageable) {
@@ -130,7 +135,14 @@ public class PostService {
     }
 
     public List<PopularPostResponse> getPopularPosts(String period) {
-        return postHistoryLogMapper.getPopularPostsByPeriod(period);
+        List<PopularPostResponse> responses = postHistoryLogMapper.getPopularPostsByPeriod(period);
+        responses.forEach(response -> {
+            if(response.getCreatedAt() != null && !response.getCreatedAt().isEmpty()) {
+                LocalDateTime createdTime = LocalDateTime.parse(response.getCreatedAt(), originalFormatter);
+                response.setCreatedAt(RelativeTimeFormatter.formatRelativeTime(createdTime));
+            }
+        });
+        return responses;
     }
 
     /**

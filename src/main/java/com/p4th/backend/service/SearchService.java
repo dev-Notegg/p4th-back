@@ -3,6 +3,7 @@ package com.p4th.backend.service;
 import com.p4th.backend.dto.response.SearchResponse;
 import com.p4th.backend.domain.Post;
 import com.p4th.backend.repository.SearchRepository;
+import com.p4th.backend.util.RelativeTimeFormatter;
 import lombok.RequiredArgsConstructor;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -12,14 +13,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.time.format.DateTimeFormatter;
-
 @Service
 @RequiredArgsConstructor
 public class SearchService {
 
     private final SearchRepository searchRepository;
-    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     public Page<SearchResponse.SearchResult> search(String query, Pageable pageable) {
         // 전체 검색: 제목, 내용, 닉네임에 대해 대소문자 구분 없이 LIKE 검색
@@ -40,7 +38,7 @@ public class SearchService {
             // imageCount: HTML 내 이미지 태그(조건에 맞는 경우)의 개수
             result.setImageCount(countInlineImages(post.getContent()));
             result.setImageUrl(extractFirstImageUrl(post.getContent()));
-            result.setCreatedAt(post.getCreatedAt() != null ? post.getCreatedAt().format(formatter) : null);
+            result.setCreatedAt(post.getCreatedAt() != null ? RelativeTimeFormatter.formatRelativeTime(post.getCreatedAt()) : null);
             return result;
         });
     }
@@ -65,7 +63,7 @@ public class SearchService {
             result.setCommentCount(post.getCommentCount());
             result.setImageCount(countInlineImages(post.getContent()));
             result.setImageUrl(extractFirstImageUrl(post.getContent()));
-            result.setCreatedAt(post.getCreatedAt() != null ? post.getCreatedAt().format(formatter) : null);
+            result.setCreatedAt(post.getCreatedAt() != null ? RelativeTimeFormatter.formatRelativeTime(post.getCreatedAt()) : null);
             return result;
         });
     }
