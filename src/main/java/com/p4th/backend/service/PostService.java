@@ -89,6 +89,11 @@ public class PostService {
             for (MultipartFile file : attachments) {
                 String attachmentId = ULIDUtil.getULID();
                 String keyDir = "posts/" + postId; // posts 폴더 내에 postId 폴더 생성
+                String originalFilename = file.getOriginalFilename();
+                String attachType = "UNKNOWN";
+                if (originalFilename != null && originalFilename.lastIndexOf('.') != -1) {
+                    attachType = originalFilename.substring(originalFilename.lastIndexOf('.') + 1).toLowerCase();
+                }
                 String fileName = attachmentId + "_" + file.getOriginalFilename();
                 String fileUrl = s3Service.upload(file, keyDir, fileName);
                 PostAttachment attachment = new PostAttachment();
@@ -96,7 +101,7 @@ public class PostService {
                 attachment.setPostId(postId);
                 attachment.setFileName(file.getOriginalFilename());
                 attachment.setFileUrl(fileUrl);
-                attachment.setAttachType("IMAGE");
+                attachment.setAttachType(attachType);
                 attachment.setFileSize(file.getSize());
                 attachment.setCreatedBy(userId);
                 int insertedAttachment = postAttachmentMapper.insertAttachment(attachment);
@@ -153,6 +158,11 @@ public class PostService {
             for (MultipartFile file : newAttachments) {
                 String attachmentId = ULIDUtil.getULID();
                 String keyDir = "posts/" + postId;
+                String originalFilename = file.getOriginalFilename();
+                String attachType = "UNKNOWN";
+                if (originalFilename != null && originalFilename.lastIndexOf('.') != -1) {
+                    attachType = originalFilename.substring(originalFilename.lastIndexOf('.') + 1).toLowerCase();
+                }
                 String fileName = attachmentId + "_" + file.getOriginalFilename();
                 String fileUrl = s3Service.upload(file, keyDir, fileName);
                 PostAttachment attachment = new PostAttachment();
@@ -160,7 +170,7 @@ public class PostService {
                 attachment.setPostId(postId);
                 attachment.setFileName(file.getOriginalFilename());
                 attachment.setFileUrl(fileUrl);
-                attachment.setAttachType("IMAGE");
+                attachment.setAttachType(attachType);
                 attachment.setFileSize(file.getSize());
                 attachment.setCreatedBy(request.getUserId());
                 int insertedAttachment = postAttachmentMapper.insertAttachment(attachment);
