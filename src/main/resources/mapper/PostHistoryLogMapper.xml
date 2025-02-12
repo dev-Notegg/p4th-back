@@ -16,7 +16,7 @@
             p.post_id AS postId,
             p.board_id AS boardId,
             p.user_id AS userId,
-            (SELECT u.nickname from user_info u where u.user_id = p.user_id) AS nickname,
+            u.nickname AS nickname,
             p.title AS title,
             c.category_name AS category,
             b.board_name AS boardName,
@@ -29,6 +29,7 @@
                  JOIN post p ON h.post_id = p.post_id
                  JOIN board b ON p.board_id = b.board_id
                  JOIN category c ON b.category_id = c.category_id
+                 JOIN user_info u ON u.user_id = p.user_id
         WHERE h.period_type = #{period}
         ORDER BY h.popularity_score DESC
         LIMIT 20
