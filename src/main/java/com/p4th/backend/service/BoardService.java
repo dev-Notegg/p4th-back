@@ -25,7 +25,7 @@ public class BoardService {
             BoardResponseDto dto = new BoardResponseDto();
             dto.setBoardId(board.getBoardId());
             dto.setCategoryId(board.getCategoryId());
-            dto.setCategoryName(board.getCategory().getCategoryName());
+            dto.setCategoryName(board.getCategoryName());
             dto.setBoardName(board.getBoardName());
             dto.setBoardLevel(board.getBoardLevel());
             dto.setSortOrder(board.getSortOrder());
