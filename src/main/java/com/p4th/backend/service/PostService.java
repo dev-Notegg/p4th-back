@@ -11,6 +11,7 @@ import com.p4th.backend.mapper.UserMapper;
 import com.p4th.backend.common.exception.CustomException;
 import com.p4th.backend.common.exception.ErrorCode;
 import com.p4th.backend.repository.PostRepository;
+import com.p4th.backend.util.HtmlImageUtils;
 import com.p4th.backend.util.RelativeTimeFormatter;
 import com.p4th.backend.util.ULIDUtil;
 import lombok.RequiredArgsConstructor;
@@ -30,10 +31,10 @@ public class PostService {
     private final PostMapper postMapper;
     private final CommentMapper commentMapper;
     private final UserMapper userMapper;
-    private final S3Service s3Service;
     private final PostHistoryLogMapper postHistoryLogMapper;
     private final PostRepository postRepository;
     private static final DateTimeFormatter originalFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    private final S3Service s3Service;
 
     @Transactional(readOnly = true)
     public Page<PostListDto> getPostsByBoard(String boardId, Pageable pageable) {
@@ -71,10 +72,8 @@ public class PostService {
         if (user == null) {
             throw new CustomException(ErrorCode.USER_NOT_FOUND, "사용자 정보를 찾을 수 없습니다.");
         }
-
-        // HTML 컨텐츠 내의 inline 미디어 처리 (예: base64 이미지 업로드 후 URL 교체)
-        String processedContent = processInlineMedia(content, boardId);
-
+        // HTML 콘텐츠 내의 inline 미디어 처리
+        String processedContent = HtmlImageUtils.processInlineMedia(content, boardId, s3Service);
         // 게시글 생성
         Post post = new Post();
         String postId = ULIDUtil.getULID();
@@ -101,11 +100,7 @@ public class PostService {
         if (!existing.getUserId().equals(userId)) {
             throw new CustomException(ErrorCode.UNAUTHORIZED_ACCESS, "본인이 작성한 게시글만 수정할 수 있습니다.");
         }
-
-        // HTML 내 inline 미디어 처리
-        String processedContent = processInlineMedia(content, boardId);
-
-        // 게시글 업데이트
+        String processedContent = HtmlImageUtils.processInlineMedia(content, boardId, s3Service);
         Post post = new Post();
         post.setPostId(postId);
         post.setBoardId(boardId);
@@ -121,7 +116,7 @@ public class PostService {
     public void deletePost(String postId, String requesterUserId) {
         Post existing = postMapper.getPostDetail(postId);
         if (existing == null) {
-            throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR, "게시글을 찾을 수 없습니다.");
+            throw new CustomException(ErrorCode.POST_NOT_FOUND, "게시글을 찾을 수 없습니다.");
         }
         // 관리자 권한(예: admin_role == 1)이거나 본인 게시글일 때 삭제 가능
         User requester = userMapper.selectByUserId(requesterUserId);
@@ -137,7 +132,15 @@ public class PostService {
     public List<PopularPostResponse> getPopularPosts(String period) {
         List<PopularPostResponse> responses = postHistoryLogMapper.getPopularPostsByPeriod(period);
         responses.forEach(response -> {
-            if(response.getCreatedAt() != null && !response.getCreatedAt().isEmpty()) {
+            // imageUrl, imageCount는 content 필드에서 추출
+            if (response.getContent() != null && !response.getContent().isEmpty()) {
+                String imgUrl = HtmlImageUtils.extractFirstImageUrl(response.getContent());
+                int imgCount = HtmlImageUtils.countInlineImages(response.getContent());
+                response.setImageUrl(imgUrl);
+                response.setImageCount(imgCount);
+            }
+
+            if (response.getCreatedAt() != null && !response.getCreatedAt().isEmpty()) {
                 LocalDateTime createdTime = LocalDateTime.parse(response.getCreatedAt(), originalFormatter);
                 response.setCreatedAt(RelativeTimeFormatter.formatRelativeTime(createdTime));
             }
@@ -145,37 +148,4 @@ public class PostService {
         return responses;
     }
 
-    /**
-     * HTML 컨텐츠 내의 inline 미디어 처리
-     *
-     * @param content 원본 HTML 컨텐츠
-     * @param boardId 게시글이 속한 게시판 ID (이미지 저장 경로에 사용)
-     * @return inline 미디어가 처리되어 URL로 교체된 HTML 컨텐츠
-     */
-    private String processInlineMedia(String content, String boardId) {
-        org.jsoup.nodes.Document doc = org.jsoup.Jsoup.parse(content);
-        org.jsoup.select.Elements imgTags = doc.select("img[src^=data:image/]");
-        for (org.jsoup.nodes.Element img : imgTags) {
-            String dataUri = img.attr("src");
-            int commaIndex = dataUri.indexOf(",");
-            if (commaIndex > 0) {
-                String metadata = dataUri.substring(0, commaIndex);  // 예: "data:image/png;base64"
-                String base64Data = dataUri.substring(commaIndex + 1);
-                // 확장자 추출 (예: image/png -> png)
-                String ext = metadata.substring(metadata.indexOf("/") + 1, metadata.indexOf(";")).toLowerCase();
-                byte[] mediaBytes = java.util.Base64.getDecoder().decode(base64Data);
-                // 파일명 생성 (예: ULID + 확장자)
-                String attachmentId = ULIDUtil.getULID();
-                String fileName = attachmentId + "." + ext;
-                String keyDir = "posts/" + boardId;
-                // S3Service의 byte[] 업로드 메서드 호출
-                String fileUrl = s3Service.upload(mediaBytes, keyDir, fileName);
-                // 이미지 태그의 src 값을 업로드된 URL로 교체
-                img.attr("src", fileUrl);
-                // (필요 시, attachType을 로그로 남기거나 DB에 저장하는 로직 추가 가능)
-            }
-        }
-        // 문서의 body 내부 HTML 반환 (doc.body().html())
-        return doc.body().html();
-    }
 }

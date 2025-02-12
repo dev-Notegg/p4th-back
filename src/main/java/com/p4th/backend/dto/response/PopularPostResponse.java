@@ -1,5 +1,6 @@
 package com.p4th.backend.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -41,4 +42,7 @@ public class PopularPostResponse {
 
     @Schema(description = "게시글 작성일 (상대 시간 형식)", example = "0분 전")
     private String createdAt;
+
+    @JsonIgnore
+    private transient String content;
 }
