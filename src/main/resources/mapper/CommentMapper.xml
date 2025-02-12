@@ -20,7 +20,55 @@
             updated_at
         FROM comment
         WHERE post_id = #{postId}
-        ORDER BY created_at
+        ORDER BY created_at DESC
+    </select>
+
+    <!-- 댓글 등록 -->
+    <insert id="insertComment" parameterType="com.p4th.backend.domain.Comment">
+        INSERT INTO comment (
+            comment_id,
+            post_id,
+            parent_comment_id,
+            user_id,
+            content,
+            created_by
+        ) VALUES (
+                     #{commentId},
+                     #{postId},
+                     #{parentCommentId},
+                     #{userId},
+                     #{content},
+                     #{createdBy}
+                 )
+    </insert>
+
+    <!-- 댓글 수정 -->
+    <update id="updateComment">
+        UPDATE comment
+        SET content = #{content},
+            updated_at = NOW()
+        WHERE comment_id = #{commentId}
+    </update>
+
+    <!-- 댓글 삭제 -->
+    <delete id="deleteComment">
+        DELETE FROM comment
+        WHERE comment_id = #{commentId}
+    </delete>
+
+    <select id="getCommentById" resultType="com.p4th.backend.domain.Comment">
+        SELECT
+            comment_id,
+            post_id,
+            parent_comment_id,
+            user_id,
+            content,
+            created_at,
+            created_by,
+            updated_at,
+            updated_by
+        FROM comment
+        WHERE comment_id = #{commentId}
     </select>
 
 </mapper>

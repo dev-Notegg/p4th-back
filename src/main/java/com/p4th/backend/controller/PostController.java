@@ -3,12 +3,7 @@ package com.p4th.backend.controller;
 import com.p4th.backend.domain.Post;
 import com.p4th.backend.dto.request.RegisterPostRequest;
 import com.p4th.backend.dto.request.UpdatePostRequest;
-import com.p4th.backend.dto.response.PopularPostResponse;
-import com.p4th.backend.dto.response.CreatePostResponse;
-import com.p4th.backend.dto.response.PostResponseDto;
-import com.p4th.backend.dto.response.DeletePostResponse;
-import com.p4th.backend.dto.response.UpdatePostResponse;
-import com.p4th.backend.dto.response.PostListDto;
+import com.p4th.backend.dto.response.*;
 import com.p4th.backend.service.PostService;
 import com.p4th.backend.security.JwtProvider;
 import io.swagger.v3.oas.annotations.Operation;
@@ -52,7 +47,7 @@ public class PostController {
             @ParameterObject
             @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
         Page<PostListDto> posts = postService.getPostsByBoard(boardId, pageable);
-        return ResponseEntity.ok(posts);
+        return ResponseEntity.ok().body(posts);
     }
 
     @Operation(summary = "게시글 상세 조회", description = "postId를 입력받아 게시글 상세 정보를 조회한다.")
@@ -67,7 +62,7 @@ public class PostController {
             @Parameter(name = "postId", description = "게시글 ID", required = true) @PathVariable("postId") String postId) {
         Post post = postService.getPostDetail(postId);
         PostResponseDto responseDto = PostResponseDto.from(post);
-        return ResponseEntity.ok(responseDto);
+        return ResponseEntity.ok().body(responseDto);
     }
 
     @Operation(summary = "게시글 등록", description = "게시글 작성을 처리한다. 토큰에서 회원ID를 추출하여 사용하며, 클라이언트는 HTML 콘텐츠(내부 미디어 포함)를 JSON 형식으로 전송한다.")
@@ -84,7 +79,7 @@ public class PostController {
         String userId = jwtProvider.resolveUserId(httpRequest);
         String postId = postService.registerPost(request.getBoardId(), userId, request.getTitle(), request.getContent());
         CreatePostResponse response = new CreatePostResponse(postId);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok().body(response);
     }
 
     @Operation(summary = "게시글 수정", description = "게시글 수정 API. 토큰의 회원ID와 게시글 작성자가 일치해야 수정 가능하다.")
@@ -105,7 +100,7 @@ public class PostController {
         String userId = jwtProvider.resolveUserId(httpRequest);
         postService.updatePost(postId, request.getBoardId(), userId, request.getTitle(), request.getContent());
         UpdatePostResponse response = new UpdatePostResponse(postId);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok().body(response);
     }
 
     @Operation(summary = "게시글 삭제", description = "게시글 삭제 API. 토큰의 회원ID와 게시글 작성자가 일치해야 삭제 가능하다.")

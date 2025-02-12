@@ -116,4 +116,18 @@
         FROM post
     </select>
 
+    <!-- 댓글 수 증가 -->
+    <update id="incrementCommentCount">
+        UPDATE post
+        SET comment_count = comment_count + 1
+        WHERE post_id = #{postId}
+    </update>
+
+    <!-- 댓글 수 감소 -->
+    <update id="decrementCommentCount">
+        UPDATE post
+        SET comment_count = comment_count - 1
+        WHERE post_id = #{postId}
+    </update>
+
 </mapper>
