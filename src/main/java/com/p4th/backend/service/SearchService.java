@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -36,9 +37,9 @@ public class SearchService {
             result.setBoardName(post.getBoard() != null ? post.getBoard().getBoardName() : null);
             result.setViewCount(post.getViewCount());
             result.setCommentCount(post.getCommentCount());
-            // imageCount: HTML 내 이미지 태그(이미지 확장자인 경우) 개수만 계산
+            // imageCount: HTML 내 이미지 태그(조건에 맞는 경우)의 개수
             result.setImageCount(countInlineImages(post.getContent()));
-            // 썸네일 이미지 URL: HTML 내 첫 번째 <img> 태그의 src
+            // 썸네일 이미지 URL: HTML 내 첫 번째 이미지 태그의 src (조건에 맞는 경우)
             result.setImageUrl(extractThumbnail(post.getContent()));
             result.setCreatedAt(post.getCreatedAt() != null ? post.getCreatedAt().format(formatter) : null);
             return result;
@@ -72,10 +73,11 @@ public class SearchService {
 
     /**
      * HTML 문자열에서 첫 번째 <img> 태그의 src 속성을 추출한다.
-     * 단, src가 이미지 파일 확장자(jpg, jpeg, png, gif, bmp)인 경우에만 반환한다.
+     * src가 이미지 파일 확장자(jpg, jpeg, png, gif, bmp)로 끝거나,
+     * 또는 HTTP URL로 시작하면서 (비디오/임베디드 관련 키워드가 없는 경우) 이미지 URL로 판단한다.
      *
      * @param htmlContent 게시글의 HTML 컨텐츠
-     * @return 첫 번째 이미지 URL (이미지 확장자인 경우), 아니면 null
+     * @return 첫 번째 이미지 URL (조건에 맞으면), 없으면 null
      */
     private static String extractThumbnail(String htmlContent) {
         if (htmlContent == null || htmlContent.isEmpty()) {
@@ -85,7 +87,12 @@ public class SearchService {
         Element img = doc.selectFirst("img[src]");
         if (img != null) {
             String src = img.attr("src");
-            if (src.matches("(?i).*\\.(jpg|jpeg|png|gif|bmp)(\\?.*)?$")) {
+            if (src.matches("(?i).*\\.(jpg|jpeg|png|gif|bmp)(\\?.*)?$") ||
+                    (src.startsWith("http") &&
+                            !src.toLowerCase().contains("youtube") &&
+                            !src.toLowerCase().contains("youtu.be") &&
+                            !src.toLowerCase().contains("vimeo") &&
+                            !src.toLowerCase().contains("dailymotion"))) {
                 return src;
             }
         }
@@ -93,7 +100,8 @@ public class SearchService {
     }
 
     /**
-     * HTML 문자열 내의 <img> 태그 중, src가 이미지 파일 확장자(jpg, jpeg, png, gif, bmp)인 태그의 개수를 반환한다.
+     * HTML 문자열 내의 <img> 태그 중, src가 이미지 파일 확장자(jpg, jpeg, png, gif, bmp)로 끝거나,
+     * 또는 HTTP URL로 시작하면서 (비디오/임베디드 관련 키워드가 없는 경우) 이미지로 판단되는 태그의 개수를 반환한다.
      *
      * @param htmlContent 게시글의 HTML 컨텐츠
      * @return 이미지 태그의 개수
@@ -103,8 +111,19 @@ public class SearchService {
             return 0;
         }
         Document doc = Jsoup.parse(htmlContent);
-        return doc.select("img[src]").stream()
-                .filter(img -> img.attr("src").matches("(?i).*\\.(jpg|jpeg|png|gif|bmp)(\\?.*)?$"))
-                .toArray().length;
+        Elements imgs = doc.select("img[src]");
+        int count = 0;
+        for (Element img : imgs) {
+            String src = img.attr("src");
+            if (src.matches("(?i).*\\.(jpg|jpeg|png|gif|bmp)(\\?.*)?$") ||
+                    (src.startsWith("http") &&
+                            !src.toLowerCase().contains("youtube") &&
+                            !src.toLowerCase().contains("youtu.be") &&
+                            !src.toLowerCase().contains("vimeo") &&
+                            !src.toLowerCase().contains("dailymotion"))) {
+                count++;
+            }
+        }
+        return count;
     }
 }
