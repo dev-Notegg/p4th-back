@@ -1,6 +1,5 @@
 package com.p4th.backend.service;
 
-import com.p4th.backend.domain.Board;
 import com.p4th.backend.domain.Category;
 import com.p4th.backend.mapper.CategoryMapper;
 import lombok.RequiredArgsConstructor;
@@ -15,12 +14,5 @@ public class CategoryService {
 
     public List<Category> getAllCategories() {
         return categoryMapper.getAllCategories();
-    }
-
-    public Category getBoardsByCategory(String categoryId) {
-        Category category = categoryMapper.getCategoryById(categoryId);
-        List<Board> boards = categoryMapper.getBoardsByCategory(categoryId);
-        category.setBoards(boards);
-        return category;
     }
 }
