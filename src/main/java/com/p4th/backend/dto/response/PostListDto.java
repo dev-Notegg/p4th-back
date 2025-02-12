@@ -15,12 +15,12 @@ public class PostListDto {
     private String userId;
     private String nickname;
     private String title;
-    private String category;
-    private String boardName;
+    private String category;    // 게시판의 카테고리명
+    private String boardName;   // 게시판명
     private int viewCount;
     private int commentCount;
-    private String imageUrl;
-    private int imageCount;
+    private String imageUrl;    // 썸네일 이미지 URL
+    private int imageCount;     // HTML 내 이미지 태그 개수
     private String createdAt;
 
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
@@ -40,22 +40,10 @@ public class PostListDto {
         }
         dto.viewCount = post.getViewCount();
         dto.commentCount = post.getCommentCount();
-
-        // 첨부파일 개수
-        int attachmentCount = (post.getAttachments() != null) ? post.getAttachments().size() : 0;
-        // HTML 컨텐츠 내의 <img> 태그(이미지 확장자인 경우)의 개수
-        int inlineImageCount = countInlineImages(post.getContent());
-        dto.imageCount = attachmentCount + inlineImageCount;
-
-        // 우선순위: HTML 내의 첫 번째 <img> 태그의 src 사용, 없으면 첨부파일 첫 번째 URL 사용
-        String inlineImageUrl = extractFirstImageUrl(post.getContent());
-        if (inlineImageUrl != null) {
-            dto.imageUrl = inlineImageUrl;
-        } else if (attachmentCount > 0) {
-            dto.imageUrl = post.getAttachments().get(0).getFileUrl();
-        } else {
-            dto.imageUrl = null;
-        }
+        // imageCount: HTML 내 이미지 태그(이미지 확장자인 경우) 개수를 계산
+        dto.imageCount = countInlineImages(post.getContent());
+        // 썸네일: HTML 내 첫 번째 <img> 태그의 src 사용
+        dto.imageUrl = extractFirstImageUrl(post.getContent());
         if (post.getCreatedAt() != null) {
             dto.createdAt = post.getCreatedAt().format(formatter);
         }
@@ -63,11 +51,11 @@ public class PostListDto {
     }
 
     /**
-     * HTML 문자열에서 첫 번째 <img> 태그의 src 속성을 추출한다.
-     * 단, 추출된 URL이 이미지 파일 확장자(jpg, jpeg, png, gif, bmp)인 경우에만 반환한다.
+     * HTML 문자열에서 첫 번째 <img> 태그의 src를 추출한다.
+     * 단, src가 이미지 파일 확장자(jpg, jpeg, png, gif, bmp)인 경우에만 반환한다.
      *
      * @param htmlContent 게시글의 HTML 컨텐츠
-     * @return 첫 번째 이미지 URL (이미지 확장자인 경우), 아니면 null
+     * @return 첫 번째 이미지 URL (이미지인 경우), 없으면 null
      */
     private static String extractFirstImageUrl(String htmlContent) {
         if (htmlContent == null || htmlContent.isEmpty()) {
@@ -86,10 +74,10 @@ public class PostListDto {
     }
 
     /**
-     * HTML 문자열 내의 <img> 태그 중, src 속성이 이미지 파일 확장자(jpg, jpeg, png, gif, bmp)인 태그의 개수를 반환한다.
+     * HTML 문자열 내의 <img> 태그 중, src가 이미지 파일 확장자(jpg, jpeg, png, gif, bmp)인 태그의 개수를 반환한다.
      *
      * @param htmlContent 게시글의 HTML 컨텐츠
-     * @return 이미지 태그 개수
+     * @return 이미지 태그의 개수
      */
     private static int countInlineImages(String htmlContent) {
         if (htmlContent == null || htmlContent.isEmpty()) {

@@ -33,8 +33,6 @@ public class Post {
     private LocalDateTime updatedAt;
 
     @OneToMany(mappedBy = "post", fetch = FetchType.LAZY)
-    private List<PostAttachment> attachments;
-    @OneToMany(mappedBy = "post", fetch = FetchType.LAZY)
     private List<Comment> comments;
     // 연관관계 (읽기 전용)
     @ManyToOne(fetch = FetchType.LAZY)
@@ -43,22 +41,4 @@ public class Post {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", insertable = false, updatable = false)
     private User user;
-
-    /**
-     * 첨부파일 목록에서 첫 번째 첨부파일 URL을 반환한다.
-     * 첨부파일이 없으면 null을 반환.
-     */
-    public String getFirstAttachmentUrl() {
-        if (attachments != null && !attachments.isEmpty()) {
-            return attachments.get(0).getFileUrl();
-        }
-        return null;
-    }
-
-    /**
-     * 첨부파일 개수를 반환한다.
-     */
-    public int getAttachmentCount() {
-        return attachments != null ? attachments.size() : 0;
-    }
 }

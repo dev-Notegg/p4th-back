@@ -25,7 +25,6 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.List;
 
@@ -80,10 +79,9 @@ public class PostController {
             @Parameter(name = "boardId", description = "게시판 ID", required = true) @RequestParam String boardId,
             @Parameter(name = "title", description = "게시글 제목", required = true) @RequestParam String title,
             @Parameter(name = "content", description = "게시글 내용", required = true) @RequestParam String content,
-            @Parameter(name = "files", description = "첨부 파일 리스트") @RequestPart(value = "files", required = false) List<MultipartFile> files,
             HttpServletRequest request) {
         String userId = jwtProvider.resolveUserId(request);
-        String postId = postService.registerPost(boardId, userId, title, content, files);
+        String postId = postService.registerPost(boardId, userId, title, content);
         CreatePostResponse response = new CreatePostResponse(postId);
         return ResponseEntity.ok().body(response);
     }
@@ -102,10 +100,9 @@ public class PostController {
             @Parameter(name = "boardId", description = "게시판 ID", required = true) @RequestParam String boardId,
             @Parameter(name = "title", description = "게시글 제목", required = true) @RequestParam String title,
             @Parameter(name = "content", description = "게시글 내용", required = true) @RequestParam String content,
-            @Parameter(name = "newFiles", description = "첨부 파일 리스트") @RequestPart(value = "newFiles", required = false) List<MultipartFile> newFiles,
             HttpServletRequest request) {
         String userId = jwtProvider.resolveUserId(request);
-        postService.updatePost(postId, boardId, userId, title, content, newFiles);
+        postService.updatePost(postId, boardId, userId, title, content);
         UpdatePostResponse response = new UpdatePostResponse(postId);
         return ResponseEntity.ok().body(response);
     }

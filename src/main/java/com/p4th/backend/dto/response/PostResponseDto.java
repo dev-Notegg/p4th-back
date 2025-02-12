@@ -6,7 +6,6 @@ import lombok.Data;
 
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Data
 public class PostResponseDto {
@@ -20,7 +19,6 @@ public class PostResponseDto {
     private int commentCount;
     private String createdAt;
     private String createdBy;
-    private List<PostAttachmentDto> attachments;
     private List<Comment> comments;
 
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
@@ -37,18 +35,6 @@ public class PostResponseDto {
         dto.commentCount = post.getCommentCount();
         dto.createdAt = post.getCreatedAt() != null ? post.getCreatedAt().format(formatter) : null;
         dto.createdBy = post.getCreatedBy();
-        if (post.getAttachments() != null) {
-            dto.attachments = post.getAttachments().stream().map(attachment -> {
-                PostAttachmentDto attDto = new PostAttachmentDto();
-                attDto.setAttachmentId(attachment.getAttachmentId());
-                attDto.setPostId(attachment.getPostId());
-                attDto.setFileName(attachment.getFileName());
-                attDto.setFileUrl(attachment.getFileUrl());
-                attDto.setAttachType(attachment.getAttachType());
-                attDto.setFileSize(attachment.getFileSize());
-                return attDto;
-            }).collect(Collectors.toList());
-        }
         dto.comments = post.getComments();
         return dto;
     }
