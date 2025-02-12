@@ -4,12 +4,14 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.p4th.backend.mapper.PostMapper">
 
+    <!-- 게시판별 게시글 개수 조회 -->
     <select id="countPostsByBoard" resultType="int">
         SELECT COUNT(*)
         FROM post
         WHERE board_id = #{boardId}
     </select>
 
+    <!-- 게시글 상세 조회 (작성자 닉네임 포함) -->
     <select id="getPostDetail" resultType="com.p4th.backend.domain.Post">
         SELECT
             p.post_id AS postId,
@@ -32,6 +34,7 @@
         WHERE p.post_id = #{postId}
     </select>
 
+    <!-- 게시글 등록 -->
     <insert id="insertPost">
         INSERT INTO post
         (
@@ -53,6 +56,7 @@
             )
     </insert>
 
+    <!-- 게시글 수정 -->
     <update id="updatePost">
         UPDATE post
         SET
@@ -63,6 +67,7 @@
         WHERE post_id = #{postId}
     </update>
 
+    <!-- 게시글 삭제 -->
     <delete id="deletePost">
         DELETE FROM post
         WHERE post_id = #{postId}
@@ -87,8 +92,6 @@
             b.board_name AS boardName,
             p.view_count AS viewCount,
             p.comment_count AS commentCount,
-            (SELECT pa.file_url FROM post_attachment pa WHERE pa.post_id = p.post_id LIMIT 1) AS imageUrl,
-            (SELECT COUNT(*) FROM post_attachment pa WHERE pa.post_id = p.post_id) AS imageCount,
             p.created_at AS createdAt
         FROM post p
                  LEFT JOIN user_info u ON p.user_id = u.user_id
@@ -99,6 +102,7 @@
         LIMIT 20
     </select>
 
+    <!-- 전체 게시글 조회 -->
     <select id="getAllPosts" resultType="com.p4th.backend.domain.Post">
         SELECT
             post_id,
