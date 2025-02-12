@@ -1,6 +1,8 @@
 package com.p4th.backend.controller;
 
 import com.p4th.backend.domain.Post;
+import com.p4th.backend.dto.request.RegisterPostRequest;
+import com.p4th.backend.dto.request.UpdatePostRequest;
 import com.p4th.backend.dto.response.PopularPostResponse;
 import com.p4th.backend.dto.response.CreatePostResponse;
 import com.p4th.backend.dto.response.PostResponseDto;
@@ -68,25 +70,24 @@ public class PostController {
         return ResponseEntity.ok(responseDto);
     }
 
-    @Operation(summary = "게시글 등록", description = "게시글 작성 및 첨부파일 업로드를 한 번에 처리한다. 토큰에서 회원ID를 추출하여 사용한다.")
+    @Operation(summary = "게시글 등록", description = "게시글 작성을 처리한다. 토큰에서 회원ID를 추출하여 사용하며, 클라이언트는 HTML 콘텐츠(내부 미디어 포함)를 JSON 형식으로 전송한다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "게시글 등록 성공"),
             @ApiResponse(responseCode = "400", description = "입력 데이터 오류",
                     content = @Content(schema = @Schema(implementation = com.p4th.backend.dto.response.ErrorResponse.class)))
     })
-    @PostMapping(consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<CreatePostResponse> registerPost(
-            @Parameter(name = "boardId", description = "게시판 ID", required = true) @RequestParam String boardId,
-            @Parameter(name = "title", description = "게시글 제목", required = true) @RequestParam String title,
-            @Parameter(name = "content", description = "게시글 내용", required = true) @RequestParam String content,
-            HttpServletRequest request) {
-        String userId = jwtProvider.resolveUserId(request);
-        String postId = postService.registerPost(boardId, userId, title, content);
+            @Parameter(name = "RegisterPostRequest", description = "게시글 등록 요청 DTO", required = true)
+            @RequestBody RegisterPostRequest request,
+            HttpServletRequest httpRequest) {
+        String userId = jwtProvider.resolveUserId(httpRequest);
+        String postId = postService.registerPost(request.getBoardId(), userId, request.getTitle(), request.getContent());
         CreatePostResponse response = new CreatePostResponse(postId);
-        return ResponseEntity.ok().body(response);
+        return ResponseEntity.ok(response);
     }
 
-    @Operation(summary = "게시글 수정", description = "게시글 수정 API. 토큰의 회원ID와 게시글 작성자가 일치해야 수정 가능하다. 기존 첨부파일은 모두 삭제되고, 신규 첨부파일로 교체된다.")
+    @Operation(summary = "게시글 수정", description = "게시글 수정 API. 토큰의 회원ID와 게시글 작성자가 일치해야 수정 가능하다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "게시글 수정 성공"),
             @ApiResponse(responseCode = "400", description = "입력 데이터 오류",
@@ -94,17 +95,17 @@ public class PostController {
             @ApiResponse(responseCode = "403", description = "권한이 없습니다.",
                     content = @Content(schema = @Schema(implementation = com.p4th.backend.dto.response.ErrorResponse.class)))
     })
-    @PutMapping(value = "/{postId}", consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
+    @PutMapping(value = "/{postId}", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<UpdatePostResponse> updatePost(
-            @Parameter(name = "postId", description = "게시글 ID", required = true) @PathVariable("postId") String postId,
-            @Parameter(name = "boardId", description = "게시판 ID", required = true) @RequestParam String boardId,
-            @Parameter(name = "title", description = "게시글 제목", required = true) @RequestParam String title,
-            @Parameter(name = "content", description = "게시글 내용", required = true) @RequestParam String content,
-            HttpServletRequest request) {
-        String userId = jwtProvider.resolveUserId(request);
-        postService.updatePost(postId, boardId, userId, title, content);
+            @Parameter(name = "postId", description = "게시글 ID", required = true)
+            @PathVariable("postId") String postId,
+            @Parameter(name = "UpdatePostRequest", description = "게시글 수정 요청 DTO", required = true)
+            @RequestBody UpdatePostRequest request,
+            HttpServletRequest httpRequest) {
+        String userId = jwtProvider.resolveUserId(httpRequest);
+        postService.updatePost(postId, request.getBoardId(), userId, request.getTitle(), request.getContent());
         UpdatePostResponse response = new UpdatePostResponse(postId);
-        return ResponseEntity.ok().body(response);
+        return ResponseEntity.ok(response);
     }
 
     @Operation(summary = "게시글 삭제", description = "게시글 삭제 API. 토큰의 회원ID와 게시글 작성자가 일치해야 삭제 가능하다.")
