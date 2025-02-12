@@ -1,10 +1,9 @@
 package com.p4th.backend.dto.response;
 
+import com.p4th.backend.util.RelativeTimeFormatter;
 import com.p4th.backend.domain.Post;
-import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
-
-import java.time.format.DateTimeFormatter;
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -36,7 +35,8 @@ public class PostResponseDto {
     @Schema(description = "댓글 수", example = "2")
     private int commentCount;
 
-    @Schema(description = "게시글 생성일시", example = "2025-02-10 16:11:22")
+    //RelativeTimeFormatter를 통해 포맷된 문자열로 반환함
+    @Schema(description = "게시글 작성일 (0분 전, X분 전, X시간 전, 또는 날짜 형식)", example = "0분 전")
     private String createdAt;
 
     @Schema(description = "게시글 생성자", example = "user_001")
@@ -44,8 +44,6 @@ public class PostResponseDto {
 
     @Schema(description = "댓글 목록")
     private List<CommentResponse> comments;
-
-    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     public static PostResponseDto from(Post post) {
         PostResponseDto dto = new PostResponseDto();
@@ -57,7 +55,8 @@ public class PostResponseDto {
         dto.setContent(post.getContent());
         dto.setViewCount(post.getViewCount());
         dto.setCommentCount(post.getCommentCount());
-        dto.setCreatedAt(post.getCreatedAt() != null ? post.getCreatedAt().format(formatter) : null);
+        // createdAt을 RelativeTimeFormatter로 포맷
+        dto.setCreatedAt(RelativeTimeFormatter.formatRelativeTime(post.getCreatedAt()));
         dto.setCreatedBy(post.getCreatedBy());
         if (post.getComments() != null) {
             dto.setComments(post.getComments().stream()

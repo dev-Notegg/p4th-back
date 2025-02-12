@@ -1,9 +1,9 @@
 package com.p4th.backend.dto.response;
 
+import com.p4th.backend.util.RelativeTimeFormatter;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import com.p4th.backend.domain.Comment;
-import java.time.format.DateTimeFormatter;
 
 @Data
 @Schema(description = "댓글 조회 응답 DTO")
@@ -24,10 +24,8 @@ public class CommentResponse {
     @Schema(description = "댓글 내용", example = "첫 번째 댓글입니다.")
     private String content;
 
-    @Schema(description = "작성일자", example = "2025-02-12 15:00:01")
+    @Schema(description = "댓글 작성일 (0분 전, X분 전, X시간 전, 또는 날짜 형식)", example = "0분 전")
     private String createdAt;
-
-    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     public static CommentResponse from(Comment comment) {
         CommentResponse response = new CommentResponse();
@@ -36,7 +34,7 @@ public class CommentResponse {
         response.setUserId(comment.getUserId());
         response.setNickname(comment.getNickname() != null ? comment.getNickname() : "");
         response.setContent(comment.getContent());
-        response.setCreatedAt(comment.getCreatedAt() != null ? comment.getCreatedAt().format(formatter) : null);
+        response.setCreatedAt(RelativeTimeFormatter.formatRelativeTime(comment.getCreatedAt()));
         return response;
     }
 }
