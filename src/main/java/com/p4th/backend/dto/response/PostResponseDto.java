@@ -1,5 +1,6 @@
 package com.p4th.backend.dto.response;
 
+import com.p4th.backend.domain.Comment;
 import com.p4th.backend.domain.Post;
 import lombok.Data;
 
@@ -20,6 +21,7 @@ public class PostResponseDto {
     private String createdAt;
     private String createdBy;
     private List<PostAttachmentDto> attachments;
+    private List<Comment> comments;
 
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
