@@ -32,7 +32,7 @@ public class CommentResponse {
         response.setCommentId(comment.getCommentId());
         response.setParentCommentId(comment.getParentCommentId());
         response.setUserId(comment.getUserId());
-        response.setNickname(comment.getNickname() != null ? comment.getNickname() : "");
+        response.setNickname(comment.getNickname() != null ? comment.getNickname() : null);
         response.setContent(comment.getContent());
         response.setCreatedAt(RelativeTimeFormatter.formatRelativeTime(comment.getCreatedAt()));
         return response;
