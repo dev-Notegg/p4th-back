@@ -30,7 +30,7 @@ public class RelativeTimeFormatter {
         } else if (hours < 24) {
             return hours + "시간 전";
         } else {
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
             return createdAt.format(formatter);
         }
     }
