@@ -7,6 +7,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import java.time.format.DateTimeFormatter;
+import org.apache.commons.text.StringEscapeUtils;
 
 @Data
 public class PostListDto {
@@ -40,10 +41,14 @@ public class PostListDto {
         }
         dto.viewCount = post.getViewCount();
         dto.commentCount = post.getCommentCount();
-        // imageCount: HTML 내 이미지 태그(이미지 확장자인 경우) 개수를 계산
-        dto.imageCount = countInlineImages(post.getContent());
-        // 썸네일: HTML 내 첫 번째 <img> 태그의 src 사용
-        dto.imageUrl = extractFirstImageUrl(post.getContent());
+
+        // content가 DB에 이스케이프되어 저장된 경우 unescape 처리
+        String unescapedContent = StringEscapeUtils.unescapeHtml4(post.getContent());
+
+        // HTML 내 이미지 태그 처리
+        dto.imageCount = countInlineImages(unescapedContent);
+        dto.imageUrl = extractFirstImageUrl(unescapedContent);
+
         if (post.getCreatedAt() != null) {
             dto.createdAt = post.getCreatedAt().format(formatter);
         }
@@ -62,11 +67,11 @@ public class PostListDto {
             return null;
         }
         Document doc = Jsoup.parse(htmlContent);
-        Element img = doc.selectFirst("img[src]");
-        if (img != null) {
+        // 여러 <img> 태그가 있을 경우 조건에 맞는 첫 번째 태그의 src 반환
+        Elements imgs = doc.select("img[src]");
+        for (Element img : imgs) {
             String src = img.attr("src");
-            // 이미지 확장자 검사 (대소문자 무시)
-            if (src.matches("(?i).*\\.(jpg|jpeg|png|gif|bmp)(\\?.*)?$")) {
+            if (isImageUrl(src)) {
                 return src;
             }
         }
@@ -88,10 +93,30 @@ public class PostListDto {
         int count = 0;
         for (Element img : imgs) {
             String src = img.attr("src");
-            if (src.matches("(?i).*\\.(jpg|jpeg|png|gif|bmp)(\\?.*)?$")) {
+            if (isImageUrl(src)) {
                 count++;
             }
         }
         return count;
+    }
+
+    /**
+     * 주어진 src URL이 이미지로 간주될 수 있는지 판단한다.
+     * 조건:
+     * 1. src가 jpg, jpeg, png, gif, bmp 확장자(쿼리스트링 포함)로 끝나거나,
+     * 2. src가 HTTP URL로 시작하고, 비디오/임베디드 관련 키워드(예: "youtube", "youtu.be", "vimeo", "dailymotion")가 포함되지 않으면 이미지로 판단한다.
+     */
+    private static boolean isImageUrl(String src) {
+        if (src == null || src.isEmpty()) {
+            return false;
+        }
+        if (src.matches("(?i).*\\.(jpg|jpeg|png|gif|bmp)(\\?.*)?$")) {
+            return true;
+        }
+        return src.startsWith("http") &&
+                !src.toLowerCase().contains("youtube") &&
+                !src.toLowerCase().contains("youtu.be") &&
+                !src.toLowerCase().contains("vimeo") &&
+                !src.toLowerCase().contains("dailymotion");
     }
 }

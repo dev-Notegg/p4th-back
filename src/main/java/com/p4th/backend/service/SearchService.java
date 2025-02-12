@@ -39,8 +39,7 @@ public class SearchService {
             result.setCommentCount(post.getCommentCount());
             // imageCount: HTML 내 이미지 태그(조건에 맞는 경우)의 개수
             result.setImageCount(countInlineImages(post.getContent()));
-            // 썸네일 이미지 URL: HTML 내 첫 번째 이미지 태그의 src (조건에 맞는 경우)
-            result.setImageUrl(extractThumbnail(post.getContent()));
+            result.setImageUrl(extractFirstImageUrl(post.getContent()));
             result.setCreatedAt(post.getCreatedAt() != null ? post.getCreatedAt().format(formatter) : null);
             return result;
         });
@@ -65,7 +64,7 @@ public class SearchService {
             result.setViewCount(post.getViewCount());
             result.setCommentCount(post.getCommentCount());
             result.setImageCount(countInlineImages(post.getContent()));
-            result.setImageUrl(extractThumbnail(post.getContent()));
+            result.setImageUrl(extractFirstImageUrl(post.getContent()));
             result.setCreatedAt(post.getCreatedAt() != null ? post.getCreatedAt().format(formatter) : null);
             return result;
         });
@@ -79,20 +78,15 @@ public class SearchService {
      * @param htmlContent 게시글의 HTML 컨텐츠
      * @return 첫 번째 이미지 URL (조건에 맞으면), 없으면 null
      */
-    private static String extractThumbnail(String htmlContent) {
+    private static String extractFirstImageUrl(String htmlContent) {
         if (htmlContent == null || htmlContent.isEmpty()) {
             return null;
         }
         Document doc = Jsoup.parse(htmlContent);
-        Element img = doc.selectFirst("img[src]");
-        if (img != null) {
+        Elements imgs = doc.select("img[src]");
+        for (Element img : imgs) {
             String src = img.attr("src");
-            if (src.matches("(?i).*\\.(jpg|jpeg|png|gif|bmp)(\\?.*)?$") ||
-                    (src.startsWith("http") &&
-                            !src.toLowerCase().contains("youtube") &&
-                            !src.toLowerCase().contains("youtu.be") &&
-                            !src.toLowerCase().contains("vimeo") &&
-                            !src.toLowerCase().contains("dailymotion"))) {
+            if (isImageUrl(src)) {
                 return src;
             }
         }
@@ -115,15 +109,26 @@ public class SearchService {
         int count = 0;
         for (Element img : imgs) {
             String src = img.attr("src");
-            if (src.matches("(?i).*\\.(jpg|jpeg|png|gif|bmp)(\\?.*)?$") ||
-                    (src.startsWith("http") &&
-                            !src.toLowerCase().contains("youtube") &&
-                            !src.toLowerCase().contains("youtu.be") &&
-                            !src.toLowerCase().contains("vimeo") &&
-                            !src.toLowerCase().contains("dailymotion"))) {
+            if (isImageUrl(src)) {
                 count++;
             }
         }
         return count;
+    }
+
+    private static boolean isImageUrl(String src) {
+        if (src == null || src.isEmpty()) {
+            return false;
+        }
+        // 조건 1: 파일 확장자 검사
+        if (src.matches("(?i).*\\.(jpg|jpeg|png|gif|bmp)(\\?.*)?$")) {
+            return true;
+        }
+        // 조건 2: HTTP URL이면서 비디오/임베디드 관련 키워드가 없는 경우
+        return src.startsWith("http") &&
+                !src.toLowerCase().contains("youtube") &&
+                !src.toLowerCase().contains("youtu.be") &&
+                !src.toLowerCase().contains("vimeo") &&
+                !src.toLowerCase().contains("dailymotion");
     }
 }
