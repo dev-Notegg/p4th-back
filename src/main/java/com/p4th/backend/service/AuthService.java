@@ -80,7 +80,7 @@ public class AuthService {
         if (user.getPassCode() == null || !user.getPassCode().equals(passCode)) {
             throw new CustomException(ErrorCode.INVALID_PASSCODE);
         }
-        String tempPassword = ULIDUtil.getULID().substring(0, 12);
+        String tempPassword = ULIDUtil.getULID().substring(14);
         user.setPassword(PasswordUtil.encode(tempPassword));
         userMapper.updatePassword(user);
         return tempPassword;
