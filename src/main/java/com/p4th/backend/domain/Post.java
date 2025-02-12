@@ -18,6 +18,8 @@ public class Post {
     private String boardId;
     @Column(name = "user_id")
     private String userId;
+    @Transient
+    private String nickname;
     private String title;
     private String content;
     private int pinnedYn;

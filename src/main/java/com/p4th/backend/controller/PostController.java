@@ -187,7 +187,7 @@ public class PostController {
         dto.setPostId(post.getPostId());
         dto.setBoardId(post.getBoardId());
         dto.setUserId(post.getUserId());
-        dto.setNickname(post.getUser().getNickname());
+        dto.setNickname(post.getNickname());
         dto.setTitle(post.getTitle());
         dto.setContent(post.getContent());
         dto.setViewCount(post.getViewCount());
