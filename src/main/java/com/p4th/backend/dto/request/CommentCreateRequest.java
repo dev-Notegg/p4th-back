@@ -6,9 +6,6 @@ import lombok.Data;
 @Data
 @Schema(description = "댓글 작성 요청 DTO")
 public class CommentCreateRequest {
-    @Schema(description = "작성자 ID", example = "id1234")
-    private String userId;
-
     @Schema(description = "댓글 내용", example = "댓글 내용 작성...")
     private String content;
 

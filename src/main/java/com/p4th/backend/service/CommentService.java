@@ -14,7 +14,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -24,31 +23,18 @@ public class CommentService {
 
     private final CommentMapper commentMapper;
     private final UserMapper userMapper;
-    private final PostMapper postMapper; // 추가: 게시글 업데이트를 위해
-
-    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    private final PostMapper postMapper;
 
     @Transactional(readOnly = true)
     public List<CommentResponse> getCommentsByPost(String postId) {
         List<Comment> comments = commentMapper.getCommentsByPost(postId);
-        return comments.stream().map(comment -> {
-            CommentResponse response = new CommentResponse();
-            response.setCommentId(comment.getCommentId());
-            response.setParentCommentId(comment.getParentCommentId());
-            response.setUserId(comment.getUserId());
-            // 사용자 닉네임 조회
-            User user = userMapper.selectByUserId(comment.getUserId());
-            response.setNickname(user != null ? user.getNickname() : "");
-            response.setContent(comment.getContent());
-            response.setCreatedAt(comment.getCreatedAt() != null ? comment.getCreatedAt().format(formatter) : null);
-            return response;
-        }).collect(Collectors.toList());
+        return comments.stream().map(CommentResponse::from).collect(Collectors.toList());
     }
 
     @Transactional
-    public String createComment(String postId, CommentCreateRequest request) {
+    public String createComment(String postId, String userId, CommentCreateRequest request) {
         // 사용자 유효성 검사
-        User user = userMapper.selectByUserId(request.getUserId());
+        User user = userMapper.selectByUserId(userId);
         if (user == null) {
             throw new CustomException(ErrorCode.USER_NOT_FOUND, "사용자를 찾을 수 없습니다.");
         }
@@ -56,10 +42,10 @@ public class CommentService {
         String commentId = ULIDUtil.getULID();
         comment.setCommentId(commentId);
         comment.setPostId(postId);
-        comment.setUserId(request.getUserId());
+        comment.setUserId(userId);
         comment.setContent(request.getContent());
         comment.setParentCommentId(request.getParentCommentId());
-        comment.setCreatedBy(request.getUserId());
+        comment.setCreatedBy(userId);
         int inserted = commentMapper.insertComment(comment);
         if (inserted != 1) {
             throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR, "댓글 등록 실패");
@@ -70,17 +56,30 @@ public class CommentService {
     }
 
     @Transactional
-    public boolean updateComment(String commentId, String content) {
+    public boolean updateComment(String commentId, String content, String userId) {
+        // 댓글 조회 및 권한 체크
+        Comment comment = commentMapper.getCommentById(commentId);
+        if (comment == null) {
+            throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR, "댓글을 찾을 수 없습니다.");
+        }
+        if (!comment.getUserId().equals(userId)) {
+            throw new CustomException(ErrorCode.UNAUTHORIZED_ACCESS, "본인이 작성한 댓글만 수정할 수 있습니다.");
+        }
         int updated = commentMapper.updateComment(commentId, content);
         return updated == 1;
     }
 
     @Transactional
-    public boolean deleteComment(String commentId) {
-        // 먼저 삭제될 댓글의 postId를 확인
+    public boolean deleteComment(String commentId, String userId) {
+        // 댓글 조회
         Comment comment = commentMapper.getCommentById(commentId);
         if (comment == null) {
             throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR, "댓글을 찾을 수 없습니다.");
+        }
+        // 권한 체크: 요청자가 댓글 작성자이거나, 관리자인 경우
+        User requester = userMapper.selectByUserId(userId);
+        if (!comment.getUserId().equals(userId) && (requester == null || requester.getAdminRole() != 1)) {
+            throw new CustomException(ErrorCode.UNAUTHORIZED_ACCESS, "권한이 없습니다.");
         }
         int deleted = commentMapper.deleteComment(commentId);
         if (deleted != 1) {
