@@ -21,8 +21,6 @@ public class Board {
     private int boardLevel;
     private int sortOrder;
     private int recommend_yn;
-    private String status;
-    private LocalDateTime statusChangedAt;
     private String createdBy;
     private LocalDateTime createdAt;
     private String updatedBy;

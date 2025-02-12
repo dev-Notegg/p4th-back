@@ -26,8 +26,6 @@
             b.board_level,
             b.sort_order,
             b.recommend_yn,
-            b.status,
-            b.status_changed_at,
             b.created_by,
             b.created_at,
             b.updated_by,

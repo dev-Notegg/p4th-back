@@ -30,8 +30,6 @@ public class BoardService {
             dto.setBoardLevel(board.getBoardLevel());
             dto.setSortOrder(board.getSortOrder());
             dto.setRecommend_yn(board.getRecommend_yn());
-            dto.setStatus(board.getStatus());
-            dto.setStatusChangedAt(board.getStatusChangedAt());
             dto.setCreatedBy(board.getCreatedBy());
             dto.setCreatedAt(board.getCreatedAt());
             dto.setUpdatedBy(board.getUpdatedBy());
