@@ -2,15 +2,14 @@ package com.p4th.backend.service;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
+import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.p4th.backend.config.S3Config;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
@@ -95,5 +94,27 @@ public class S3Service {
         // URL 인코딩되어 있을 수 있으므로 디코딩 처리
         key = URLDecoder.decode(key, StandardCharsets.UTF_8);
         amazonS3.deleteObject(s3Config.getBucketName(), key);
+    }
+
+    /**
+     * 바이트 배열 데이터를 업로드하는 메서드
+     *
+     * @param data    업로드할 이미지 데이터
+     * @param dirName 저장할 폴더명
+     * @param fileName 저장할 파일명
+     * @return 업로드된 파일의 CDN URL
+     */
+    public String upload(byte[] data, String dirName, String fileName) {
+        try (InputStream is = new ByteArrayInputStream(data)) {
+            ObjectMetadata metadata = new ObjectMetadata();
+            metadata.setContentLength(data.length);
+            String key = dirName + "/" + fileName;
+            amazonS3.putObject(new PutObjectRequest(s3Config.getBucketName(), key, is, metadata)
+                    .withCannedAcl(CannedAccessControlList.PublicRead));
+            String url = amazonS3.getUrl(s3Config.getBucketName(), key).toString();
+            return convertCdnUrl(url);
+        } catch (IOException e) {
+            throw new RuntimeException("바이트 배열 업로드 중 오류 발생: " + e.getMessage(), e);
+        }
     }
 }

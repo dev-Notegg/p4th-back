@@ -83,7 +83,7 @@ public class PostController {
             @Parameter(name = "files", description = "첨부 파일 리스트") @RequestPart(value = "files", required = false) List<MultipartFile> files,
             HttpServletRequest request) {
         String userId = jwtProvider.resolveUserId(request);
-        String postId = postService.registerPostWithAttachments(boardId, userId, title, content, files);
+        String postId = postService.registerPost(boardId, userId, title, content, files);
         CreatePostResponse response = new CreatePostResponse(postId);
         return ResponseEntity.ok().body(response);
     }
@@ -105,7 +105,7 @@ public class PostController {
             @Parameter(name = "newFiles", description = "첨부 파일 리스트") @RequestPart(value = "newFiles", required = false) List<MultipartFile> newFiles,
             HttpServletRequest request) {
         String userId = jwtProvider.resolveUserId(request);
-        postService.updatePostWithAttachments(postId, boardId, userId, title, content, newFiles);
+        postService.updatePost(postId, boardId, userId, title, content, newFiles);
         UpdatePostResponse response = new UpdatePostResponse(postId);
         return ResponseEntity.ok().body(response);
     }
