@@ -24,8 +24,6 @@ public class Comment {
     private LocalDateTime createdAt;
     private String updatedBy;
     private LocalDateTime updatedAt;
-    // 연관관계 필드 (읽기 전용)
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "post_id", insertable = false, updatable = false)
-    private Post post;
+    @Transient
+    private String nickname;
 }

@@ -20,7 +20,7 @@
             updated_at
         FROM comment
         WHERE post_id = #{postId}
-        ORDER BY created_at DESC
+        ORDER BY created_at
     </select>
 
     <!-- 댓글 등록 -->

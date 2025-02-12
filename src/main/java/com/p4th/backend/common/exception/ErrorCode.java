@@ -20,7 +20,10 @@ public enum ErrorCode {
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, 50000, "내부 서버 오류가 발생하였습니다."),
 
     // 권한 없음
-    UNAUTHORIZED_ACCESS(HttpStatus.FORBIDDEN, 40300, "권한이 없습니다.");
+    UNAUTHORIZED_ACCESS(HttpStatus.FORBIDDEN, 40300, "권한이 없습니다."),
+
+    //게시글 관련
+    POST_NOT_FOUND(HttpStatus.NOT_FOUND, 40400, "게시글을 찾을 수 없습니다.");
 
     private final HttpStatus httpStatus;
     private final int code;

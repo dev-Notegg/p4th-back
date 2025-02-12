@@ -41,9 +41,10 @@ public class PostService {
         // 조회수 1증가
         postMapper.incrementViewCount(postId);
         Post post = postMapper.getPostDetail(postId);
-        if (post != null) {
-            post.setComments(commentMapper.getCommentsByPost(postId));
+        if (post == null) {
+            throw new CustomException(ErrorCode.POST_NOT_FOUND, "게시글을 찾을 수 없습니다.");
         }
+        post.setComments(commentMapper.getCommentsByPost(postId));
         return post;
     }
 
