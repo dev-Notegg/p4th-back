@@ -19,7 +19,8 @@
             p.content AS content,
             p.view_count AS viewCount,
             p.comment_count AS commentCount,
-            p.created_at AS createdAt
+            p.created_at AS createdAt,
+            p.created_by AS createdBy
         FROM post p
                  LEFT JOIN user_info u ON p.user_id = u.user_id
         WHERE p.post_id = #{postId}

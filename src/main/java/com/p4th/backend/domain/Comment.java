@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+
 @Getter
 @Setter
 @Entity
@@ -16,8 +18,12 @@ public class Comment {
     private String parentCommentId;
     private String userId;
     private String content;
+    private String status;
+    private LocalDateTime statusChagedAt;
     private String createdBy;
+    private LocalDateTime createdAt;
     private String updatedBy;
+    private LocalDateTime updatedAt;
     // 연관관계 필드 (읽기 전용)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id", insertable = false, updatable = false)

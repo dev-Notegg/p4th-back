@@ -3,6 +3,8 @@ package com.p4th.backend.domain;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+
 @Getter
 @Setter
 public class Banner {
@@ -14,4 +16,8 @@ public class Banner {
     private int seq;
     private String startDate;
     private String endDate;
+    private String createdBy;
+    private LocalDateTime createdAt;
+    private String updatedBy;
+    private LocalDateTime updatedAt;
 }

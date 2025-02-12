@@ -29,7 +29,7 @@ public class PostListDto {
         dto.setPostId(post.getPostId());
         dto.setBoardId(post.getBoardId());
         dto.setUserId(post.getUserId());
-        dto.setNickname(post.getNickname());
+        dto.setNickname(post.getUser().getNickname());
         dto.setTitle(post.getTitle());
         // 연관관계가 설정되어 있다면 Board와 Category 정보를 가져온다.
         if (post.getBoard() != null) {

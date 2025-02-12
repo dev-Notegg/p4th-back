@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+
 @Getter
 @Setter
 @Entity
@@ -18,7 +20,7 @@ public class PostAttachment {
     private String attachType;
     private long fileSize;
     private String createdBy;
-    private String updatedBy;
+    private LocalDateTime createdAt;
     // 연관관계 (읽기 전용)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id", insertable = false, updatable = false)

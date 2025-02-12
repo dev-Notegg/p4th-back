@@ -18,14 +18,17 @@ public class Post {
     private String boardId;
     @Column(name = "user_id")
     private String userId;
-    private String nickname;
     private String title;
     private String content;
+    private int pinnedYn;
+    private String status;
+    private LocalDateTime statusChangedAt;
     private int viewCount;
     private int commentCount;
-    private LocalDateTime createdAt;
     private String createdBy;
+    private LocalDateTime createdAt;
     private String updatedBy;
+    private LocalDateTime updatedAt;
 
     @OneToMany(mappedBy = "post", fetch = FetchType.LAZY)
     private List<PostAttachment> attachments;

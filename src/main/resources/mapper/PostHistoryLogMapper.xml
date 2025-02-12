@@ -16,6 +16,7 @@
             p.post_id AS postId,
             p.board_id AS boardId,
             p.user_id AS userId,
+            (SELECT u.nickname from user_info u where u.user_id = p.user_id) AS nickname,
             p.title AS title,
             c.category_name AS category,
             b.board_name AS boardName,

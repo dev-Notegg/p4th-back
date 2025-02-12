@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+
 @Getter
 @Setter
 @Entity
@@ -16,8 +18,13 @@ public class Board {
     private String boardName;
     private int boardLevel;
     private int sortOrder;
+    private int recommend_yn;
+    private String status;
+    private LocalDateTime statusChangedAt;
     private String createdBy;
+    private LocalDateTime createdAt;
     private String updatedBy;
+    private LocalDateTime updatedAt;
     // 연관관계 필드 (읽기 전용)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id", insertable = false, updatable = false)
