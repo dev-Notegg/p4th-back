@@ -18,8 +18,9 @@ public class Comment {
     private String parentCommentId;
     private String userId;
     private String content;
-    private String status;
-    private LocalDateTime statusChagedAt;
+    // 상태를 ENUM으로 관리
+    private CommentStatus status;  // NORMAL, REPORTED, DELETED
+    private LocalDateTime statusChangedAt;
     private String createdBy;
     private LocalDateTime createdAt;
     private String updatedBy;

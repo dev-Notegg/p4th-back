@@ -3,6 +3,7 @@ package com.p4th.backend.service;
 import com.p4th.backend.common.exception.CustomException;
 import com.p4th.backend.common.exception.ErrorCode;
 import com.p4th.backend.domain.Comment;
+import com.p4th.backend.domain.CommentStatus;
 import com.p4th.backend.domain.User;
 import com.p4th.backend.dto.request.CommentCreateRequest;
 import com.p4th.backend.dto.response.CommentResponse;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -27,8 +29,35 @@ public class CommentService {
 
     @Transactional(readOnly = true)
     public List<CommentResponse> getCommentsByPost(String postId) {
+        // 모든 댓글을 가져오되, 나중에 상태에 따라 필터링 또는 내용 변경 처리
         List<Comment> comments = commentMapper.getCommentsByPost(postId);
-        return comments.stream().map(CommentResponse::from).collect(Collectors.toList());
+        // 그룹핑: 부모 댓글 ID별 자식 댓글 목록을 생성 (자식 댓글이 있는 경우 표시)
+        Map<String, List<Comment>> childrenMap = comments.stream()
+                .filter(c -> c.getParentCommentId() != null)
+                .collect(Collectors.groupingBy(Comment::getParentCommentId));
+
+        // 댓글 리스트 변환: 삭제 상태인 댓글 중 자식 댓글이 없으면 제외
+        return comments.stream()
+                .filter(c -> {
+                    if (CommentStatus.DELETED.equals(c.getStatus())) {
+                        // 자식 댓글이 있는지 확인
+                        return childrenMap.containsKey(c.getCommentId());
+                    }
+                    return true;
+                })
+                .map(comment -> {
+                    // 만약 댓글 상태가 DELETED이면, content를 "삭제되었습니다"로 설정
+                    if (CommentStatus.DELETED.equals(comment.getStatus())) {
+                        comment.setContent("삭제된 댓글입니다");
+                    }
+                    // 작성일시 변환
+                    String relativeTime = comment.getCreatedAt() != null ?
+                            com.p4th.backend.util.RelativeTimeFormatter.formatRelativeTime(comment.getCreatedAt()) : null;
+                    CommentResponse response = CommentResponse.from(comment);
+                    response.setCreatedAt(relativeTime);
+                    return response;
+                })
+                .collect(Collectors.toList());
     }
 
     @Transactional
@@ -81,9 +110,20 @@ public class CommentService {
         if (!comment.getUserId().equals(userId) && (requester == null || requester.getAdminRole() != 1)) {
             throw new CustomException(ErrorCode.UNAUTHORIZED_ACCESS, "권한이 없습니다.");
         }
-        int deleted = commentMapper.deleteComment(commentId);
-        if (deleted != 1) {
-            throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR, "댓글 삭제 실패");
+        // 자식 댓글이 있는지 확인
+        int childCount = commentMapper.countChildComments(commentId);
+        if (childCount == 0) {
+            // 자식 댓글이 없으면 물리 삭제
+            int deleted = commentMapper.physicalDeleteComment(commentId);
+            if (deleted != 1) {
+                throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR, "댓글 삭제 실패");
+            }
+        } else {
+            // 자식 댓글이 있으면 상태 업데이트 처리
+            int updated = commentMapper.deleteComment(commentId);
+            if (updated != 1) {
+                throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR, "댓글 삭제 실패");
+            }
         }
         // 댓글 삭제 후 해당 게시글의 comment_count 감소
         postMapper.decrementCommentCount(comment.getPostId());

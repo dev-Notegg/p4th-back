@@ -20,7 +20,10 @@ public class User {
     private int membershipLevel;   // 회원 등급
     private int adminRole;         // 관리자 등급
     private int warning_count;     //누적신고 처리횟수
-    private String accountStatus;  // 'ACTIVE','WITHDRAWN','SUSPENDED'
+    // 계정 상태를 ENUM으로 관리
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, columnDefinition = "ENUM('ACTIVE','WITHDRAWN','SUSPENDED') DEFAULT 'ACTIVE'")
+    private AccountStatus accountStatus;
     private LocalDateTime accountStatusChangedAt;
     private LocalDateTime lastLoginAt;
     private String lastLoginIp;

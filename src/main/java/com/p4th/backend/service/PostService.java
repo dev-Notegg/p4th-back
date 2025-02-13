@@ -1,6 +1,7 @@
 package com.p4th.backend.service;
 
 import com.p4th.backend.domain.Post;
+import com.p4th.backend.domain.PostStatus;
 import com.p4th.backend.domain.User;
 import com.p4th.backend.dto.response.PopularPostResponse;
 import com.p4th.backend.dto.response.PostListDto;
@@ -51,6 +52,9 @@ public class PostService {
             throw new CustomException(ErrorCode.POST_NOT_FOUND, "게시글을 찾을 수 없습니다.");
         }
         post.setComments(commentMapper.getCommentsByPost(postId));
+        if (post.getStatus() == PostStatus.DELETED) {
+            post.setContent("삭제된 게시글입니다");
+        }
         return post;
     }
 
@@ -123,9 +127,18 @@ public class PostService {
         if (!existing.getUserId().equals(requesterUserId) && (requester == null || requester.getAdminRole() != 1)) {
             throw new CustomException(ErrorCode.UNAUTHORIZED_ACCESS, "본인이 작성한 게시글만 삭제할 수 있습니다.");
         }
-        int deleted = postMapper.deletePost(postId);
-        if (deleted != 1) {
-            throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR, "게시글 삭제 실패");
+        // 게시글에 댓글이 없는 경우 -> 물리 삭제
+        if (existing.getCommentCount() == 0) {
+            int deleted = postMapper.physicalDeletePost(postId);
+            if (deleted != 1) {
+                throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR, "게시글 삭제 실패");
+            }
+        } else {
+            // 댓글이 있는 경우 상태 업데이트 처리
+            int updated = postMapper.deletePost(postId); // 상태를 DELETED로 업데이트
+            if (updated != 1) {
+                throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR, "게시글 삭제 실패");
+            }
         }
     }
 

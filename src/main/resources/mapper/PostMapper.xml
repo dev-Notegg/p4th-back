@@ -67,11 +67,19 @@
         WHERE post_id = #{postId}
     </update>
 
-    <!-- 게시글 삭제 -->
-    <delete id="deletePost">
+    <!-- 물리 삭제: 댓글이 없는 게시글에 대해 실제 삭제 -->
+    <delete id="physicalDeletePost">
         DELETE FROM post
         WHERE post_id = #{postId}
     </delete>
+
+    <!-- 상태 업데이트: 댓글이 있는 게시글은 상태를 DELETED로 업데이트 -->
+    <update id="deletePost">
+        UPDATE post
+        SET status = 'DELETED',
+            status_changed_at = NOW()
+        WHERE post_id = #{postId}
+    </update>
 
     <!-- 게시글 상세 조회 시 조회수 1증가 -->
     <update id="incrementViewCount">

@@ -23,7 +23,8 @@ public class Post {
     private String title;
     private String content;
     private int pinnedYn;
-    private String status;
+    @Enumerated(EnumType.STRING)
+    private PostStatus status;  // NORMAL, REPORTED, DELETED
     private LocalDateTime statusChangedAt;
     private int viewCount;
     private int commentCount;
