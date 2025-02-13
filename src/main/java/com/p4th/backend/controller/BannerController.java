@@ -21,7 +21,9 @@ public class BannerController {
 
     private final BannerService bannerService;
 
-    @Operation(summary = "배너 목록 조회", description = "관리자 페이지에서 등록한 배너 목록을 조회한다.")
+    @Operation(summary = "배너 목록 조회",
+               description = "관리자 페이지에서 등록한 배너 목록을 조회한다." +
+                       "메인노출여부(display_yn)이 1이고 광고시작일~종료일이 현재 날짜에 해당되는 배너만 리턴되며 노출 순서(seq)대로 조회된다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "배너 목록 조회 성공",
                     content = @Content(schema = @Schema(implementation = Banner.class))),

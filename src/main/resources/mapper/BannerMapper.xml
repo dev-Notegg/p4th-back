@@ -19,6 +19,8 @@
             updated_by,
             updated_at
         FROM banner
+        WHERE display_yn = 1
+          AND NOW() BETWEEN start_date AND end_date
         ORDER BY seq
     </select>
 
