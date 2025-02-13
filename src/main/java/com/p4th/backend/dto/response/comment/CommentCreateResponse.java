@@ -1,4 +1,4 @@
-package com.p4th.backend.dto.response;
+package com.p4th.backend.dto.response.comment;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;

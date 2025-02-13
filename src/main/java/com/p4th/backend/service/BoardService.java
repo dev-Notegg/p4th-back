@@ -1,8 +1,8 @@
 package com.p4th.backend.service;
 
 import com.p4th.backend.domain.Board;
-import com.p4th.backend.dto.response.BoardResponseDto;
-import com.p4th.backend.dto.response.PopularBoardResponse;
+import com.p4th.backend.dto.response.banner.BoardResponse;
+import com.p4th.backend.dto.response.board.PopularBoardResponse;
 import com.p4th.backend.mapper.BoardMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -19,10 +19,10 @@ public class BoardService {
         return boardMapper.getPopularBoards();
     }
 
-    public List<BoardResponseDto> getBoardsByCategory(String categoryId) {
+    public List<BoardResponse> getBoardsByCategory(String categoryId) {
         List<Board> boards = boardMapper.getBoardsByCategory(categoryId);
         return boards.stream().map(board -> {
-            BoardResponseDto dto = new BoardResponseDto();
+            BoardResponse dto = new BoardResponse();
             // 필드 복사 (getter/setter 활용)
             dto.setBoardId(board.getBoardId());
             dto.setCategoryId(board.getCategoryId());

@@ -1,6 +1,6 @@
 package com.p4th.backend.controller;
 
-import com.p4th.backend.dto.response.SearchResponse;
+import com.p4th.backend.dto.response.search.SearchResponse;
 import com.p4th.backend.service.SearchService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;

@@ -1,6 +1,6 @@
 package com.p4th.backend.service;
 
-import com.p4th.backend.dto.response.SearchResponse;
+import com.p4th.backend.dto.response.search.SearchResponse;
 import com.p4th.backend.domain.Post;
 import com.p4th.backend.repository.SearchRepository;
 import com.p4th.backend.util.HtmlImageUtils;

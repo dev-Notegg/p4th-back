@@ -3,8 +3,8 @@ package com.p4th.backend.service;
 import com.p4th.backend.domain.Post;
 import com.p4th.backend.domain.PostStatus;
 import com.p4th.backend.domain.User;
-import com.p4th.backend.dto.response.PopularPostResponse;
-import com.p4th.backend.dto.response.PostListDto;
+import com.p4th.backend.dto.response.post.PopularPostResponse;
+import com.p4th.backend.dto.response.post.PostListResponse;
 import com.p4th.backend.mapper.CommentMapper;
 import com.p4th.backend.mapper.PostHistoryLogMapper;
 import com.p4th.backend.mapper.PostMapper;
@@ -38,9 +38,9 @@ public class PostService {
     private final S3Service s3Service;
 
     @Transactional(readOnly = true)
-    public Page<PostListDto> getPostsByBoard(String boardId, Pageable pageable) {
+    public Page<PostListResponse> getPostsByBoard(String boardId, Pageable pageable) {
         Page<Post> posts = postRepository.findByBoardId(boardId, pageable);
-        return posts.map(PostListDto::from);
+        return posts.map(PostListResponse::from);
     }
 
     @Transactional

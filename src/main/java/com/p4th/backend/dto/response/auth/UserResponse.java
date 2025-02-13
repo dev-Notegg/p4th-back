@@ -1,16 +1,16 @@
-package com.p4th.backend.dto.response;
+package com.p4th.backend.dto.response.auth;
 
 import com.p4th.backend.domain.User;
 import lombok.Data;
 
 @Data
-public class UserDto {
+public class UserResponse {
     private String userId;
     private String nickname;
     private int membershipLevel;
     private int adminRole;
 
-    public UserDto(User user) {
+    public UserResponse(User user) {
         this.userId = user.getUserId();
         this.nickname = user.getNickname();
         this.membershipLevel = user.getMembershipLevel();

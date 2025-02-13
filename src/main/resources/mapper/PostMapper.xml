@@ -89,7 +89,7 @@
     </update>
 
     <!-- 인기 게시글 조회 -->
-    <select id="getPopularPosts" resultType="com.p4th.backend.dto.response.PopularPostResponse">
+    <select id="getPopularPosts" resultType="com.p4th.backend.dto.response.post.PopularPostResponse">
         SELECT
             p.post_id AS postId,
             p.board_id AS boardId,

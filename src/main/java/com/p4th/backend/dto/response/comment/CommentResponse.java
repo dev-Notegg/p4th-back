@@ -1,4 +1,4 @@
-package com.p4th.backend.dto.response;
+package com.p4th.backend.dto.response.comment;
 
 import com.p4th.backend.domain.CommentStatus;
 import com.p4th.backend.util.RelativeTimeFormatter;

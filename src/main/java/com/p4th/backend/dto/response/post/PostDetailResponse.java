@@ -1,6 +1,7 @@
-package com.p4th.backend.dto.response;
+package com.p4th.backend.dto.response.post;
 
 import com.p4th.backend.domain.PostStatus;
+import com.p4th.backend.dto.response.comment.CommentResponse;
 import com.p4th.backend.util.RelativeTimeFormatter;
 import com.p4th.backend.domain.Post;
 import lombok.Data;
@@ -10,7 +11,7 @@ import java.util.stream.Collectors;
 
 @Data
 @Schema(description = "게시글 상세 조회 응답 DTO")
-public class PostResponseDto {
+public class PostDetailResponse {
 
     @Schema(description = "게시글 ID", example = "01HXYA5X2V6N3QZQF9LZBHY7TW")
     private String postId;
@@ -49,8 +50,8 @@ public class PostResponseDto {
     @Schema(description = "댓글 목록")
     private List<CommentResponse> comments;
 
-    public static PostResponseDto from(Post post) {
-        PostResponseDto dto = new PostResponseDto();
+    public static PostDetailResponse from(Post post) {
+        PostDetailResponse dto = new PostDetailResponse();
         dto.setPostId(post.getPostId());
         dto.setBoardId(post.getBoardId());
         dto.setUserId(post.getUserId());

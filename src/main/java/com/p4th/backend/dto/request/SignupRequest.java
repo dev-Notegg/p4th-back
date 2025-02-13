@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Data
 @Schema(description = "회원가입 요청 DTO")
-public class SignupRequestDto {
+public class SignupRequest {
     @Schema(description = "회원 ID", example = "id1234")
     private String userId;
 

@@ -1,4 +1,4 @@
-package com.p4th.backend.dto.response;
+package com.p4th.backend.dto.response.auth;
 
 import lombok.Data;
 
@@ -6,8 +6,8 @@ import lombok.Data;
 public class LoginResponse {
     private String accessToken;
     private String refreshToken;
-    private UserDto user;
-    public LoginResponse(String accessToken, String refreshToken, UserDto user) {
+    private UserResponse user;
+    public LoginResponse(String accessToken, String refreshToken, UserResponse user) {
         this.accessToken = accessToken;
         this.refreshToken = refreshToken;
         this.user = user;

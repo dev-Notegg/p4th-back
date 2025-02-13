@@ -1,13 +1,17 @@
 package com.p4th.backend.controller;
 
 import com.p4th.backend.common.exception.ErrorResponse;
-import com.p4th.backend.dto.request.SignupRequestDto;
-import com.p4th.backend.dto.response.UserDto;
+import com.p4th.backend.dto.request.SignupRequest;
+import com.p4th.backend.dto.response.auth.UserResponse;
 import com.p4th.backend.dto.request.FindIdRequest;
 import com.p4th.backend.dto.request.FindPasswordRequest;
 import com.p4th.backend.dto.request.LoginRequest;
 import com.p4th.backend.dto.request.RefreshTokenRequest;
-import com.p4th.backend.dto.response.*;
+import com.p4th.backend.dto.response.CheckResponse;
+import com.p4th.backend.dto.response.auth.FindIdResponse;
+import com.p4th.backend.dto.response.auth.FindPasswordResponse;
+import com.p4th.backend.dto.response.auth.LoginResponse;
+import com.p4th.backend.dto.response.auth.SignUpResponse;
 import com.p4th.backend.service.AuthService;
 import com.p4th.backend.service.AuthService.LoginResult;
 import com.p4th.backend.service.AuthService.SignUpResult;
@@ -44,7 +48,7 @@ public class AuthController {
     @PostMapping("/signup")
     public ResponseEntity<SignUpResponse> signUp(
             @Parameter(name = "SignupRequestDto", description = "회원가입 요청 DTO (userId, password, nickname)", required = true)
-            @RequestBody SignupRequestDto request) {
+            @RequestBody SignupRequest request) {
         SignUpResult result = authService.signUp(request.getUserId(), request.getPassword(), request.getNickname());
         SignUpResponse response = new SignUpResponse(result.getUserId(), result.getPassCode());
         return ResponseEntity.ok().body(response);
@@ -93,7 +97,7 @@ public class AuthController {
             @RequestBody LoginRequest request,
             HttpServletRequest httpRequest) {
         LoginResult result = authService.login(request.getUserId(), request.getPassword(), httpRequest.getRemoteAddr());
-        LoginResponse response = new LoginResponse(result.getAccessToken(), result.getRefreshToken(), new UserDto(result.getUser()));
+        LoginResponse response = new LoginResponse(result.getAccessToken(), result.getRefreshToken(), new UserResponse(result.getUser()));
         return ResponseEntity.ok().body(response);
     }
 
@@ -144,7 +148,7 @@ public class AuthController {
             @Valid @RequestBody RefreshTokenRequest request) {
         String userId = jwtProvider.getUserIdFromToken(request.getRefreshToken());
         LoginResult result = authService.refreshTokenForMember(userId, request.getRefreshToken());
-        LoginResponse response = new LoginResponse(result.getAccessToken(), result.getRefreshToken(), new UserDto(result.getUser()));
+        LoginResponse response = new LoginResponse(result.getAccessToken(), result.getRefreshToken(), new UserResponse(result.getUser()));
         return ResponseEntity.ok().body(response);
     }
 }

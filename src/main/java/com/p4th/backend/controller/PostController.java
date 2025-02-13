@@ -3,7 +3,7 @@ package com.p4th.backend.controller;
 import com.p4th.backend.domain.Post;
 import com.p4th.backend.dto.request.RegisterPostRequest;
 import com.p4th.backend.dto.request.UpdatePostRequest;
-import com.p4th.backend.dto.response.*;
+import com.p4th.backend.dto.response.post.*;
 import com.p4th.backend.service.PostService;
 import com.p4th.backend.security.JwtProvider;
 import io.swagger.v3.oas.annotations.Operation;
@@ -41,27 +41,27 @@ public class PostController {
                     content = @Content(schema = @Schema(implementation = com.p4th.backend.dto.response.ErrorResponse.class)))
     })
     @GetMapping
-    public ResponseEntity<Page<PostListDto>> getPostsByBoard(
+    public ResponseEntity<Page<PostListResponse>> getPostsByBoard(
             @Parameter(name = "board_id", description = "게시판 ID", required = true)
             @RequestParam("board_id") String boardId,
             @ParameterObject
             @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
-        Page<PostListDto> posts = postService.getPostsByBoard(boardId, pageable);
+        Page<PostListResponse> posts = postService.getPostsByBoard(boardId, pageable);
         return ResponseEntity.ok().body(posts);
     }
 
     @Operation(summary = "게시글 상세 조회", description = "postId를 입력받아 게시글 상세 정보를 조회한다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "게시글 상세 조회 성공",
-                    content = @Content(schema = @Schema(implementation = PostResponseDto.class))),
+                    content = @Content(schema = @Schema(implementation = PostDetailResponse.class))),
             @ApiResponse(responseCode = "400", description = "입력 데이터 오류",
                     content = @Content(schema = @Schema(implementation = com.p4th.backend.dto.response.ErrorResponse.class)))
     })
     @GetMapping("/{postId}")
-    public ResponseEntity<PostResponseDto> getPostDetail(
+    public ResponseEntity<PostDetailResponse> getPostDetail(
             @Parameter(name = "postId", description = "게시글 ID", required = true) @PathVariable("postId") String postId) {
         Post post = postService.getPostDetail(postId);
-        PostResponseDto responseDto = PostResponseDto.from(post);
+        PostDetailResponse responseDto = PostDetailResponse.from(post);
         return ResponseEntity.ok().body(responseDto);
     }
 

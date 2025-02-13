@@ -1,11 +1,11 @@
-package com.p4th.backend.dto.response;
+package com.p4th.backend.dto.response.banner;
 
 import lombok.Data;
 
 import java.time.LocalDateTime;
 
 @Data
-public class BoardResponseDto {
+public class BoardResponse {
     private String boardId;
     private String categoryId;
     private String boardName;

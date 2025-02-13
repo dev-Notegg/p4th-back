@@ -1,4 +1,4 @@
-package com.p4th.backend.dto.response;
+package com.p4th.backend.dto.response.post;
 
 import lombok.Data;
 

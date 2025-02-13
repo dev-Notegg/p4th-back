@@ -6,7 +6,7 @@ import com.p4th.backend.domain.Comment;
 import com.p4th.backend.domain.CommentStatus;
 import com.p4th.backend.domain.User;
 import com.p4th.backend.dto.request.CommentCreateRequest;
-import com.p4th.backend.dto.response.CommentResponse;
+import com.p4th.backend.dto.response.comment.CommentResponse;
 import com.p4th.backend.mapper.CommentMapper;
 import com.p4th.backend.mapper.PostMapper;
 import com.p4th.backend.mapper.UserMapper;

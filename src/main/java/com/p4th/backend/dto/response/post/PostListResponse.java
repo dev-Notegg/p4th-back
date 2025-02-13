@@ -1,4 +1,4 @@
-package com.p4th.backend.dto.response;
+package com.p4th.backend.dto.response.post;
 
 import com.p4th.backend.domain.Post;
 import com.p4th.backend.domain.PostStatus;
@@ -12,7 +12,7 @@ import java.time.format.DateTimeFormatter;
 import org.apache.commons.text.StringEscapeUtils;
 
 @Data
-public class PostListDto {
+public class PostListResponse {
     private String postId;
     private String boardId;
     private String userId;
@@ -29,8 +29,8 @@ public class PostListDto {
 
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
-    public static PostListDto from(Post post) {
-        PostListDto dto = new PostListDto();
+    public static PostListResponse from(Post post) {
+        PostListResponse dto = new PostListResponse();
         dto.postId = post.getPostId();
         dto.boardId = post.getBoardId();
         dto.userId = post.getUserId();

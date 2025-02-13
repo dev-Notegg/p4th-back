@@ -2,9 +2,9 @@ package com.p4th.backend.controller;
 
 import com.p4th.backend.dto.request.CommentCreateRequest;
 import com.p4th.backend.dto.request.CommentUpdateRequest;
-import com.p4th.backend.dto.response.CommentCreateResponse;
-import com.p4th.backend.dto.response.CommentResponse;
-import com.p4th.backend.dto.response.CommentUpdateResponse;
+import com.p4th.backend.dto.response.comment.CommentCreateResponse;
+import com.p4th.backend.dto.response.comment.CommentResponse;
+import com.p4th.backend.dto.response.comment.CommentUpdateResponse;
 import com.p4th.backend.security.JwtProvider;
 import com.p4th.backend.service.CommentService;
 import io.swagger.v3.oas.annotations.Operation;
