@@ -7,4 +7,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface PostRepository extends JpaRepository<Post, String> {
     Page<Post> findByBoardId(String boardId, Pageable pageable);
+    Page<Post> findByUserId(String userId, Pageable pageable);
 }

@@ -5,92 +5,57 @@
 
 <mapper namespace="com.p4th.backend.mapper.UserMapper">
 
-    <!-- 회원가입 -->
-    <insert id="insertUser">
-        INSERT INTO user_info
-        (
+    <select id="getCommentsByUser" resultType="com.p4th.backend.domain.Comment">
+        SELECT
+            comment_id,
+            post_id,
+            parent_comment_id,
             user_id,
-            password,
-            nickname,
-            pass_code,
-            created_by
-        )
-        VALUES
-            (
-                #{userId},
-                #{password},
-                #{nickname},
-                #{passCode},
-                #{userId}
-            )
-    </insert>
-
-    <select id="selectByUserId" resultType="com.p4th.backend.domain.User">
-        SELECT
-            user_id AS userId,
-            password,
-            password_changed_at AS passwordChangedAt,
-            pass_code AS passCode,
-            nickname,
-            membership_level AS membershipLevel,
-            admin_role AS adminRole,
-            warning_count AS warningCount,
-            account_status AS accountStatus,
-            account_status_changed_at AS accountStatusChangedAt,
-            last_login_ip AS lastLoginIp,
-            access_token AS accessToken,
-            refresh_token AS refreshToken,
-            created_by AS createdBy,
+            content,
+            status,
+            status_changed_at,
+            created_by,
             created_at AS createdAt,
-            updated_by AS updatedBy,
+            updated_by,
             updated_at AS updatedAt
-        FROM user_info
+        FROM comment
         WHERE user_id = #{userId}
+        ORDER BY created_at DESC
     </select>
 
-    <!-- passCode로 회원 조회 (아이디 찾기) -->
-    <select id="selectByPassCode" resultType="com.p4th.backend.domain.User">
+    <!-- 전체 카테고리 목록 조회 -->
+    <select id="getAllCategories" resultType="com.p4th.backend.domain.Category">
         SELECT
-            user_id AS userId
-        FROM user_info
-        WHERE pass_code = #{passCode}
+            category_id,
+            category_name,
+            sort_order,
+            main_exposure,
+            is_notice,
+            created_by,
+            created_at,
+            updated_by,
+            updated_at
+        FROM category
+        ORDER BY sort_order
     </select>
 
-    <!-- 토큰 업데이트 -->
-    <update id="updateTokens">
-        UPDATE user_info
-        SET
-            access_token = #{accessToken},
-            refresh_token = #{refreshToken},
-            updated_by = 'SYSTEM'
-        WHERE user_id = #{userId}
-    </update>
-
-    <!-- 마지막 로그인 ip/시간 업데이트 -->
-    <update id="updateLastLoginInfo">
-        UPDATE user_info
-        SET
-            last_login_ip = #{lastLoginIp},
-            last_login_at = NOW(),
-            updated_by = 'SYSTEM'
-        WHERE user_id = #{userId}
-    </update>
-
-    <!-- 비밀번호 업데이트 (비밀번호 찾기 시 임시 비밀번호 저장) -->
-    <update id="updatePassword">
-        UPDATE user_info
-        SET
-            password = #{password},
-            password_changed_at = NOW(),
-            updated_by = #{userId}
-        WHERE user_id = #{userId}
-    </update>
-
-    <select id="selectByNickname" resultType="com.p4th.backend.domain.User">
+    <!-- 특정 카테고리에 해당하는 게시판 조회 -->
+    <select id="getBoardsByCategory" resultType="com.p4th.backend.domain.Board">
         SELECT
-            user_id AS userId,
-            nickname
-        FROM user_info
-        WHERE nickname = #{nickname}
+            b.board_id,
+            b.category_id,
+            c.category_name,
+            b.board_name,
+            b.board_level,
+            b.sort_order,
+            b.recommend_yn,
+            b.created_by,
+            b.created_at,
+            b.updated_by,
+            b.updated_at
+        FROM board b
+                 JOIN category c ON b.category_id = c.category_id
+        WHERE b.category_id = #{categoryId}
+        ORDER BY b.sort_order
     </select>
 </mapper>

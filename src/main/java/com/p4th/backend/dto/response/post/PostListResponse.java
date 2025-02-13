@@ -67,7 +67,7 @@ public class PostListResponse {
      * @param htmlContent 게시글의 HTML 컨텐츠
      * @return 첫 번째 이미지 URL (이미지인 경우), 없으면 null
      */
-    private static String extractFirstImageUrl(String htmlContent) {
+    public static String extractFirstImageUrl(String htmlContent) {
         if (htmlContent == null || htmlContent.isEmpty()) {
             return null;
         }
@@ -89,7 +89,7 @@ public class PostListResponse {
      * @param htmlContent 게시글의 HTML 컨텐츠
      * @return 이미지 태그의 개수
      */
-    private static int countInlineImages(String htmlContent) {
+    public static int countInlineImages(String htmlContent) {
         if (htmlContent == null || htmlContent.isEmpty()) {
             return 0;
         }

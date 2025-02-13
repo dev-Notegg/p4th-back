@@ -7,9 +7,9 @@ import com.p4th.backend.domain.CommentStatus;
 import com.p4th.backend.domain.User;
 import com.p4th.backend.dto.request.CommentCreateRequest;
 import com.p4th.backend.dto.response.comment.CommentResponse;
+import com.p4th.backend.mapper.AuthMapper;
 import com.p4th.backend.mapper.CommentMapper;
 import com.p4th.backend.mapper.PostMapper;
-import com.p4th.backend.mapper.UserMapper;
 import com.p4th.backend.util.ULIDUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
 public class CommentService {
 
     private final CommentMapper commentMapper;
-    private final UserMapper userMapper;
+    private final AuthMapper authMapper;
     private final PostMapper postMapper;
 
     @Transactional(readOnly = true)
@@ -63,7 +63,7 @@ public class CommentService {
     @Transactional
     public String createComment(String postId, String userId, CommentCreateRequest request) {
         // 사용자 유효성 검사
-        User user = userMapper.selectByUserId(userId);
+        User user = authMapper.selectByUserId(userId);
         if (user == null) {
             throw new CustomException(ErrorCode.USER_NOT_FOUND, "사용자를 찾을 수 없습니다.");
         }
@@ -113,7 +113,7 @@ public class CommentService {
             throw new CustomException(ErrorCode.COMMENT_ALREADY_DELETED, "이미 삭제된 댓글입니다.");
         }
         // 권한 체크: 요청자가 댓글 작성자이거나, 관리자인 경우
-        User requester = userMapper.selectByUserId(userId);
+        User requester = authMapper.selectByUserId(userId);
         if (!comment.getUserId().equals(userId) && (requester == null || requester.getAdminRole() != 1)) {
             throw new CustomException(ErrorCode.UNAUTHORIZED_ACCESS, "권한이 없습니다.");
         }

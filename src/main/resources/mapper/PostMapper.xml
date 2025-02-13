@@ -139,4 +139,13 @@
         WHERE post_id = #{postId}
     </update>
 
+    <select id="findRecentPostsByUserId" resultType="com.p4th.backend.domain.Post">
+        SELECT p.*
+        FROM post_view pv
+                 JOIN post p ON pv.post_id = p.post_id
+        WHERE pv.user_id = #{userId}
+        ORDER BY pv.viewed_at DESC
+        LIMIT 15
+    </select>
+
 </mapper>

@@ -1,5 +1,6 @@
 package com.p4th.backend.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -18,10 +19,15 @@ public class Category {
     private int sortOrder;
     private int mainExposure;
     private int isNotice;
+    @JsonIgnore
     private String createdBy;
+    @JsonIgnore
     private LocalDateTime createdAt;
+    @JsonIgnore
     private String updatedBy;
+    @JsonIgnore
     private LocalDateTime updatedAt;
+    @JsonIgnore
     @OneToMany(mappedBy = "category", fetch = FetchType.LAZY)
     private List<Board> boards;
 }

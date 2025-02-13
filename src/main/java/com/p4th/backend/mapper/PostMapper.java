@@ -28,4 +28,12 @@ public interface PostMapper {
     void incrementCommentCount(String postId);
 
     void decrementCommentCount(String postId);
+
+    /**
+     * 지정한 사용자(userId)가 최근 본 게시물 목록을 offset, limit에 따라 조회한다.
+     *
+     * @param userId 조회할 사용자 ID
+     * @return 조회된 게시글 목록
+     */
+    List<Post> findRecentPostsByUserId(@Param("userId") String userId);
 }

@@ -3,17 +3,12 @@ package com.p4th.backend.service;
 import com.p4th.backend.domain.Post;
 import com.p4th.backend.domain.PostStatus;
 import com.p4th.backend.domain.User;
-import com.p4th.backend.dto.response.post.PopularPostResponse;
 import com.p4th.backend.dto.response.post.PostListResponse;
-import com.p4th.backend.mapper.CommentMapper;
-import com.p4th.backend.mapper.PostHistoryLogMapper;
-import com.p4th.backend.mapper.PostMapper;
-import com.p4th.backend.mapper.UserMapper;
+import com.p4th.backend.mapper.*;
 import com.p4th.backend.common.exception.CustomException;
 import com.p4th.backend.common.exception.ErrorCode;
 import com.p4th.backend.repository.PostRepository;
 import com.p4th.backend.util.HtmlImageUtils;
-import com.p4th.backend.util.RelativeTimeFormatter;
 import com.p4th.backend.util.ULIDUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -21,20 +16,14 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.List;
-
 @Service
 @RequiredArgsConstructor
 public class PostService {
 
     private final PostMapper postMapper;
     private final CommentMapper commentMapper;
-    private final UserMapper userMapper;
-    private final PostHistoryLogMapper postHistoryLogMapper;
+    private final AuthMapper authMapper;
     private final PostRepository postRepository;
-    private static final DateTimeFormatter originalFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     private final S3Service s3Service;
 
     @Transactional(readOnly = true)
@@ -72,7 +61,7 @@ public class PostService {
     @Transactional
     public String registerPost(String boardId, String userId, String title, String content) {
         // 사용자 정보 조회
-        User user = userMapper.selectByUserId(userId);
+        User user = authMapper.selectByUserId(userId);
         if (user == null) {
             throw new CustomException(ErrorCode.USER_NOT_FOUND, "사용자 정보를 찾을 수 없습니다.");
         }
@@ -131,7 +120,7 @@ public class PostService {
             throw new CustomException(ErrorCode.POST_ALREADY_DELETED, "이미 삭제된 게시글입니다.");
         }
         // 관리자 권한(예: admin_role == 1)이거나 본인 게시글일 때 삭제 가능
-        User requester = userMapper.selectByUserId(requesterUserId);
+        User requester = authMapper.selectByUserId(requesterUserId);
         if (!existing.getUserId().equals(requesterUserId) && (requester == null || requester.getAdminRole() != 1)) {
             throw new CustomException(ErrorCode.UNAUTHORIZED_ACCESS, "본인이 작성한 게시글만 삭제할 수 있습니다.");
         }
@@ -148,26 +137,6 @@ public class PostService {
                 throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR, "게시글 삭제 실패");
             }
         }
-    }
-
-    public List<PopularPostResponse> getPopularPosts(String period) {
-        List<PopularPostResponse> responses = postHistoryLogMapper.getPopularPostsByPeriod(period);
-        responses.forEach(response -> {
-            // imageUrl, imageCount는 content 필드에서 추출
-            //삭제된 게시글인 경우 이미지 처리하지 않음
-            if (response.getContent() != null && !response.getContent().isEmpty() && !PostStatus.DELETED.equals(response.getStatus())) {
-                String imgUrl = HtmlImageUtils.extractFirstImageUrl(response.getContent());
-                int imgCount = HtmlImageUtils.countInlineImages(response.getContent());
-                response.setImageUrl(imgUrl);
-                response.setImageCount(imgCount);
-            }
-
-            if (response.getCreatedAt() != null && !response.getCreatedAt().isEmpty()) {
-                LocalDateTime createdTime = LocalDateTime.parse(response.getCreatedAt(), originalFormatter);
-                response.setCreatedAt(RelativeTimeFormatter.formatRelativeTime(createdTime));
-            }
-        });
-        return responses;
     }
 
 }

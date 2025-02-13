@@ -23,7 +23,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import jakarta.servlet.http.HttpServletRequest;
-import java.util.List;
 
 @Tag(name = "게시글 API", description = "게시글 관련 API")
 @RestController
@@ -121,18 +120,4 @@ public class PostController {
         return ResponseEntity.ok().body(response);
     }
 
-    @Operation(summary = "인기 게시글 목록 조회", description = "인기 게시글 목록(최대 20개)을 반환한다. period 파라미터(DAILY, WEEKLY, MONTHLY)를 통해 조회 기간을 지정한다.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "인기 게시글 목록 조회 성공",
-                    content = @Content(schema = @Schema(implementation = PopularPostResponse.class))),
-            @ApiResponse(responseCode = "400", description = "입력 데이터 오류",
-                    content = @Content(schema = @Schema(implementation = com.p4th.backend.dto.response.ErrorResponse.class)))
-    })
-    @GetMapping("/popular")
-    public ResponseEntity<List<?>> getPopularPosts(
-            @Parameter(name = "period", description = "조회 기간 (DAILY, WEEKLY, MONTHLY)", example = "DAILY")
-            @RequestParam(value = "period", defaultValue = "DAILY") String period) {
-        List<?> popularPosts = postService.getPopularPosts(period);
-        return ResponseEntity.ok().body(popularPosts);
-    }
 }
