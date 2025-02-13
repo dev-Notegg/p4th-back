@@ -1,6 +1,6 @@
 package com.p4th.backend.controller;
 
-import com.p4th.backend.dto.response.banner.BoardResponse;
+import com.p4th.backend.dto.response.board.BoardResponse;
 import com.p4th.backend.dto.response.board.PopularBoardResponse;
 import com.p4th.backend.service.BoardService;
 import io.swagger.v3.oas.annotations.Operation;

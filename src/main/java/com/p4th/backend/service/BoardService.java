@@ -1,7 +1,7 @@
 package com.p4th.backend.service;
 
 import com.p4th.backend.domain.Board;
-import com.p4th.backend.dto.response.banner.BoardResponse;
+import com.p4th.backend.dto.response.board.BoardResponse;
 import com.p4th.backend.dto.response.board.PopularBoardResponse;
 import com.p4th.backend.mapper.BoardMapper;
 import lombok.RequiredArgsConstructor;

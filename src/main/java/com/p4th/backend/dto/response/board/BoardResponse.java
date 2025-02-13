@@ -1,4 +1,4 @@
-package com.p4th.backend.dto.response.banner;
+package com.p4th.backend.dto.response.board;
 
 import lombok.Data;
 

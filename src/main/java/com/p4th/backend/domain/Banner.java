@@ -1,5 +1,6 @@
 package com.p4th.backend.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -16,8 +17,12 @@ public class Banner {
     private int seq;
     private String startDate;
     private String endDate;
+    @JsonIgnore
     private String createdBy;
+    @JsonIgnore
     private LocalDateTime createdAt;
+    @JsonIgnore
     private String updatedBy;
+    @JsonIgnore
     private LocalDateTime updatedAt;
 }
