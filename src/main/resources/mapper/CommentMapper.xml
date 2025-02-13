@@ -80,6 +80,7 @@
             parent_comment_id,
             user_id,
             content,
+            status,
             created_at,
             created_by,
             updated_at,

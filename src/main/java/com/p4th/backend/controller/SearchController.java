@@ -18,7 +18,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@Tag(name = "통합검색 API", description = "통합검색 관련 API")
+@Tag(name = "검색 API", description = "검색 관련 API")
 @RestController
 @RequestMapping("/api/search")
 @RequiredArgsConstructor
@@ -26,7 +26,11 @@ public class SearchController {
 
     private final SearchService searchService;
 
-    @Operation(summary = "전체 통합검색", description = "작성자 닉네임, 게시글 내용, 제목을 포함한 게시글을 전체 게시판에서 검색한다.")
+    @Operation(
+            summary = "검색",
+            description = "작성자 닉네임, 게시글 내용, 제목을 포함한 게시글을 검색한다. " +
+                    "boardId(게시판ID)를 제공하면 해당 게시판 내에서 검색하고, 제공하지 않으면 전체 게시판에서 검색한다."
+    )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "검색 성공",
                     content = @Content(schema = @Schema(implementation = SearchResponse.class))),
@@ -35,28 +39,13 @@ public class SearchController {
     })
     @GetMapping
     public ResponseEntity<Page<SearchResponse.SearchResult>> search(
+            @Parameter(name = "boardId", description = "게시판 ID (옵션)")
+            @RequestParam(value = "boardId", required = false) String boardId,
             @Parameter(name = "query", description = "검색어", required = true)
             @RequestParam("query") String query,
             @ParameterObject @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
-        Page<SearchResponse.SearchResult> response = searchService.search(query, pageable);
-        return ResponseEntity.ok().body(response);
-    }
-
-    @Operation(summary = "게시판 내 검색", description = "특정 게시판 내에서 제목, 작성자 닉네임, 내용으로 게시글을 검색한다.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "게시판 내 검색 성공",
-                    content = @Content(schema = @Schema(implementation = SearchResponse.class))),
-            @ApiResponse(responseCode = "400", description = "검색어가 없거나 오류 발생",
-                    content = @Content(schema = @Schema(implementation = com.p4th.backend.dto.response.ErrorResponse.class)))
-    })
-    @GetMapping("/board/{boardId}")
-    public ResponseEntity<Page<SearchResponse.SearchResult>> boardSearch(
-            @Parameter(name = "boardId", description = "게시판 ID", required = true)
-            @PathVariable("boardId") String boardId,
-            @Parameter(name = "query", description = "검색어", required = true)
-            @RequestParam("query") String query,
-            @ParameterObject @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
-        Page<SearchResponse.SearchResult> response = searchService.searchInBoard(boardId, query, pageable);
-        return ResponseEntity.ok().body(response);
+        Page<SearchResponse.SearchResult> response;
+        response = searchService.search(boardId, query, pageable);
+        return ResponseEntity.ok(response);
     }
 }

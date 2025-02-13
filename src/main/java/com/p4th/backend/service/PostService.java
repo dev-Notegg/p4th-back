@@ -101,6 +101,9 @@ public class PostService {
         if (existing == null) {
             throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR, "게시글을 찾을 수 없습니다.");
         }
+        if (PostStatus.DELETED.equals(existing.getStatus())) {
+            throw new CustomException(ErrorCode.POST_ALREADY_DELETED, "이미 삭제된 게시글입니다.");
+        }
         if (!existing.getUserId().equals(userId)) {
             throw new CustomException(ErrorCode.UNAUTHORIZED_ACCESS, "본인이 작성한 게시글만 수정할 수 있습니다.");
         }
@@ -151,7 +154,8 @@ public class PostService {
         List<PopularPostResponse> responses = postHistoryLogMapper.getPopularPostsByPeriod(period);
         responses.forEach(response -> {
             // imageUrl, imageCount는 content 필드에서 추출
-            if (response.getContent() != null && !response.getContent().isEmpty()) {
+            //삭제된 게시글인 경우 이미지 처리하지 않음
+            if (response.getContent() != null && !response.getContent().isEmpty() && !PostStatus.DELETED.equals(response.getStatus())) {
                 String imgUrl = HtmlImageUtils.extractFirstImageUrl(response.getContent());
                 int imgCount = HtmlImageUtils.countInlineImages(response.getContent());
                 response.setImageUrl(imgUrl);
