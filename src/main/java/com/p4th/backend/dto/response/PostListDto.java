@@ -1,6 +1,7 @@
 package com.p4th.backend.dto.response;
 
 import com.p4th.backend.domain.Post;
+import com.p4th.backend.domain.PostStatus;
 import com.p4th.backend.util.RelativeTimeFormatter;
 import lombok.Data;
 import org.jsoup.Jsoup;
@@ -19,6 +20,7 @@ public class PostListDto {
     private String title;
     private String category;    // 게시판의 카테고리명
     private String boardName;   // 게시판명
+    private PostStatus status;
     private int viewCount;
     private int commentCount;
     private String imageUrl;    // 썸네일 이미지 URL
@@ -40,6 +42,7 @@ public class PostListDto {
                 dto.category = post.getBoard().getCategory().getCategoryName();
             }
         }
+        dto.status = post.getStatus();
         dto.viewCount = post.getViewCount();
         dto.commentCount = post.getCommentCount();
 

@@ -1,6 +1,7 @@
 package com.p4th.backend.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.p4th.backend.domain.PostStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -13,6 +14,12 @@ public class PopularPostResponse {
     @Schema(description = "게시판 ID", example = "01HXYA4V8D5N1PZQF8KZBHY6XT")
     private String boardId;
 
+    @Schema(description = "카테고리명", example = "일반 카테고리")
+    private String category;
+
+    @Schema(description = "게시판명", example = "자유게시판")
+    private String boardName;
+
     @Schema(description = "작성자 ID", example = "user_001")
     private String userId;
 
@@ -22,11 +29,8 @@ public class PopularPostResponse {
     @Schema(description = "게시글 제목", example = "첫 번째 게시글")
     private String title;
 
-    @Schema(description = "카테고리명", example = "일반 카테고리")
-    private String category;
-
-    @Schema(description = "게시판명", example = "자유게시판")
-    private String boardName;
+    @Schema(description = "게시글 상태", example = "NORMAL")
+    private PostStatus status;
 
     @Schema(description = "조회수", example = "19")
     private int viewCount;

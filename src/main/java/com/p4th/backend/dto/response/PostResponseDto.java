@@ -1,5 +1,6 @@
 package com.p4th.backend.dto.response;
 
+import com.p4th.backend.domain.PostStatus;
 import com.p4th.backend.util.RelativeTimeFormatter;
 import com.p4th.backend.domain.Post;
 import lombok.Data;
@@ -29,6 +30,9 @@ public class PostResponseDto {
     @Schema(description = "게시글 내용", example = "이것은 첫 번째 게시글 내용입니다.22")
     private String content;
 
+    @Schema(description = "게시글 상태", example = "NORMAL")
+    private PostStatus status;
+
     @Schema(description = "조회수", example = "18")
     private int viewCount;
 
@@ -53,6 +57,7 @@ public class PostResponseDto {
         dto.setNickname(post.getNickname());
         dto.setTitle(post.getTitle());
         dto.setContent(post.getContent());
+        dto.setStatus(post.getStatus());
         dto.setViewCount(post.getViewCount());
         dto.setCommentCount(post.getCommentCount());
         // createdAt을 RelativeTimeFormatter로 포맷

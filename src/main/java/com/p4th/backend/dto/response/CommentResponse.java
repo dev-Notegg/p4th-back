@@ -1,5 +1,6 @@
 package com.p4th.backend.dto.response;
 
+import com.p4th.backend.domain.CommentStatus;
 import com.p4th.backend.util.RelativeTimeFormatter;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
@@ -27,6 +28,9 @@ public class CommentResponse {
     @Schema(description = "댓글 작성일 (0분 전, X분 전, X시간 전, 또는 날짜 형식)", example = "0분 전")
     private String createdAt;
 
+    @Schema(description = "댓글 상태", example = "NORMAL")
+    private CommentStatus status;
+
     public static CommentResponse from(Comment comment) {
         CommentResponse response = new CommentResponse();
         response.setCommentId(comment.getCommentId());
@@ -35,6 +39,7 @@ public class CommentResponse {
         response.setNickname(comment.getNickname() != null ? comment.getNickname() : null);
         response.setContent(comment.getContent());
         response.setCreatedAt(RelativeTimeFormatter.formatRelativeTime(comment.getCreatedAt()));
+        response.setStatus(comment.getStatus());
         return response;
     }
 }

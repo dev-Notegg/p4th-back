@@ -96,6 +96,7 @@
             p.user_id AS userId,
             u.nickname AS nickname,
             p.title AS title,
+            p.status AS status,
             c.category_name AS category,
             b.board_name AS boardName,
             p.view_count AS viewCount,
