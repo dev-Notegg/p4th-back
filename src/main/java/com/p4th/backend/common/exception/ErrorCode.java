@@ -21,6 +21,7 @@ public enum ErrorCode {
 
     // 권한 없음
     UNAUTHORIZED_ACCESS(HttpStatus.FORBIDDEN, 40300, "권한이 없습니다."),
+    LOGIN_REQUIRED(HttpStatus.FORBIDDEN, 40301, "로그인 후 이용가능한 메뉴입니다."),
 
     //게시글 관련
     POST_NOT_FOUND(HttpStatus.NOT_FOUND, 40400, "게시글을 찾을 수 없습니다."),

@@ -28,7 +28,7 @@ import java.util.List;
 
 @Tag(name = "사용자 API", description = "사용자 관련 API (최근 본 게시물, 작성한 글, 내가 쓴 댓글, 내 계정 조회 등)")
 @RestController
-@RequestMapping("/api/users")
+@RequestMapping("/api/user")
 @RequiredArgsConstructor
 public class UserController {
 
@@ -39,15 +39,13 @@ public class UserController {
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "최근 본 게시물 목록 조회 성공")
     })
-    @GetMapping(value = "/{userId}/recent-posts")
+    @GetMapping(value = "/recent-posts")
     public ResponseEntity<Page<PostListResponse>> getRecentPosts(
-            @Parameter(name = "userId", description = "사용자 ID", required = true)
-            @PathVariable("userId") String userId,
             @ParameterObject Pageable pageable,
             HttpServletRequest httpRequest) {
-        String userIdFromJwt = jwtProvider.resolveUserId(httpRequest);
-        if (userIdFromJwt == null || !userIdFromJwt.equals(userId)) {
-            throw new CustomException(ErrorCode.UNAUTHORIZED_ACCESS, "로그인 후 이용가능한 메뉴입니다.");
+        String userId = jwtProvider.resolveUserId(httpRequest);
+        if (userId == null) {
+            throw new CustomException(ErrorCode.LOGIN_REQUIRED);
         }
         Page<PostListResponse> posts = userService.getRecentPosts(userId, pageable);
         return ResponseEntity.ok(posts);
@@ -59,13 +57,11 @@ public class UserController {
     })
     @GetMapping(value = "/{userId}/posts")
     public ResponseEntity<Page<PostListResponse>> getUserPosts(
-            @Parameter(name = "userId", description = "사용자 ID", required = true)
-            @PathVariable("userId") String userId,
             @ParameterObject Pageable pageable,
             HttpServletRequest httpRequest) {
-        String userIdFromJwt = jwtProvider.resolveUserId(httpRequest);
-        if (userIdFromJwt == null || !userIdFromJwt.equals(userId)) {
-            throw new CustomException(ErrorCode.UNAUTHORIZED_ACCESS, "로그인 후 이용가능한 메뉴입니다.");
+        String userId = jwtProvider.resolveUserId(httpRequest);
+        if (userId == null) {
+            throw new CustomException(ErrorCode.LOGIN_REQUIRED);
         }
         Page<PostListResponse> posts = userService.getUserPosts(userId, pageable);
         return ResponseEntity.ok(posts);
@@ -77,13 +73,11 @@ public class UserController {
     })
     @GetMapping(value = "/{userId}/comments")
     public ResponseEntity<Page<UserCommentPostResponse>> getUserComments(
-            @Parameter(name = "userId", description = "사용자 ID", required = true)
-            @PathVariable("userId") String userId,
             @ParameterObject Pageable pageable,
             HttpServletRequest httpRequest) {
-        String userIdFromJwt = jwtProvider.resolveUserId(httpRequest);
-        if (userIdFromJwt == null || !userIdFromJwt.equals(userId)) {
-            throw new CustomException(ErrorCode.UNAUTHORIZED_ACCESS, "로그인 후 이용가능한 메뉴입니다.");
+        String userId = jwtProvider.resolveUserId(httpRequest);
+        if (userId == null) {
+            throw new CustomException(ErrorCode.LOGIN_REQUIRED);
         }
         Page<UserCommentPostResponse> responses = userService.getUserComments(userId, pageable);
         return ResponseEntity.ok(responses);
@@ -99,7 +93,7 @@ public class UserController {
     public ResponseEntity<UserProfileResponse> getProfile(HttpServletRequest httpRequest) {
         String userId = jwtProvider.resolveUserId(httpRequest);
         if (userId == null) {
-            throw new CustomException(ErrorCode.UNAUTHORIZED_ACCESS, "로그인 후 이용가능한 메뉴입니다.");
+            throw new CustomException(ErrorCode.LOGIN_REQUIRED);
         }
         UserProfileResponse profile = userService.getUserProfile(userId);
         return ResponseEntity.ok(profile);
