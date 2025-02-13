@@ -34,7 +34,7 @@ public class PostController {
     private final PostService postService;
     private final JwtProvider jwtProvider;
 
-    @Operation(summary = "게시글 목록 조회", description = "게시판 ID와 Pageable 정보를 사용하여 게시글 목록을 조회한다.")
+    @Operation(summary = "게시글 목록 조회", description = "게시판 ID를 사용하여 게시글 목록을 조회한다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "게시글 목록 조회 성공"),
             @ApiResponse(responseCode = "400", description = "입력 데이터 오류",

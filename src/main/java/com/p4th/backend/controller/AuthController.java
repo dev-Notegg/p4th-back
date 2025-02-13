@@ -113,7 +113,7 @@ public class AuthController {
         return ResponseEntity.ok().body(response);
     }
 
-    @Operation(summary = "비밀번호 찾기", description = "회원ID와 패쓰코드를 입력받아 임시 비밀번호를 발급하는 API이다.")
+    @Operation(summary = "임시 비밀번호 발급", description = "회원ID와 패쓰코드를 입력받아 임시 비밀번호를 발급하는 API이다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "임시 비밀번호 발급 성공",
                     content = @Content(schema = @Schema(implementation = FindPasswordResponse.class))),
@@ -122,7 +122,7 @@ public class AuthController {
     })
     @PostMapping("/find-password")
     public ResponseEntity<FindPasswordResponse> findPassword(
-            @Parameter(name = "FindPasswordRequest", description = "비밀번호 찾기 요청 DTO (userId, passCode)", required = true)
+            @Parameter(name = "FindPasswordRequest", description = "임시 비밀번호 발급 요청 DTO (userId, passCode)", required = true)
             @RequestBody FindPasswordRequest request) {
         String tempPassword = authService.findPassword(request.getUserId(), request.getPassCode());
         FindPasswordResponse response = new FindPasswordResponse(tempPassword);
@@ -138,7 +138,7 @@ public class AuthController {
             @ApiResponse(responseCode = "401", description = "리프레쉬 토큰이 유효하지 않은 경우",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
-    @PostMapping("/v1/token")
+    @PostMapping("/token/refresh")
     public ResponseEntity<LoginResponse> updateToken(
             @Parameter(name = "RefreshTokenRequest", description = "토큰 갱신 요청 DTO (refreshToken)", required = true)
             @Valid @RequestBody RefreshTokenRequest request) {
