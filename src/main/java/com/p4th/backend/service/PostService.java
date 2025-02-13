@@ -117,10 +117,15 @@ public class PostService {
         }
     }
 
+    @Transactional
     public void deletePost(String postId, String requesterUserId) {
         Post existing = postMapper.getPostDetail(postId);
         if (existing == null) {
             throw new CustomException(ErrorCode.POST_NOT_FOUND, "게시글을 찾을 수 없습니다.");
+        }
+        // 이미 삭제 상태인 경우 에러 발생
+        if (PostStatus.DELETED.equals(existing.getStatus())) {
+            throw new CustomException(ErrorCode.POST_ALREADY_DELETED, "이미 삭제된 게시글입니다.");
         }
         // 관리자 권한(예: admin_role == 1)이거나 본인 게시글일 때 삭제 가능
         User requester = userMapper.selectByUserId(requesterUserId);

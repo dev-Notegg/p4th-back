@@ -23,8 +23,13 @@ public enum ErrorCode {
     UNAUTHORIZED_ACCESS(HttpStatus.FORBIDDEN, 40300, "권한이 없습니다."),
 
     //게시글 관련
-    POST_NOT_FOUND(HttpStatus.NOT_FOUND, 40400, "게시글을 찾을 수 없습니다.");
-
+    POST_NOT_FOUND(HttpStatus.NOT_FOUND, 40400, "게시글을 찾을 수 없습니다."),
+    POST_ALREADY_DELETED(HttpStatus.BAD_REQUEST, 40401, "이미 삭제된 게시글입니다."),
+        
+    //댓글 관련
+    COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND, 40500, "댓글을 찾을 수 없습니다."),
+    COMMENT_ALREADY_DELETED(HttpStatus.BAD_REQUEST, 40501, "이미 삭제된 댓글입니다.");
+        
     private final HttpStatus httpStatus;
     private final int code;
     private final String message;
