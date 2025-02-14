@@ -1,5 +1,6 @@
 package com.p4th.backend.controller;
 
+import com.p4th.backend.common.exception.ErrorResponse;
 import com.p4th.backend.dto.request.CommentCreateRequest;
 import com.p4th.backend.dto.request.CommentUpdateRequest;
 import com.p4th.backend.dto.response.comment.CommentCreateResponse;
@@ -9,13 +10,14 @@ import com.p4th.backend.security.JwtProvider;
 import com.p4th.backend.service.CommentService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -34,7 +36,7 @@ public class CommentController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "댓글 목록 조회 성공")
     })
-    @GetMapping(value = "/posts/{postId}/comments", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/posts/{postId}/comments")
     public ResponseEntity<List<CommentResponse>> getComments(
             @Parameter(name = "postId", description = "게시글 ID", required = true)
             @PathVariable("postId") String postId) {
@@ -44,11 +46,10 @@ public class CommentController {
 
     @Operation(summary = "댓글 작성", description = "게시글에 댓글을 작성한다.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "댓글 작성 성공")
+            @ApiResponse(responseCode = "200", description = "댓글 작성 성공"),
+            @ApiResponse(responseCode = "400", description = "사용자를 찾을 수 없음", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
-    @PostMapping(value = "/posts/{postId}/comments",
-            consumes = MediaType.APPLICATION_JSON_VALUE,
-            produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/posts/{postId}/comments")
     public ResponseEntity<CommentCreateResponse> createComment(
             @Parameter(name = "postId", description = "게시글 ID", required = true)
             @PathVariable("postId") String postId,
@@ -63,12 +64,11 @@ public class CommentController {
     @Operation(summary = "댓글 수정", description = "댓글 수정 API. 작성자 본인만 수정할 수 있다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "댓글 수정 성공"),
-            @ApiResponse(responseCode = "403", description = "권한 없음",
-                    content = @io.swagger.v3.oas.annotations.media.Content)
+            @ApiResponse(responseCode = "403", description = "권한 없음", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "댓글을 찾을 수 없음", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "400", description = "이미 삭제된 댓글", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
-    @PutMapping(value = "/comments/{commentId}",
-            consumes = MediaType.APPLICATION_JSON_VALUE,
-            produces = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(value = "/comments/{commentId}")
     public ResponseEntity<CommentUpdateResponse> updateComment(
             @Parameter(name = "commentId", description = "댓글 ID", required = true)
             @PathVariable("commentId") String commentId,
@@ -83,10 +83,13 @@ public class CommentController {
     @Operation(summary = "댓글 삭제", description = "댓글 삭제 API. 작성자 본인 또는 관리자는 삭제 가능하다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "댓글 삭제 성공"),
-            @ApiResponse(responseCode = "403", description = "권한 없음",
-                    content = @io.swagger.v3.oas.annotations.media.Content)
+            @ApiResponse(responseCode = "403", description = "권한 없음", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "댓글을 찾을 수 없음", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "400", description = "이미 삭제된 댓글", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "500", description = "내부 서버 오류",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
-    @DeleteMapping(value = "/comments/{commentId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @DeleteMapping(value = "/comments/{commentId}")
     public ResponseEntity<?> deleteComment(
             @Parameter(name = "commentId", description = "댓글 ID", required = true)
             @PathVariable("commentId") String commentId,

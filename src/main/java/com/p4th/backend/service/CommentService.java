@@ -46,7 +46,7 @@ public class CommentService {
                     return true;
                 })
                 .map(comment -> {
-                    // 만약 댓글 상태가 DELETED이면, content를 "삭제되었습니다"로 설정
+                    // 만약 댓글 상태가 DELETED이면, content를 "삭제된 댓글입니다"로 설정
                     if (CommentStatus.DELETED.equals(comment.getStatus())) {
                         comment.setContent("삭제된 댓글입니다");
                     }

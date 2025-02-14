@@ -28,27 +28,37 @@ public class PostService {
 
     @Transactional(readOnly = true)
     public Page<PostListResponse> getPostsByBoard(String boardId, Pageable pageable) {
-        Page<Post> posts = postRepository.findByBoardId(boardId, pageable);
-        return posts.map(PostListResponse::from);
+        try {
+            Page<Post> posts = postRepository.findByBoardId(boardId, pageable);
+            return posts.map(PostListResponse::from);
+        } catch (Exception e) {
+            throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR, "게시글 목록 조회 중 오류: " + e.getMessage());
+        }
     }
 
     @Transactional
     public Post getPostDetail(String postId, String userId) {
-        // 조회수 1증가
-        postMapper.incrementViewCount(postId);
-        // 최근 본 게시물 테이블에 기록 삽입
-        if (userId != null && !userId.isEmpty()) {
-            postMapper.insertPostView(userId, postId);
+        try {
+            // 조회수 1증가
+            postMapper.incrementViewCount(postId);
+            // 최근 본 게시물 테이블에 기록 삽입
+            if (userId != null && !userId.trim().isEmpty()) {
+                postMapper.insertPostView(userId, postId);
+            }
+            Post post = postMapper.getPostDetail(postId);
+            if (post == null) {
+                throw new CustomException(ErrorCode.POST_NOT_FOUND, "게시글을 찾을 수 없습니다.");
+            }
+            post.setComments(commentMapper.getCommentsByPost(postId));
+            if (PostStatus.DELETED.equals(post.getStatus())) {
+                post.setContent("삭제된 게시글입니다");
+            }
+            return post;
+        } catch (CustomException ce) {
+            throw ce;
+        } catch (Exception e) {
+            throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR, "게시글 상세 조회 중 오류: " + e.getMessage());
         }
-        Post post = postMapper.getPostDetail(postId);
-        if (post == null) {
-            throw new CustomException(ErrorCode.POST_NOT_FOUND, "게시글을 찾을 수 없습니다.");
-        }
-        post.setComments(commentMapper.getCommentsByPost(postId));
-        if (post.getStatus() == PostStatus.DELETED) {
-            post.setContent("삭제된 게시글입니다");
-        }
-        return post;
     }
 
     /**
@@ -64,82 +74,90 @@ public class PostService {
      */
     @Transactional
     public String registerPost(String boardId, String userId, String title, String content) {
-        // 사용자 정보 조회
-        User user = authMapper.selectByUserId(userId);
-        if (user == null) {
-            throw new CustomException(ErrorCode.USER_NOT_FOUND, "사용자 정보를 찾을 수 없습니다.");
+        try {
+            User user = authMapper.selectByUserId(userId);
+            if (user == null) {
+                throw new CustomException(ErrorCode.USER_NOT_FOUND, "사용자 정보를 찾을 수 없습니다.");
+            }
+            // HTML 콘텐츠 내의 inline 미디어 처리
+            String processedContent = HtmlImageUtils.processInlineMedia(content, boardId, s3Service);
+            // 게시글 생성
+            Post post = new Post();
+            String postId = ULIDUtil.getULID();
+            post.setPostId(postId);
+            post.setBoardId(boardId);
+            post.setUserId(userId);
+            post.setTitle(title);
+            post.setContent(processedContent);
+            post.setStatus(PostStatus.NORMAL);
+            int inserted = postMapper.insertPost(post);
+            if (inserted != 1) {
+                throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR, "게시글 등록 실패");
+            }
+            return postId;
+        } catch (Exception e) {
+            throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR, "게시글 등록 중 오류: " + e.getMessage());
         }
-        // HTML 콘텐츠 내의 inline 미디어 처리
-        String processedContent = HtmlImageUtils.processInlineMedia(content, boardId, s3Service);
-        // 게시글 생성
-        Post post = new Post();
-        String postId = ULIDUtil.getULID();
-        post.setPostId(postId);
-        post.setBoardId(boardId);
-        post.setUserId(userId);
-        post.setTitle(title);
-        post.setContent(processedContent);
-        int inserted = postMapper.insertPost(post);
-        if (inserted != 1) {
-            throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR, "게시글 등록 실패");
-        }
-        return postId;
     }
 
 
     @Transactional
     public void updatePost(String postId, String boardId, String userId, String title, String content) {
-        // 권한 체크: 수정 요청자의 userId와 기존 게시글의 작성자 비교
-        Post existing = postMapper.getPostDetail(postId);
-        if (existing == null) {
-            throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR, "게시글을 찾을 수 없습니다.");
-        }
-        if (PostStatus.DELETED.equals(existing.getStatus())) {
-            throw new CustomException(ErrorCode.POST_ALREADY_DELETED, "이미 삭제된 게시글입니다.");
-        }
-        if (!existing.getUserId().equals(userId)) {
-            throw new CustomException(ErrorCode.UNAUTHORIZED_ACCESS, "본인이 작성한 게시글만 수정할 수 있습니다.");
-        }
-        String processedContent = HtmlImageUtils.processInlineMedia(content, boardId, s3Service);
-        Post post = new Post();
-        post.setPostId(postId);
-        post.setBoardId(boardId);
-        post.setUserId(userId);
-        post.setTitle(title);
-        post.setContent(processedContent);
-        int updated = postMapper.updatePost(post);
-        if (updated != 1) {
-            throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR, "게시글 수정 실패");
+        try {
+            Post existing = postMapper.getPostDetail(postId);
+            if (existing == null) {
+                throw new CustomException(ErrorCode.POST_NOT_FOUND, "게시글을 찾을 수 없습니다.");
+            }
+            if (PostStatus.DELETED.equals(existing.getStatus())) {
+                throw new CustomException(ErrorCode.POST_ALREADY_DELETED, "이미 삭제된 게시글입니다.");
+            }
+            if (!existing.getUserId().equals(userId)) {
+                throw new CustomException(ErrorCode.UNAUTHORIZED_ACCESS, "본인이 작성한 게시글만 수정할 수 있습니다.");
+            }
+            String processedContent = HtmlImageUtils.processInlineMedia(content, boardId, s3Service);
+            Post post = new Post();
+            post.setPostId(postId);
+            post.setBoardId(boardId);
+            post.setUserId(userId);
+            post.setTitle(title);
+            post.setContent(processedContent);
+            int updated = postMapper.updatePost(post);
+            if (updated != 1) {
+                throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR, "게시글 수정 실패");
+            }
+        } catch (Exception e) {
+            throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR, "게시글 수정 중 오류: " + e.getMessage());
         }
     }
 
     @Transactional
     public void deletePost(String postId, String requesterUserId) {
-        Post existing = postMapper.getPostDetail(postId);
-        if (existing == null) {
-            throw new CustomException(ErrorCode.POST_NOT_FOUND, "게시글을 찾을 수 없습니다.");
-        }
-        // 이미 삭제 상태인 경우 에러 발생
-        if (PostStatus.DELETED.equals(existing.getStatus())) {
-            throw new CustomException(ErrorCode.POST_ALREADY_DELETED, "이미 삭제된 게시글입니다.");
-        }
-        // 관리자 권한(예: admin_role == 1)이거나 본인 게시글일 때 삭제 가능
-        User requester = authMapper.selectByUserId(requesterUserId);
-        if (!existing.getUserId().equals(requesterUserId) && (requester == null || requester.getAdminRole() != 1)) {
-            throw new CustomException(ErrorCode.UNAUTHORIZED_ACCESS, "본인이 작성한 게시글만 삭제할 수 있습니다.");
-        }
-        // 게시글에 댓글이 없는 경우 -> 물리 삭제
-        if (existing.getCommentCount() == 0) {
-            int deleted = postMapper.physicalDeletePost(postId);
-            if (deleted != 1) {
-                throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR, "게시글 삭제 실패");
+        try {
+            Post existing = postMapper.getPostDetail(postId);
+            if (existing == null) {
+                throw new CustomException(ErrorCode.POST_NOT_FOUND, "게시글을 찾을 수 없습니다.");
             }
-        } else {
-            // 댓글이 있는 경우 상태 업데이트 처리
-            int updated = postMapper.deletePost(postId); // 상태를 DELETED로 업데이트
-            if (updated != 1) {
-                throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR, "게시글 삭제 실패");
+            // 이미 삭제 상태인 경우 에러 발생
+            if (PostStatus.DELETED.equals(existing.getStatus())) {
+                throw new CustomException(ErrorCode.POST_ALREADY_DELETED, "이미 삭제된 게시글입니다.");
             }
+            User requester = authMapper.selectByUserId(requesterUserId);
+            if (!existing.getUserId().equals(requesterUserId) && (requester == null || requester.getAdminRole() != 1)) {
+                throw new CustomException(ErrorCode.UNAUTHORIZED_ACCESS, "본인이 작성한 게시글만 삭제할 수 있습니다.");
+            }
+            if (existing.getCommentCount() == 0) {
+                int deleted = postMapper.physicalDeletePost(postId);
+                if (deleted != 1) {
+                    throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR, "게시글 삭제 실패");
+                }
+            } else {
+                int updated = postMapper.deletePost(postId); // 상태를 DELETED로 업데이트
+                if (updated != 1) {
+                    throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR, "게시글 삭제 실패");
+                }
+            }
+        } catch (Exception e) {
+            throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR, "게시글 삭제 중 오류: " + e.getMessage());
         }
     }
 

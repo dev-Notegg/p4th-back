@@ -36,78 +36,101 @@ public class MenuService {
 
     @Transactional(readOnly = true)
     public List<PostListResponse> getRecentPosts(String userId) {
-        List<Post> recentPosts = postMapper.findRecentPostsByUserId(userId);
-        return recentPosts.stream()
-                .map(PostListResponse::from)
-                .collect(Collectors.toList());
+        try {
+            List<Post> recentPosts = postMapper.findRecentPostsByUserId(userId);
+            return recentPosts.stream()
+                    .map(PostListResponse::from)
+                    .collect(Collectors.toList());
+        } catch (Exception e) {
+            throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR, "최근 본 게시물 조회 중 오류: " + e.getMessage());
+        }
     }
 
     @Transactional(readOnly = true)
     public Page<PostListResponse> getUserPosts(String userId, Pageable pageable) {
-        Page<Post> posts = postRepository.findByUserId(userId, pageable);
-        List<PostListResponse> dtoList = posts.getContent().stream()
-                .map(PostListResponse::from)
-                .collect(Collectors.toList());
-        return new PageImpl<>(dtoList, pageable, posts.getTotalElements());
+        try {
+            Page<Post> posts = postRepository.findByUserId(userId, pageable);
+            List<PostListResponse> dtoList = posts.getContent().stream()
+                    .map(PostListResponse::from)
+                    .collect(Collectors.toList());
+            return new PageImpl<>(dtoList, pageable, posts.getTotalElements());
+        } catch (Exception e) {
+            throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR, "내가 작성한 글 조회 중 오류: " + e.getMessage());
+        }
     }
 
     @Transactional(readOnly = true)
     public Page<UserCommentPostResponse> getUserComments(String userId, Pageable pageable) {
-        // userMapper.getCommentsByUser(userId)를 통해 사용자가 작성한 댓글들을 조회
-        List<com.p4th.backend.domain.Comment> comments = menuMapper.getCommentsByUser(userId);
-        Map<String, List<com.p4th.backend.domain.Comment>> grouped = comments.stream()
-                .collect(Collectors.groupingBy(com.p4th.backend.domain.Comment::getPostId));
+        try {
+            List<com.p4th.backend.domain.Comment> comments = menuMapper.getCommentsByUser(userId);
+            Map<String, List<com.p4th.backend.domain.Comment>> grouped = comments.stream()
+                    .collect(Collectors.groupingBy(com.p4th.backend.domain.Comment::getPostId));
 
-        List<UserCommentPostResponse> responses = grouped.entrySet().stream()
-                .map(entry -> {
-                    String postId = entry.getKey();
-                    Post post = postMapper.getPostDetail(postId);
-                    if (post == null) {
-                        return null;
-                    }
-                    UserCommentPostResponse dto = UserCommentPostResponse.from(post);
-                    List<com.p4th.backend.domain.Comment> myComments = entry.getValue().stream()
-                            .filter(c -> c.getUserId().equals(userId))
-                            .toList();
-                    dto.setComments(myComments.stream()
-                            .map(com.p4th.backend.dto.response.user.UserCommentResponse::from)
-                            .collect(Collectors.toList()));
-                    return dto;
-                })
-                .filter(Objects::nonNull)
-                .collect(Collectors.toList());
-        return new PageImpl<>(responses, pageable, responses.size());
+            List<UserCommentPostResponse> responses = grouped.entrySet().stream()
+                    .map(entry -> {
+                        String postId = entry.getKey();
+                        Post post = postMapper.getPostDetail(postId);
+                        if (post == null) {
+                            return null;
+                        }
+                        UserCommentPostResponse dto = UserCommentPostResponse.from(post);
+                        List<com.p4th.backend.domain.Comment> myComments = entry.getValue().stream()
+                                .filter(c -> c.getUserId().equals(userId))
+                                .toList();
+                        dto.setComments(myComments.stream()
+                                .map(com.p4th.backend.dto.response.user.UserCommentResponse::from)
+                                .collect(Collectors.toList()));
+                        return dto;
+                    })
+                    .filter(Objects::nonNull)
+                    .collect(Collectors.toList());
+            return new PageImpl<>(responses, pageable, responses.size());
+        } catch (Exception e) {
+            throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR, "내가 쓴 댓글 조회 중 오류: " + e.getMessage());
+        }
     }
 
     @Transactional(readOnly = true)
     public UserProfileResponse getUserProfile(String userId) {
-        User user = authMapper.selectByUserId(userId);
-        if (user == null) {
-            throw new CustomException(ErrorCode.USER_NOT_FOUND, "사용자를 찾을 수 없습니다.");
+        try {
+            User user = authMapper.selectByUserId(userId);
+            if (user == null) {
+                throw new CustomException(ErrorCode.USER_NOT_FOUND, "사용자를 찾을 수 없습니다.");
+            }
+            return UserProfileResponse.from(user);
+        } catch (Exception e) {
+            throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR, "내 계정 조회 중 오류: " + e.getMessage());
         }
-        return UserProfileResponse.from(user);
     }
 
     public List<Category> getAllCategories() {
-        return menuMapper.getAllCategories();
+        try {
+            return menuMapper.getAllCategories();
+        } catch (Exception e) {
+            throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR, "전체 카테고리 조회 중 오류: " + e.getMessage());
+        }
     }
 
     public List<BoardResponse> getBoardsByCategory(String categoryId) {
-        List<Board> boards = menuMapper.getBoardsByCategory(categoryId);
-        return boards.stream().map(board -> {
-            BoardResponse dto = new BoardResponse();
-            dto.setBoardId(board.getBoardId());
-            dto.setCategoryId(board.getCategoryId());
-            dto.setCategoryName(board.getCategoryName());
-            dto.setBoardName(board.getBoardName());
-            dto.setBoardLevel(board.getBoardLevel());
-            dto.setSortOrder(board.getSortOrder());
-            dto.setRecommendYn(board.getRecommendYn());
-            dto.setCreatedBy(board.getCreatedBy());
-            dto.setCreatedAt(board.getCreatedAt());
-            dto.setUpdatedBy(board.getUpdatedBy());
-            dto.setUpdatedAt(board.getUpdatedAt());
-            return dto;
-        }).collect(Collectors.toList());
+        try {
+            List<Board> boards = menuMapper.getBoardsByCategory(categoryId);
+            return boards.stream().map(board -> {
+                BoardResponse dto = new BoardResponse();
+                dto.setBoardId(board.getBoardId());
+                dto.setCategoryId(board.getCategoryId());
+                dto.setCategoryName(board.getCategoryName());
+                dto.setBoardName(board.getBoardName());
+                dto.setBoardLevel(board.getBoardLevel());
+                dto.setSortOrder(board.getSortOrder());
+                dto.setRecommendYn(board.getRecommendYn());
+                dto.setCreatedBy(board.getCreatedBy());
+                dto.setCreatedAt(board.getCreatedAt());
+                dto.setUpdatedBy(board.getUpdatedBy());
+                dto.setUpdatedAt(board.getUpdatedAt());
+                return dto;
+            }).collect(Collectors.toList());
+        } catch (Exception e) {
+            throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR, "카테고리 내 게시판 조회 중 오류: " + e.getMessage());
+        }
     }
 }

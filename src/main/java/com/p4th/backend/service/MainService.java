@@ -1,5 +1,7 @@
 package com.p4th.backend.service;
 
+import com.p4th.backend.common.exception.CustomException;
+import com.p4th.backend.common.exception.ErrorCode;
 import com.p4th.backend.domain.Banner;
 import com.p4th.backend.domain.PostStatus;
 import com.p4th.backend.dto.response.board.PopularBoardResponse;
@@ -24,30 +26,54 @@ public class MainService {
     private static final DateTimeFormatter originalFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     public List<PopularBoardResponse> getPopularBoards() {
-        return mainMapper.getPopularBoards();
+        try {
+            List<PopularBoardResponse> boards = mainMapper.getPopularBoards();
+            if (boards == null) {
+                throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR, "인기 게시판 목록 조회 실패");
+            }
+            return boards;
+        } catch (Exception e) {
+            throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR, "인기 게시판 목록 조회 중 오류: " + e.getMessage());
+        }
     }
 
     public List<Banner> getBanners() {
-        return mainMapper.getBanners();
+        try {
+            List<Banner> banners = mainMapper.getBanners();
+            if (banners == null) {
+                throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR, "배너 목록 조회 실패");
+            }
+            return banners;
+        } catch (Exception e) {
+            throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR, "배너 목록 조회 중 오류: " + e.getMessage());
+        }
     }
 
     public List<PopularPostResponse> getPopularPosts(String period) {
-        List<PopularPostResponse> responses = postHistoryLogMapper.getPopularPostsByPeriod(period);
-        responses.forEach(response -> {
-            // imageUrl, imageCount는 content 필드에서 추출
-            //삭제된 게시글인 경우 이미지 처리하지 않음
-            if (response.getContent() != null && !response.getContent().isEmpty() && !PostStatus.DELETED.equals(response.getStatus())) {
-                String imgUrl = HtmlImageUtils.extractFirstImageUrl(response.getContent());
-                int imgCount = HtmlImageUtils.countInlineImages(response.getContent());
-                response.setImageUrl(imgUrl);
-                response.setImageCount(imgCount);
-            }
-
-            if (response.getCreatedAt() != null && !response.getCreatedAt().isEmpty()) {
-                LocalDateTime createdTime = LocalDateTime.parse(response.getCreatedAt(), originalFormatter);
-                response.setCreatedAt(RelativeTimeFormatter.formatRelativeTime(createdTime));
-            }
-        });
-        return responses;
+        try {
+            List<PopularPostResponse> responses = postHistoryLogMapper.getPopularPostsByPeriod(period);
+            responses.forEach(response -> {
+                try {
+                    // imageUrl, imageCount는 content 필드에서 추출
+                    //삭제된 게시글인 경우 이미지 처리하지 않음
+                    if (response.getContent() != null && !response.getContent().isEmpty() &&
+                            !PostStatus.DELETED.equals(response.getStatus())) {
+                        String imgUrl = HtmlImageUtils.extractFirstImageUrl(response.getContent());
+                        int imgCount = HtmlImageUtils.countInlineImages(response.getContent());
+                        response.setImageUrl(imgUrl);
+                        response.setImageCount(imgCount);
+                    }
+                    if (response.getCreatedAt() != null && !response.getCreatedAt().isEmpty()) {
+                        LocalDateTime createdTime = LocalDateTime.parse(response.getCreatedAt(), originalFormatter);
+                        response.setCreatedAt(RelativeTimeFormatter.formatRelativeTime(createdTime));
+                    }
+                } catch (Exception e) {
+                    throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR, "인기 게시글 처리 중 오류: " + e.getMessage());
+                }
+            });
+            return responses;
+        } catch (Exception e) {
+            throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR, "인기 게시글 조회 중 오류: " + e.getMessage());
+        }
     }
 }

@@ -26,13 +26,12 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "인증 API", description = "인증 및 토큰 관련 API")
 @RestController
-@RequestMapping(value = "/api/auth", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(value = "/api/auth")
 @RequiredArgsConstructor
 public class AuthController {
 
@@ -42,7 +41,7 @@ public class AuthController {
     @Operation(summary = "회원가입", description = "회원ID, 비밀번호, 닉네임을 받아 회원가입을 진행하며, 가입 완료 후 회원ID와 패쓰코드를 반환한다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "회원가입 성공"),
-            @ApiResponse(responseCode = "400", description = "입력 데이터 오류 또는 중복된 회원ID/닉네임",
+            @ApiResponse(responseCode = "500", description = "회원가입 중 내부 서버 오류",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @PostMapping("/signup")
@@ -57,7 +56,9 @@ public class AuthController {
     @Operation(summary = "회원ID 중복 확인", description = "전달된 회원ID를 기반으로 중복 여부를 확인한다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "중복 확인 성공",
-                    content = @Content(schema = @Schema(implementation = CheckResponse.class)))
+                    content = @Content(schema = @Schema(implementation = CheckResponse.class))),
+            @ApiResponse(responseCode = "400", description = "입력값이 빈 값이거나 잘못된 경우",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @GetMapping("/check-user-id")
     public ResponseEntity<CheckResponse> checkUserId(
@@ -72,7 +73,9 @@ public class AuthController {
     @Operation(summary = "닉네임 중복 확인", description = "전달된 nickname을 기반으로 중복 여부를 확인한다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "중복 확인 성공",
-                    content = @Content(schema = @Schema(implementation = CheckResponse.class)))
+                    content = @Content(schema = @Schema(implementation = CheckResponse.class))),
+            @ApiResponse(responseCode = "400", description = "입력값이 빈 값이거나 잘못된 경우",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @GetMapping("/check-nickname")
     public ResponseEntity<CheckResponse> checkNickname(

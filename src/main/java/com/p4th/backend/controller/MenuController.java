@@ -39,7 +39,9 @@ public class MenuController {
     @Operation(summary = "최근 본 게시물 목록 조회", description = "최근에 본 게시글(최대 15개)을 조회한다.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "최근 본 게시물 목록 조회 성공"),
-            @ApiResponse(responseCode = "403", description = "로그인 후 이용가능한 메뉴입니다.")
+            @ApiResponse(responseCode = "403", description = "로그인 후 이용가능한 메뉴"),
+            @ApiResponse(responseCode = "500", description = "내부 서버 오류",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @GetMapping(value = "/recent-posts")
     public ResponseEntity<List<PostListResponse>> getRecentPosts(
@@ -55,7 +57,9 @@ public class MenuController {
     @Operation(summary = "작성한 글 목록 조회", description = "내가 작성한 게시글을 최신순으로 조회한다.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "작성한 글 목록 조회 성공"),
-            @ApiResponse(responseCode = "403", description = "로그인 후 이용가능한 메뉴입니다.")
+            @ApiResponse(responseCode = "403", description = "로그인 후 이용가능한 메뉴"),
+            @ApiResponse(responseCode = "500", description = "내부 서버 오류",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @GetMapping(value = "/{userId}/posts")
     public ResponseEntity<Page<PostListResponse>> getUserPosts(
@@ -72,7 +76,9 @@ public class MenuController {
     @Operation(summary = "내가 쓴 댓글 목록 조회", description = "내가 작성한 댓글이 포함된 게시글 목록을 조회한다. 각 게시글에는 내가 쓴 댓글 정보가 포함된다.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "내가 쓴 댓글 목록 조회 성공"),
-            @ApiResponse(responseCode = "403", description = "로그인 후 이용가능한 메뉴입니다.",
+            @ApiResponse(responseCode = "403", description = "로그인 후 이용가능한 메뉴",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "500", description = "내부 서버 오류",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @GetMapping(value = "/{userId}/comments")
@@ -90,7 +96,11 @@ public class MenuController {
     @Operation(summary = "내 계정 조회", description = "로그인한 사용자의 프로필 정보를 조회한다.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "내 계정 조회 성공"),
-            @ApiResponse(responseCode = "403", description = "로그인 후 이용가능한 메뉴입니다.",
+            @ApiResponse(responseCode = "400", description = "사용자를 찾을 수 없는 경우",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "403", description = "로그인 후 이용가능한 메뉴",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "500", description = "내부 서버 오류",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @GetMapping(value = "/profile")
@@ -106,7 +116,7 @@ public class MenuController {
     @Operation(summary = "전체 카테고리 목록 조회", description = "전체 카테고리 목록을 조회한다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "카테고리 목록 조회 성공"),
-            @ApiResponse(responseCode = "400", description = "입력 데이터 오류 또는 기타 문제",
+            @ApiResponse(responseCode = "500", description = "내부 서버 오류",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @GetMapping("/category")
@@ -119,7 +129,7 @@ public class MenuController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "카테고리 내 게시판 조회 성공",
                     content = @Content(schema = @Schema(implementation = BoardResponse.class))),
-            @ApiResponse(responseCode = "400", description = "입력 데이터 오류 또는 기타 문제",
+            @ApiResponse(responseCode = "500", description = "내부 서버 오류",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @GetMapping("/{categoryId}/boards")

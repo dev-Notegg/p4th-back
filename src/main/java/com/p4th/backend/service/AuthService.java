@@ -26,18 +26,29 @@ public class AuthService {
         String passCode = PassCodeUtil.generatePassCode();
         user.setPassCode(passCode);
         user.setNickname(nickname);
-        authMapper.insertUser(user);
+        try {
+            authMapper.insertUser(user);
+        } catch (Exception e) {
+            throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR, "회원가입 중 오류 발생: " + e.getMessage());
+        }
+
         return new SignUpResult(userId, passCode);
     }
 
     // 회원ID 중복 체크
     public boolean checkUserIdAvailable(String userId) {
+        if (userId == null || userId.trim().isEmpty()) {
+            throw new CustomException(ErrorCode.INVALID_INPUT, "아이디는 빈값일 수 없습니다.");
+        }
         User user = authMapper.selectByUserId(userId);
         return user == null;
     }
 
     // 닉네임 중복 체크
     public boolean checkNicknameAvailable(String nickname) {
+        if (nickname == null || nickname.trim().isEmpty()) {
+            throw new CustomException(ErrorCode.INVALID_INPUT, "닉네임은 빈값일 수 없습니다.");
+        }
         User user = authMapper.selectByNickname(nickname);
         return user == null;
     }

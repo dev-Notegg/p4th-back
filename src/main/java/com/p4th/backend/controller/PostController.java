@@ -1,5 +1,6 @@
 package com.p4th.backend.controller;
 
+import com.p4th.backend.common.exception.ErrorResponse;
 import com.p4th.backend.domain.Post;
 import com.p4th.backend.dto.request.RegisterPostRequest;
 import com.p4th.backend.dto.request.UpdatePostRequest;
@@ -19,7 +20,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import jakarta.servlet.http.HttpServletRequest;
@@ -36,8 +36,8 @@ public class PostController {
     @Operation(summary = "게시글 목록 조회", description = "게시판 ID를 사용하여 게시글 목록을 조회한다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "게시글 목록 조회 성공"),
-            @ApiResponse(responseCode = "400", description = "입력 데이터 오류",
-                    content = @Content(schema = @Schema(implementation = com.p4th.backend.dto.response.ErrorResponse.class)))
+            @ApiResponse(responseCode = "500", description = "내부 서버 오류",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @GetMapping
     public ResponseEntity<Page<PostListResponse>> getPostsByBoard(
@@ -53,8 +53,10 @@ public class PostController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "게시글 상세 조회 성공",
                     content = @Content(schema = @Schema(implementation = PostDetailResponse.class))),
-            @ApiResponse(responseCode = "400", description = "입력 데이터 오류",
-                    content = @Content(schema = @Schema(implementation = com.p4th.backend.dto.response.ErrorResponse.class)))
+            @ApiResponse(responseCode = "404", description = "게시글을 찾을 수 없음",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "500", description = "내부 서버 오류",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @GetMapping("/{postId}")
     public ResponseEntity<PostDetailResponse> getPostDetail(
@@ -69,10 +71,12 @@ public class PostController {
     @Operation(summary = "게시글 등록", description = "게시글 작성을 처리한다. 토큰에서 회원ID를 추출하여 사용하며, 클라이언트는 HTML 콘텐츠(내부 미디어 포함)를 JSON 형식으로 전송한다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "게시글 등록 성공"),
-            @ApiResponse(responseCode = "400", description = "입력 데이터 오류",
-                    content = @Content(schema = @Schema(implementation = com.p4th.backend.dto.response.ErrorResponse.class)))
+            @ApiResponse(responseCode = "400", description = "사용자를 찾을 수 없는 경우",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "500", description = "내부 서버 오류",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
-    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping
     public ResponseEntity<CreatePostResponse> registerPost(
             @Parameter(name = "RegisterPostRequest", description = "게시글 등록 요청 DTO", required = true)
             @RequestBody RegisterPostRequest request,
@@ -86,12 +90,16 @@ public class PostController {
     @Operation(summary = "게시글 수정", description = "게시글 수정 API. 토큰의 회원ID와 게시글 작성자가 일치해야 수정 가능하다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "게시글 수정 성공"),
-            @ApiResponse(responseCode = "400", description = "입력 데이터 오류",
-                    content = @Content(schema = @Schema(implementation = com.p4th.backend.dto.response.ErrorResponse.class))),
-            @ApiResponse(responseCode = "403", description = "권한이 없습니다.",
-                    content = @Content(schema = @Schema(implementation = com.p4th.backend.dto.response.ErrorResponse.class)))
+            @ApiResponse(responseCode = "403", description = "권한 없음",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "게시글을 찾을 수 없음",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "400", description = "삭제된 게시글",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "500", description = "내부 서버 오류",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
-    @PutMapping(value = "/{postId}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(value = "/{postId}")
     public ResponseEntity<UpdatePostResponse> updatePost(
             @Parameter(name = "postId", description = "게시글 ID", required = true)
             @PathVariable("postId") String postId,
@@ -107,10 +115,14 @@ public class PostController {
     @Operation(summary = "게시글 삭제", description = "게시글 삭제 API. 토큰의 회원ID와 게시글 작성자가 일치해야 삭제 가능하다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "게시글 삭제 성공"),
-            @ApiResponse(responseCode = "400", description = "입력 데이터 오류",
-                    content = @Content(schema = @Schema(implementation = com.p4th.backend.dto.response.ErrorResponse.class))),
-            @ApiResponse(responseCode = "403", description = "권한이 없습니다.",
-                    content = @Content(schema = @Schema(implementation = com.p4th.backend.dto.response.ErrorResponse.class)))
+            @ApiResponse(responseCode = "403", description = "권한 없음",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "게시글을 찾을 수 없음",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "400", description = "삭제된 게시글",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "500", description = "내부 서버 오류",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @DeleteMapping("/{postId}")
     public ResponseEntity<DeletePostResponse> deletePost(

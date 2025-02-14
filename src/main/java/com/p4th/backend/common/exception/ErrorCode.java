@@ -9,6 +9,7 @@ public enum ErrorCode {
     USER_NOT_FOUND(HttpStatus.BAD_REQUEST, 10202, "사용자를 찾을 수 없습니다."),
     INVALID_PASSWORD(HttpStatus.BAD_REQUEST, 10203, "비밀번호가 올바르지 않습니다."),
     INVALID_PASSCODE(HttpStatus.BAD_REQUEST, 10204, "패쓰코드가 올바르지 않습니다."),
+    INVALID_INPUT(HttpStatus.BAD_REQUEST, 40001, "유효하지 않은 입력입니다."),
 
     // JWT, 인증 관련
     AUTHENTICATION_FAILED(HttpStatus.UNAUTHORIZED, 10100, "인증에 실패하였습니다."),

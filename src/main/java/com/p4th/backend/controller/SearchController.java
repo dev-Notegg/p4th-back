@@ -1,5 +1,6 @@
 package com.p4th.backend.controller;
 
+import com.p4th.backend.common.exception.ErrorResponse;
 import com.p4th.backend.dto.response.search.SearchResponse;
 import com.p4th.backend.service.SearchService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -34,8 +35,8 @@ public class SearchController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "검색 성공",
                     content = @Content(schema = @Schema(implementation = SearchResponse.class))),
-            @ApiResponse(responseCode = "400", description = "검색어가 없거나 오류 발생",
-                    content = @Content(schema = @Schema(implementation = com.p4th.backend.dto.response.ErrorResponse.class)))
+            @ApiResponse(responseCode = "500", description = "내부 서버 오류",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @GetMapping
     public ResponseEntity<Page<SearchResponse.SearchResult>> search(

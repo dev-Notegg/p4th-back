@@ -30,7 +30,7 @@ public class MainController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "배너 목록 조회 성공",
                     content = @Content(schema = @Schema(implementation = Banner.class))),
-            @ApiResponse(responseCode = "400", description = "입력 데이터 오류",
+            @ApiResponse(responseCode = "500", description = "배너 목록 조회 중 내부 서버 오류",
                     content = @Content(schema = @Schema(implementation = com.p4th.backend.dto.response.ErrorResponse.class)))
     })
     @GetMapping("/banners")
@@ -43,7 +43,7 @@ public class MainController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "인기 게시판 목록 조회 성공",
                     content = @Content(schema = @Schema(implementation = PopularBoardResponse.class))),
-            @ApiResponse(responseCode = "400", description = "입력 데이터 오류",
+            @ApiResponse(responseCode = "500", description = "인기 게시판 목록 조회 중 내부 서버 오류",
                     content = @Content(schema = @Schema(implementation = com.p4th.backend.dto.response.ErrorResponse.class)))
     })
     @GetMapping("/popular/boards")
@@ -57,7 +57,7 @@ public class MainController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "인기 게시글 목록 조회 성공",
                     content = @Content(schema = @Schema(implementation = PopularPostResponse.class))),
-            @ApiResponse(responseCode = "400", description = "입력 데이터 오류",
+            @ApiResponse(responseCode = "500", description = "인기 게시글 조회 중 내부 서버 오류",
                     content = @Content(schema = @Schema(implementation = com.p4th.backend.dto.response.ErrorResponse.class)))
     })
     @GetMapping("/popular/posts")
