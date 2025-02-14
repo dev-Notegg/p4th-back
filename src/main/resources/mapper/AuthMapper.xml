@@ -93,4 +93,20 @@
         FROM user_info
         WHERE nickname = #{nickname}
     </select>
+
+    <!-- 닉네임 변경 업데이트 -->
+    <update id="updateUserNickname">
+        UPDATE user_info
+        SET
+            nickname = #{nickname},
+            nickname_changed_at = NOW(),
+            updated_by = #{userId}
+        WHERE user_id = #{userId}
+    </update>
+
+    <!-- 회원 탈퇴: 회원정보 삭제 -->
+    <delete id="deleteUser">
+        DELETE FROM user_info
+        WHERE user_id = #{userId}
+    </delete>
 </mapper>

@@ -3,12 +3,9 @@ package com.p4th.backend.service;
 import com.p4th.backend.domain.Board;
 import com.p4th.backend.domain.Category;
 import com.p4th.backend.domain.Post;
-import com.p4th.backend.domain.User;
 import com.p4th.backend.dto.response.board.BoardResponse;
 import com.p4th.backend.dto.response.post.PostListResponse;
 import com.p4th.backend.dto.response.user.UserCommentPostResponse;
-import com.p4th.backend.dto.response.user.UserProfileResponse;
-import com.p4th.backend.mapper.AuthMapper;
 import com.p4th.backend.mapper.PostMapper;
 import com.p4th.backend.mapper.MenuMapper;
 import com.p4th.backend.repository.PostRepository;
@@ -32,7 +29,6 @@ public class MenuService {
     private final PostRepository postRepository;
     private final PostMapper postMapper;
     private final MenuMapper menuMapper;
-    private final AuthMapper authMapper;
 
     @Transactional(readOnly = true)
     public List<PostListResponse> getRecentPosts(String userId) {
@@ -87,19 +83,6 @@ public class MenuService {
             return new PageImpl<>(responses, pageable, responses.size());
         } catch (Exception e) {
             throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR, "내가 쓴 댓글 조회 중 오류: " + e.getMessage());
-        }
-    }
-
-    @Transactional(readOnly = true)
-    public UserProfileResponse getUserProfile(String userId) {
-        try {
-            User user = authMapper.selectByUserId(userId);
-            if (user == null) {
-                throw new CustomException(ErrorCode.USER_NOT_FOUND, "사용자를 찾을 수 없습니다.");
-            }
-            return UserProfileResponse.from(user);
-        } catch (Exception e) {
-            throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR, "내 계정 조회 중 오류: " + e.getMessage());
         }
     }
 

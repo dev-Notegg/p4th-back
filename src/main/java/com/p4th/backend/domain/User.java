@@ -17,6 +17,7 @@ public class User {
     private LocalDateTime passwordChangedAt;
     private String passCode;       // 계정 복구용
     private String nickname;
+    private LocalDateTime NicknameChangedAt;
     private int membershipLevel;   // 회원 등급
     private int adminRole;         // 관리자 등급
     private int warning_count;     //누적신고 처리횟수

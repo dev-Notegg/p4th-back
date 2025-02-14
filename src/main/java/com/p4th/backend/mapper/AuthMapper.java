@@ -13,4 +13,6 @@ public interface AuthMapper {
     User selectByUserId(@Param("userId") String userId);
     void updatePassword(User user);
     User selectByNickname(@Param("nickname") String nickname);
+    void updateUserNickname(User user);
+    void deleteUser(@Param("userId") String userId);
 }

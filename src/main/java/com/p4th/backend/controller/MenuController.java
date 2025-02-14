@@ -6,7 +6,6 @@ import com.p4th.backend.common.exception.ErrorResponse;
 import com.p4th.backend.domain.Category;
 import com.p4th.backend.dto.response.board.BoardResponse;
 import com.p4th.backend.dto.response.user.UserCommentPostResponse;
-import com.p4th.backend.dto.response.user.UserProfileResponse;
 import com.p4th.backend.dto.response.post.PostListResponse;
 import com.p4th.backend.security.JwtProvider;
 import com.p4th.backend.service.MenuService;
@@ -27,7 +26,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Tag(name = "메뉴 API", description = "햄버거 메뉴 관련 API (최근 본 게시물, 작성한 글, 내가 쓴 댓글, 내 계정 조회 등)")
+@Tag(name = "메뉴 API", description = "햄버거 메뉴 관련 API (내 계정 조회 제외)")
 @RestController
 @RequestMapping("/api/menu")
 @RequiredArgsConstructor
@@ -91,26 +90,6 @@ public class MenuController {
         }
         Page<UserCommentPostResponse> responses = menuService.getUserComments(userId, pageable);
         return ResponseEntity.ok(responses);
-    }
-
-    @Operation(summary = "내 계정 조회", description = "로그인한 사용자의 프로필 정보를 조회한다.")
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "내 계정 조회 성공"),
-            @ApiResponse(responseCode = "400", description = "사용자를 찾을 수 없는 경우",
-                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-            @ApiResponse(responseCode = "403", description = "로그인 후 이용가능한 메뉴",
-                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-            @ApiResponse(responseCode = "500", description = "내부 서버 오류",
-                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
-    })
-    @GetMapping(value = "/profile")
-    public ResponseEntity<UserProfileResponse> getProfile(HttpServletRequest httpRequest) {
-        String userId = jwtProvider.resolveUserId(httpRequest);
-        if (userId == null) {
-            throw new CustomException(ErrorCode.LOGIN_REQUIRED);
-        }
-        UserProfileResponse profile = menuService.getUserProfile(userId);
-        return ResponseEntity.ok(profile);
     }
 
     @Operation(summary = "전체 카테고리 목록 조회", description = "전체 카테고리 목록을 조회한다.")

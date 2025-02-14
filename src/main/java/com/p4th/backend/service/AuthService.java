@@ -3,6 +3,7 @@ package com.p4th.backend.service;
 import com.p4th.backend.common.exception.CustomException;
 import com.p4th.backend.common.exception.ErrorCode;
 import com.p4th.backend.domain.User;
+import com.p4th.backend.dto.response.user.UserProfileResponse;
 import com.p4th.backend.mapper.AuthMapper;
 import com.p4th.backend.security.JwtProvider;
 import com.p4th.backend.util.PassCodeUtil;
@@ -10,6 +11,10 @@ import com.p4th.backend.util.PasswordUtil;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 
 @Service
 @RequiredArgsConstructor
@@ -118,6 +123,70 @@ public class AuthService {
             user.setAccessToken(newAccessToken);
             authMapper.updateTokens(user);
             return new LoginResult(newAccessToken, refreshToken, user);
+        }
+    }
+
+    @Transactional
+    public UserProfileResponse changeNickname(String userId, String newNickname) {
+        if (newNickname == null || newNickname.trim().isEmpty()) {
+            throw new CustomException(ErrorCode.INVALID_INPUT, "닉네임은 빈값일 수 없습니다.");
+        }
+        User user = authMapper.selectByUserId(userId);
+        if (user == null) {
+            throw new CustomException(ErrorCode.USER_NOT_FOUND, "사용자를 찾을 수 없습니다.");
+        }
+        // 닉네임 변경 후 10일 이내 재변경 불가 체크
+        if (user.getNicknameChangedAt() != null) {
+            long daysSinceChange = ChronoUnit.DAYS.between(user.getNicknameChangedAt(), LocalDateTime.now());
+            if (daysSinceChange < 10) {
+                throw new CustomException(ErrorCode.NICKNAME_CHANGE_NOT_ALLOWED,
+                        "닉네임은 변경 후 10일간 재변경이 불가합니다. 재변경을 원하시면 10일 이후에 시도해주세요.");
+            }
+        }
+        user.setNickname(newNickname);
+        user.setNicknameChangedAt(LocalDateTime.now());
+        authMapper.updateUserNickname(user);
+        return UserProfileResponse.from(user);
+    }
+
+    @Transactional
+    public UserProfileResponse changePassword(String userId, String oldPassword, String newPassword) {
+        if (oldPassword == null || oldPassword.trim().isEmpty() ||
+                newPassword == null || newPassword.trim().isEmpty()) {
+            throw new CustomException(ErrorCode.INVALID_INPUT, "비밀번호는 빈값일 수 없습니다.");
+        }
+        User user = authMapper.selectByUserId(userId);
+        if (user == null) {
+            throw new CustomException(ErrorCode.USER_NOT_FOUND, "사용자를 찾을 수 없습니다.");
+        }
+        if (!PasswordUtil.matches(oldPassword, user.getPassword())) {
+            throw new CustomException(ErrorCode.INVALID_PASSWORD, "현재 비밀번호가 일치하지 않습니다.");
+        }
+        user.setPassword(PasswordUtil.encode(newPassword));
+        authMapper.updatePassword(user);
+        return UserProfileResponse.from(user);
+    }
+
+    @Transactional
+    public UserProfileResponse deleteAccount(String userId) {
+        User user = authMapper.selectByUserId(userId);
+        if (user == null) {
+            throw new CustomException(ErrorCode.USER_NOT_FOUND, "사용자를 찾을 수 없습니다.");
+        }
+        authMapper.deleteUser(userId);
+        return UserProfileResponse.from(user);
+    }
+
+    @Transactional(readOnly = true)
+    public UserProfileResponse getUserProfile(String userId) {
+        try {
+            User user = authMapper.selectByUserId(userId);
+            if (user == null) {
+                throw new CustomException(ErrorCode.USER_NOT_FOUND, "사용자를 찾을 수 없습니다.");
+            }
+            return UserProfileResponse.from(user);
+        } catch (Exception e) {
+            throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR, "내 계정 조회 중 오류: " + e.getMessage());
         }
     }
 

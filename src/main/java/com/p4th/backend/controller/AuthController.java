@@ -1,17 +1,16 @@
 package com.p4th.backend.controller;
 
+import com.p4th.backend.common.exception.CustomException;
+import com.p4th.backend.common.exception.ErrorCode;
 import com.p4th.backend.common.exception.ErrorResponse;
-import com.p4th.backend.dto.request.SignupRequest;
+import com.p4th.backend.dto.request.*;
 import com.p4th.backend.dto.response.auth.UserResponse;
-import com.p4th.backend.dto.request.FindIdRequest;
-import com.p4th.backend.dto.request.FindPasswordRequest;
-import com.p4th.backend.dto.request.LoginRequest;
-import com.p4th.backend.dto.request.RefreshTokenRequest;
 import com.p4th.backend.dto.response.CheckResponse;
 import com.p4th.backend.dto.response.auth.FindIdResponse;
 import com.p4th.backend.dto.response.auth.FindPasswordResponse;
 import com.p4th.backend.dto.response.auth.LoginResponse;
 import com.p4th.backend.dto.response.auth.SignUpResponse;
+import com.p4th.backend.dto.response.user.UserProfileResponse;
 import com.p4th.backend.service.AuthService;
 import com.p4th.backend.service.AuthService.LoginResult;
 import com.p4th.backend.service.AuthService.SignUpResult;
@@ -29,7 +28,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@Tag(name = "인증 API", description = "인증 및 토큰 관련 API")
+@Tag(name = "인증/계정 API", description = "인증/계정 및 토큰 관련 API")
 @RestController
 @RequestMapping(value = "/api/auth")
 @RequiredArgsConstructor
@@ -153,5 +152,86 @@ public class AuthController {
         LoginResult result = authService.refreshTokenForMember(userId, request.getRefreshToken());
         LoginResponse response = new LoginResponse(result.getAccessToken(), result.getRefreshToken(), new UserResponse(result.getUser()));
         return ResponseEntity.ok().body(response);
+    }
+
+    @Operation(summary = "닉네임 변경", description = "닉네임 변경 API. 로그인 상태에서 요청되며, 변경 후 10일 동안 재변경이 불가하다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "닉네임 변경 성공",
+                    content = @Content(schema = @Schema(implementation = UserProfileResponse.class))),
+            @ApiResponse(responseCode = "400", description = "입력값 오류 또는 10일 이내 재변경 불가",
+                    content = @Content(schema = @Schema(implementation = com.p4th.backend.dto.response.ErrorResponse.class))),
+            @ApiResponse(responseCode = "403", description = "로그인 후 이용가능한 메뉴",
+                    content = @Content(schema = @Schema(implementation = com.p4th.backend.dto.response.ErrorResponse.class)))
+    })
+    @PutMapping(value = "/nickname")
+    public ResponseEntity<UserProfileResponse> changeNickname(
+            @Valid @RequestBody NicknameChangeRequest request,
+            HttpServletRequest httpRequest) {
+        String currentUserId = jwtProvider.resolveUserId(httpRequest);
+        if (currentUserId == null) {
+            throw new CustomException(ErrorCode.LOGIN_REQUIRED);
+        }
+        UserProfileResponse updatedProfile = authService.changeNickname(currentUserId, request.getNickname());
+        return ResponseEntity.ok(updatedProfile);
+    }
+
+    @Operation(summary = "비밀번호 변경", description = "비밀번호 변경 API. 현재 비밀번호와 새 비밀번호를 입력받아 변경 처리한다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "비밀번호 변경 성공",
+                    content = @Content(schema = @Schema(implementation = UserProfileResponse.class))),
+            @ApiResponse(responseCode = "400", description = "입력값 오류 또는 현재 비밀번호 불일치",
+                    content = @Content(schema = @Schema(implementation = com.p4th.backend.dto.response.ErrorResponse.class))),
+            @ApiResponse(responseCode = "403", description = "로그인 후 이용가능한 메뉴",
+                    content = @Content(schema = @Schema(implementation = com.p4th.backend.dto.response.ErrorResponse.class)))
+    })
+    @PutMapping(value = "/password")
+    public ResponseEntity<UserProfileResponse> changePassword(
+            @Valid @RequestBody PasswordChangeRequest request,
+            HttpServletRequest httpRequest) {
+        String currentUserId = jwtProvider.resolveUserId(httpRequest);
+        if (currentUserId == null) {
+            throw new CustomException(ErrorCode.LOGIN_REQUIRED);
+        }
+        UserProfileResponse updatedProfile = authService.changePassword(currentUserId, request.getOldPassword(), request.getNewPassword());
+        return ResponseEntity.ok(updatedProfile);
+    }
+
+    @Operation(summary = "회원 탈퇴", description = "회원 탈퇴 API. 로그인 상태에서 탈퇴 여부를 확인한 후 탈퇴 처리한다. 탈퇴 시 회원정보, 게시글, 댓글, 스크랩 등 모든 관련 데이터가 삭제된다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "회원 탈퇴 성공",
+                    content = @Content(schema = @Schema(implementation = UserProfileResponse.class))),
+            @ApiResponse(responseCode = "403", description = "로그인 후 이용가능한 메뉴",
+                    content = @Content(schema = @Schema(implementation = com.p4th.backend.dto.response.ErrorResponse.class))),
+            @ApiResponse(responseCode = "500", description = "회원 탈퇴 중 내부 서버 오류",
+                    content = @Content(schema = @Schema(implementation = com.p4th.backend.dto.response.ErrorResponse.class)))
+    })
+    @DeleteMapping
+    public ResponseEntity<UserProfileResponse> deleteAccount(HttpServletRequest httpRequest) {
+        String currentUserId = jwtProvider.resolveUserId(httpRequest);
+        if (currentUserId == null) {
+            throw new CustomException(ErrorCode.LOGIN_REQUIRED);
+        }
+        UserProfileResponse response = authService.deleteAccount(currentUserId);
+        return ResponseEntity.ok(response);
+    }
+
+    @Operation(summary = "내 계정 조회", description = "로그인한 사용자의 프로필 정보를 조회한다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "내 계정 조회 성공"),
+            @ApiResponse(responseCode = "400", description = "사용자를 찾을 수 없는 경우",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "403", description = "로그인 후 이용가능한 메뉴",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "500", description = "내부 서버 오류",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    @GetMapping(value = "/profile")
+    public ResponseEntity<UserProfileResponse> getProfile(HttpServletRequest httpRequest) {
+        String userId = jwtProvider.resolveUserId(httpRequest);
+        if (userId == null) {
+            throw new CustomException(ErrorCode.LOGIN_REQUIRED);
+        }
+        UserProfileResponse profile = authService.getUserProfile(userId);
+        return ResponseEntity.ok(profile);
     }
 }
