@@ -9,7 +9,7 @@ import org.apache.ibatis.annotations.Param;
 import java.util.List;
 
 @Mapper
-public interface UserMapper {
+public interface MenuMapper {
     List<Comment> getCommentsByUser(@Param("userId") String userId);
     List<Category> getAllCategories();
     List<Board> getBoardsByCategory(@Param("categoryId") String categoryId);

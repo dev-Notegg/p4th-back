@@ -10,7 +10,7 @@ import com.p4th.backend.dto.response.user.UserCommentPostResponse;
 import com.p4th.backend.dto.response.user.UserProfileResponse;
 import com.p4th.backend.mapper.AuthMapper;
 import com.p4th.backend.mapper.PostMapper;
-import com.p4th.backend.mapper.UserMapper;
+import com.p4th.backend.mapper.MenuMapper;
 import com.p4th.backend.repository.PostRepository;
 import com.p4th.backend.common.exception.CustomException;
 import com.p4th.backend.common.exception.ErrorCode;
@@ -27,11 +27,11 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class UserService {
+public class MenuService {
 
     private final PostRepository postRepository;
     private final PostMapper postMapper;
-    private final UserMapper userMapper;
+    private final MenuMapper menuMapper;
     private final AuthMapper authMapper;
 
     @Transactional(readOnly = true)
@@ -55,7 +55,7 @@ public class UserService {
     @Transactional(readOnly = true)
     public Page<UserCommentPostResponse> getUserComments(String userId, Pageable pageable) {
         // userMapper.getCommentsByUser(userId)를 통해 사용자가 작성한 댓글들을 조회
-        List<com.p4th.backend.domain.Comment> comments = userMapper.getCommentsByUser(userId);
+        List<com.p4th.backend.domain.Comment> comments = menuMapper.getCommentsByUser(userId);
         Map<String, List<com.p4th.backend.domain.Comment>> grouped = comments.stream()
                 .collect(Collectors.groupingBy(com.p4th.backend.domain.Comment::getPostId));
 
@@ -90,14 +90,13 @@ public class UserService {
     }
 
     public List<Category> getAllCategories() {
-        return userMapper.getAllCategories();
+        return menuMapper.getAllCategories();
     }
 
     public List<BoardResponse> getBoardsByCategory(String categoryId) {
-        List<Board> boards = userMapper.getBoardsByCategory(categoryId);
+        List<Board> boards = menuMapper.getBoardsByCategory(categoryId);
         return boards.stream().map(board -> {
             BoardResponse dto = new BoardResponse();
-            // 필드 복사 (getter/setter 활용)
             dto.setBoardId(board.getBoardId());
             dto.setCategoryId(board.getCategoryId());
             dto.setCategoryName(board.getCategoryName());

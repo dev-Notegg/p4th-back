@@ -2,13 +2,14 @@ package com.p4th.backend.controller;
 
 import com.p4th.backend.common.exception.CustomException;
 import com.p4th.backend.common.exception.ErrorCode;
+import com.p4th.backend.common.exception.ErrorResponse;
 import com.p4th.backend.domain.Category;
 import com.p4th.backend.dto.response.board.BoardResponse;
 import com.p4th.backend.dto.response.user.UserCommentPostResponse;
 import com.p4th.backend.dto.response.user.UserProfileResponse;
 import com.p4th.backend.dto.response.post.PostListResponse;
 import com.p4th.backend.security.JwtProvider;
-import com.p4th.backend.service.UserService;
+import com.p4th.backend.service.MenuService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -26,18 +27,19 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Tag(name = "사용자 API", description = "사용자 관련 API (최근 본 게시물, 작성한 글, 내가 쓴 댓글, 내 계정 조회 등)")
+@Tag(name = "메뉴 API", description = "햄버거 메뉴 관련 API (최근 본 게시물, 작성한 글, 내가 쓴 댓글, 내 계정 조회 등)")
 @RestController
-@RequestMapping("/api/user")
+@RequestMapping("/api/menu")
 @RequiredArgsConstructor
-public class UserController {
+public class MenuController {
 
-    private final UserService userService;
+    private final MenuService menuService;
     private final JwtProvider jwtProvider;
 
     @Operation(summary = "최근 본 게시물 목록 조회", description = "최근에 본 게시글(최대 15개)을 조회한다.")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "최근 본 게시물 목록 조회 성공")
+            @ApiResponse(responseCode = "200", description = "최근 본 게시물 목록 조회 성공"),
+            @ApiResponse(responseCode = "403", description = "로그인 후 이용가능한 메뉴입니다.")
     })
     @GetMapping(value = "/recent-posts")
     public ResponseEntity<Page<PostListResponse>> getRecentPosts(
@@ -47,13 +49,14 @@ public class UserController {
         if (userId == null) {
             throw new CustomException(ErrorCode.LOGIN_REQUIRED);
         }
-        Page<PostListResponse> posts = userService.getRecentPosts(userId, pageable);
+        Page<PostListResponse> posts = menuService.getRecentPosts(userId, pageable);
         return ResponseEntity.ok(posts);
     }
 
     @Operation(summary = "작성한 글 목록 조회", description = "내가 작성한 게시글을 최신순으로 조회한다.")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "작성한 글 목록 조회 성공")
+            @ApiResponse(responseCode = "200", description = "작성한 글 목록 조회 성공"),
+            @ApiResponse(responseCode = "403", description = "로그인 후 이용가능한 메뉴입니다.")
     })
     @GetMapping(value = "/{userId}/posts")
     public ResponseEntity<Page<PostListResponse>> getUserPosts(
@@ -63,13 +66,15 @@ public class UserController {
         if (userId == null) {
             throw new CustomException(ErrorCode.LOGIN_REQUIRED);
         }
-        Page<PostListResponse> posts = userService.getUserPosts(userId, pageable);
+        Page<PostListResponse> posts = menuService.getUserPosts(userId, pageable);
         return ResponseEntity.ok(posts);
     }
 
     @Operation(summary = "내가 쓴 댓글 목록 조회", description = "내가 작성한 댓글이 포함된 게시글 목록을 조회한다. 각 게시글에는 내가 쓴 댓글 정보가 포함된다.")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "내가 쓴 댓글 목록 조회 성공")
+            @ApiResponse(responseCode = "200", description = "내가 쓴 댓글 목록 조회 성공"),
+            @ApiResponse(responseCode = "403", description = "로그인 후 이용가능한 메뉴입니다.",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @GetMapping(value = "/{userId}/comments")
     public ResponseEntity<Page<UserCommentPostResponse>> getUserComments(
@@ -79,7 +84,7 @@ public class UserController {
         if (userId == null) {
             throw new CustomException(ErrorCode.LOGIN_REQUIRED);
         }
-        Page<UserCommentPostResponse> responses = userService.getUserComments(userId, pageable);
+        Page<UserCommentPostResponse> responses = menuService.getUserComments(userId, pageable);
         return ResponseEntity.ok(responses);
     }
 
@@ -87,7 +92,7 @@ public class UserController {
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "내 계정 조회 성공"),
             @ApiResponse(responseCode = "403", description = "로그인 후 이용가능한 메뉴입니다.",
-                    content = @io.swagger.v3.oas.annotations.media.Content)
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @GetMapping(value = "/profile")
     public ResponseEntity<UserProfileResponse> getProfile(HttpServletRequest httpRequest) {
@@ -95,7 +100,7 @@ public class UserController {
         if (userId == null) {
             throw new CustomException(ErrorCode.LOGIN_REQUIRED);
         }
-        UserProfileResponse profile = userService.getUserProfile(userId);
+        UserProfileResponse profile = menuService.getUserProfile(userId);
         return ResponseEntity.ok(profile);
     }
 
@@ -103,11 +108,11 @@ public class UserController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "카테고리 목록 조회 성공"),
             @ApiResponse(responseCode = "400", description = "입력 데이터 오류 또는 기타 문제",
-                    content = @Content(schema = @Schema(implementation = com.p4th.backend.dto.response.ErrorResponse.class)))
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @GetMapping("/category")
     public ResponseEntity<List<Category>> getAllCategories() {
-        List<Category> categories = userService.getAllCategories();
+        List<Category> categories = menuService.getAllCategories();
         return ResponseEntity.ok().body(categories);
     }
 
@@ -116,13 +121,13 @@ public class UserController {
             @ApiResponse(responseCode = "200", description = "카테고리 내 게시판 조회 성공",
                     content = @Content(schema = @Schema(implementation = BoardResponse.class))),
             @ApiResponse(responseCode = "400", description = "입력 데이터 오류 또는 기타 문제",
-                    content = @Content(schema = @Schema(implementation = com.p4th.backend.dto.response.ErrorResponse.class)))
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @GetMapping("/{categoryId}/boards")
     public ResponseEntity<List<BoardResponse>> getBoardsByCategory(
             @Parameter(name = "categoryId", description = "카테고리 ID", required = true)
             @PathVariable String categoryId) {
-        List<BoardResponse> boards = userService.getBoardsByCategory(categoryId);
+        List<BoardResponse> boards = menuService.getBoardsByCategory(categoryId);
         return ResponseEntity.ok().body(boards);
     }
 }
