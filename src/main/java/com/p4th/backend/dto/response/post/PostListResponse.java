@@ -17,9 +17,10 @@ public class PostListResponse {
     private String boardId;
     private String userId;
     private String nickname;
-    private String title;
     private String category;    // 게시판의 카테고리명
     private String boardName;   // 게시판명
+    private String title;
+    private String content;
     private PostStatus status;
     private int viewCount;
     private int commentCount;
@@ -45,6 +46,13 @@ public class PostListResponse {
         dto.status = post.getStatus();
         dto.viewCount = post.getViewCount();
         dto.commentCount = post.getCommentCount();
+
+        // HTML에 포함된 태그를 제거하고 텍스트만 추출한 후, 30자까지 잘라서 content로 설정
+        String plainText = Jsoup.parse(post.getContent()).text();
+        if (plainText.length() > 30) {
+            plainText = plainText.substring(0, 30);
+        }
+        dto.setContent(plainText);
 
         // content가 DB에 이스케이프되어 저장된 경우 unescape 처리
         String unescapedContent = StringEscapeUtils.unescapeHtml4(post.getContent());

@@ -30,7 +30,6 @@ public class UserCommentResponse {
         dto.setCommentId(comment.getCommentId());
         dto.setUserId(comment.getUserId());
         dto.setNickname(comment.getNickname() != null ? comment.getNickname() : "");
-        // writerLoginId는 서비스 로직에서 게시글 조회 시 별도로 설정 (예: Post.userId)
         dto.setContent(comment.getContent());
         dto.setCreatedAt(comment.getCreatedAt() != null ?
                 RelativeTimeFormatter.formatRelativeTime(comment.getCreatedAt()) : null);

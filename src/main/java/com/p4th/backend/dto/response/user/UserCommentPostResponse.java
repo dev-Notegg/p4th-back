@@ -5,6 +5,7 @@ import lombok.Data;
 import com.p4th.backend.domain.Post;
 import com.p4th.backend.util.HtmlImageUtils;
 import com.p4th.backend.util.RelativeTimeFormatter;
+import org.jsoup.Jsoup;
 
 import java.util.List;
 
@@ -23,14 +24,17 @@ public class UserCommentPostResponse {
     @Schema(description = "게시글 작성자 닉네임")
     private String nickname;
 
-    @Schema(description = "게시글 제목")
-    private String title;
-
     @Schema(description = "카테고리명")
     private String category;
 
     @Schema(description = "게시판명")
     private String boardName;
+
+    @Schema(description = "게시글 제목")
+    private String title;
+
+    @Schema(description = "게시글 내용")
+    private String content;
 
     @Schema(description = "조회수")
     private int viewCount;
@@ -63,6 +67,12 @@ public class UserCommentPostResponse {
                 dto.setCategory(post.getBoard().getCategory().getCategoryName());
             }
         }
+        // HTML에 포함된 태그를 제거하고 텍스트만 추출한 후, 30자까지 잘라서 content로 설정
+        String plainText = Jsoup.parse(post.getContent()).text();
+        if (plainText.length() > 30) {
+            plainText = plainText.substring(0, 30);
+        }
+        dto.setContent(plainText);
         dto.setViewCount(post.getViewCount());
         dto.setCommentCount(post.getCommentCount());
         dto.setImageUrl(HtmlImageUtils.extractFirstImageUrl(post.getContent()));
