@@ -11,6 +11,7 @@ import com.p4th.backend.mapper.PostHistoryLogMapper;
 import com.p4th.backend.util.HtmlImageUtils;
 import com.p4th.backend.util.RelativeTimeFormatter;
 import lombok.RequiredArgsConstructor;
+import org.jsoup.Jsoup;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -62,6 +63,14 @@ public class MainService {
                         int imgCount = HtmlImageUtils.countInlineImages(response.getContent());
                         response.setImageUrl(imgUrl);
                         response.setImageCount(imgCount);
+                    }
+                    // content를 HTML 태그 제거 후 순수 텍스트로 변환하고, 최대 30자까지 자르기
+                    if (response.getContent() != null && !response.getContent().isEmpty()) {
+                        String plainText = Jsoup.parse(response.getContent()).text();
+                        if (plainText.length() > 30) {
+                            plainText = plainText.substring(0,30);
+                        }
+                        response.setContent(plainText);
                     }
                     if (response.getCreatedAt() != null && !response.getCreatedAt().isEmpty()) {
                         LocalDateTime createdTime = LocalDateTime.parse(response.getCreatedAt(), originalFormatter);
