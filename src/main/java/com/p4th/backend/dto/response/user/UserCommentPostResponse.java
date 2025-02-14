@@ -69,8 +69,8 @@ public class UserCommentPostResponse {
         }
         // HTML에 포함된 태그를 제거하고 텍스트만 추출한 후, 30자까지 잘라서 content로 설정
         String plainText = Jsoup.parse(post.getContent()).text();
-        if (plainText.length() > 30) {
-            plainText = plainText.substring(0, 30);
+        if (plainText.length() > 50) {
+            plainText = plainText.substring(0, 50);
         }
         dto.setContent(plainText);
         dto.setViewCount(post.getViewCount());

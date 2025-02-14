@@ -10,13 +10,18 @@ import com.p4th.backend.mapper.MainMapper;
 import com.p4th.backend.mapper.PostHistoryLogMapper;
 import com.p4th.backend.util.HtmlImageUtils;
 import com.p4th.backend.util.RelativeTimeFormatter;
+import com.p4th.backend.util.HtmlContentUtils;
 import lombok.RequiredArgsConstructor;
-import org.jsoup.Jsoup;
 import org.springframework.stereotype.Service;
 
+import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAdjusters;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -52,11 +57,35 @@ public class MainService {
 
     public List<PopularPostResponse> getPopularPosts(String period) {
         try {
-            List<PopularPostResponse> responses = postHistoryLogMapper.getPopularPostsByPeriod(period);
+            // 현재 날짜 기준으로 조회 기간 계산 (전날, 전주, 전달)
+            LocalDate today = LocalDate.now();
+            Map<String, Object> params = new HashMap<>();
+            params.put("period", period);
+
+            if ("DAILY".equalsIgnoreCase(period)) {
+                LocalDate yesterday = today.minusDays(1);
+                params.put("startDate", yesterday.toString());
+                params.put("endDate", yesterday.toString());
+            } else if ("WEEKLY".equalsIgnoreCase(period)) {
+                // 전주: 지난 주 월요일 ~ 일요일
+                LocalDate lastMonday = today.with(TemporalAdjusters.previous(DayOfWeek.MONDAY));
+                LocalDate lastSunday = lastMonday.plusDays(6);
+                params.put("startDate", lastMonday.toString());
+                params.put("endDate", lastSunday.toString());
+            } else if ("MONTHLY".equalsIgnoreCase(period)) {
+                // 전달: 지난 달 1일 ~ 마지막 날
+                LocalDate firstDayLastMonth = today.minusMonths(1).withDayOfMonth(1);
+                LocalDate lastDayLastMonth = today.minusMonths(1).withDayOfMonth(today.minusMonths(1).lengthOfMonth());
+                params.put("startDate", firstDayLastMonth.toString());
+                params.put("endDate", lastDayLastMonth.toString());
+            } else {
+                throw new CustomException(ErrorCode.INVALID_INPUT, "유효하지 않은 조회 기간입니다.");
+            }
+
+            List<PopularPostResponse> responses = postHistoryLogMapper.getPopularPostsByPeriod(params);
             responses.forEach(response -> {
                 try {
-                    // imageUrl, imageCount는 content 필드에서 추출
-                    //삭제된 게시글인 경우 이미지 처리하지 않음
+                    // 삭제된 게시글인 경우 이미지 처리를 하지 않음
                     if (response.getContent() != null && !response.getContent().isEmpty() &&
                             !PostStatus.DELETED.equals(response.getStatus())) {
                         String imgUrl = HtmlImageUtils.extractFirstImageUrl(response.getContent());
@@ -64,14 +93,12 @@ public class MainService {
                         response.setImageUrl(imgUrl);
                         response.setImageCount(imgCount);
                     }
-                    // content를 HTML 태그 제거 후 순수 텍스트로 변환하고, 최대 30자까지 자르기
+                    // HTML 태그 제거 후 순수 텍스트 추출, 최대 30자까지 표시
                     if (response.getContent() != null && !response.getContent().isEmpty()) {
-                        String plainText = Jsoup.parse(response.getContent()).text();
-                        if (plainText.length() > 30) {
-                            plainText = plainText.substring(0,30);
-                        }
+                        String plainText = HtmlContentUtils.extractPlainText(response.getContent(), 30);
                         response.setContent(plainText);
                     }
+                    // 생성일시 변환 (상대 시간 형식)
                     if (response.getCreatedAt() != null && !response.getCreatedAt().isEmpty()) {
                         LocalDateTime createdTime = LocalDateTime.parse(response.getCreatedAt(), originalFormatter);
                         response.setCreatedAt(RelativeTimeFormatter.formatRelativeTime(createdTime));

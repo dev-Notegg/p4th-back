@@ -3,6 +3,7 @@ package com.p4th.backend.dto.response.post;
 import com.p4th.backend.domain.Post;
 import com.p4th.backend.domain.PostStatus;
 import com.p4th.backend.util.RelativeTimeFormatter;
+import com.p4th.backend.util.HtmlContentUtils;
 import lombok.Data;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -47,12 +48,8 @@ public class PostListResponse {
         dto.viewCount = post.getViewCount();
         dto.commentCount = post.getCommentCount();
 
-        // HTML에 포함된 태그를 제거하고 텍스트만 추출한 후, 30자까지 잘라서 content로 설정
-        String plainText = Jsoup.parse(post.getContent()).text();
-        if (plainText.length() > 30) {
-            plainText = plainText.substring(0, 30);
-        }
-        dto.setContent(plainText);
+        // HTML 태그 제거 후 순수 텍스트 추출 (최대 50자)
+        dto.setContent(HtmlContentUtils.extractPlainText(post.getContent(), 50));
 
         // content가 DB에 이스케이프되어 저장된 경우 unescape 처리
         String unescapedContent = StringEscapeUtils.unescapeHtml4(post.getContent());
