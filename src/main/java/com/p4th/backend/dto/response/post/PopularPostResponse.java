@@ -29,7 +29,7 @@ public class PopularPostResponse {
     private String title;
 
     @Schema(description = "게시글 내용", example = "가나다라마바사")
-    private transient String content;
+    private String content;
 
     @Schema(description = "게시글 상태", example = "NORMAL")
     private PostStatus status;
