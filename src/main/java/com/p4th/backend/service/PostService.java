@@ -33,9 +33,13 @@ public class PostService {
     }
 
     @Transactional
-    public Post getPostDetail(String postId) {
+    public Post getPostDetail(String postId, String userId) {
         // 조회수 1증가
         postMapper.incrementViewCount(postId);
+        // 최근 본 게시물 테이블에 기록 삽입
+        if (userId != null && !userId.isEmpty()) {
+            postMapper.insertPostView(userId, postId);
+        }
         Post post = postMapper.getPostDetail(postId);
         if (post == null) {
             throw new CustomException(ErrorCode.POST_NOT_FOUND, "게시글을 찾을 수 없습니다.");

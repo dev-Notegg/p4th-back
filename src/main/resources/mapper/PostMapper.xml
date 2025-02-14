@@ -148,4 +148,10 @@
         LIMIT 15
     </select>
 
+    <insert id="insertPostView">
+        INSERT INTO post_view (user_id, post_id, viewed_at)
+        VALUES (#{userId}, #{postId}, NOW())
+        ON DUPLICATE KEY UPDATE viewed_at = NOW()
+    </insert>
+
 </mapper>

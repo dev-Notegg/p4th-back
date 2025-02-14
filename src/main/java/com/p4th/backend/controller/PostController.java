@@ -58,8 +58,10 @@ public class PostController {
     })
     @GetMapping("/{postId}")
     public ResponseEntity<PostDetailResponse> getPostDetail(
-            @Parameter(name = "postId", description = "게시글 ID", required = true) @PathVariable("postId") String postId) {
-        Post post = postService.getPostDetail(postId);
+            @Parameter(name = "postId", description = "게시글 ID", required = true) @PathVariable("postId") String postId,
+            HttpServletRequest httpRequest) {
+        String userId = jwtProvider.resolveUserId(httpRequest);
+        Post post = postService.getPostDetail(postId, userId);
         PostDetailResponse responseDto = PostDetailResponse.from(post);
         return ResponseEntity.ok().body(responseDto);
     }

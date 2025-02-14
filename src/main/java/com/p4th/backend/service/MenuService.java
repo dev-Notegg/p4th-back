@@ -35,12 +35,11 @@ public class MenuService {
     private final AuthMapper authMapper;
 
     @Transactional(readOnly = true)
-    public Page<PostListResponse> getRecentPosts(String userId, Pageable pageable) {
+    public List<PostListResponse> getRecentPosts(String userId) {
         List<Post> recentPosts = postMapper.findRecentPostsByUserId(userId);
-        List<PostListResponse> dtoList = recentPosts.stream()
+        return recentPosts.stream()
                 .map(PostListResponse::from)
                 .collect(Collectors.toList());
-        return new PageImpl<>(dtoList, pageable, dtoList.size());
     }
 
     @Transactional(readOnly = true)

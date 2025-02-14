@@ -42,14 +42,13 @@ public class MenuController {
             @ApiResponse(responseCode = "403", description = "로그인 후 이용가능한 메뉴입니다.")
     })
     @GetMapping(value = "/recent-posts")
-    public ResponseEntity<Page<PostListResponse>> getRecentPosts(
-            @ParameterObject Pageable pageable,
+    public ResponseEntity<List<PostListResponse>> getRecentPosts(
             HttpServletRequest httpRequest) {
         String userId = jwtProvider.resolveUserId(httpRequest);
         if (userId == null) {
             throw new CustomException(ErrorCode.LOGIN_REQUIRED);
         }
-        Page<PostListResponse> posts = menuService.getRecentPosts(userId, pageable);
+        List<PostListResponse> posts = menuService.getRecentPosts(userId);
         return ResponseEntity.ok(posts);
     }
 
