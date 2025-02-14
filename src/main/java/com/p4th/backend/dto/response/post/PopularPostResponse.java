@@ -1,6 +1,5 @@
 package com.p4th.backend.dto.response.post;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.p4th.backend.domain.PostStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
@@ -29,6 +28,9 @@ public class PopularPostResponse {
     @Schema(description = "게시글 제목", example = "첫 번째 게시글")
     private String title;
 
+    @Schema(description = "게시글 내용", example = "가나다라마바사")
+    private transient String content;
+
     @Schema(description = "게시글 상태", example = "NORMAL")
     private PostStatus status;
 
@@ -46,7 +48,4 @@ public class PopularPostResponse {
 
     @Schema(description = "게시글 작성일 (상대 시간 형식)", example = "0분 전")
     private String createdAt;
-
-    @JsonIgnore
-    private transient String content;
 }
