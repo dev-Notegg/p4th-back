@@ -4,7 +4,7 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.p4th.backend.mapper.PostMapper">
 
-    <resultMap id="PostBoardCategoryResultMap" type="com.p4th.backend.domain.Post">
+    <resultMap id="PostResultMap" type="com.p4th.backend.domain.Post">
         <!-- Post 칼럼 매핑 -->
         <id property="postId" column="postId" />
         <result property="boardId" column="boardId"/>
@@ -36,7 +36,7 @@
     </select>
 
     <!-- 게시글 상세 조회 (작성자 닉네임 포함) -->
-    <select id="getPostDetail" resultType="com.p4th.backend.domain.Post">
+    <select id="getPostDetail" resultMap="PostResultMap" parameterType="String">
         SELECT
             p.post_id AS postId,
             p.board_id AS boardId,
@@ -52,9 +52,14 @@
             p.created_at AS createdAt,
             p.created_by AS createdBy,
             p.updated_at AS updatedAt,
-            p.updated_by AS updatedBy
+            p.updated_by AS updatedBy,
+            b.board_name AS b_boardName,
+            b.category_id AS b_categoryId,
+            c.category_name AS c_categoryName
         FROM post p
                  LEFT JOIN user_info u ON p.user_id = u.user_id
+                 LEFT JOIN board b ON p.board_id = b.board_id
+                 LEFT JOIN category c ON b.category_id = c.category_id
         WHERE p.post_id = #{postId}
     </select>
 
@@ -163,7 +168,7 @@
         WHERE post_id = #{postId}
     </update>
 
-    <select id="findRecentPostsByUserId" resultMap="PostBoardCategoryResultMap">
+    <select id="findRecentPostsByUserId" resultMap="PostResultMap" parameterType="String">
         SELECT
             p.post_id        AS postId,
             p.board_id       AS boardId,

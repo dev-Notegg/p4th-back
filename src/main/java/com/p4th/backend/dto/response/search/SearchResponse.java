@@ -16,7 +16,7 @@ public class SearchResponse {
         private String userId;
         private String nickname;
         private String title;
-        private String category;
+        private String categoryName;
         private String boardName;
         private int viewCount;
         private int commentCount;

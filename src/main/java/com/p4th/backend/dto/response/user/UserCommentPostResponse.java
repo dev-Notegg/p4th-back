@@ -25,7 +25,7 @@ public class UserCommentPostResponse {
     private String nickname;
 
     @Schema(description = "카테고리명")
-    private String category;
+    private String categoryName;
 
     @Schema(description = "게시판명")
     private String boardName;
@@ -64,7 +64,9 @@ public class UserCommentPostResponse {
         if (post.getBoard() != null) {
             dto.setBoardName(post.getBoard().getBoardName());
             if (post.getBoard().getCategory() != null) {
-                dto.setCategory(post.getBoard().getCategory().getCategoryName());
+                dto.setCategoryName(post.getBoard().getCategory().getCategoryName());
+            }else{
+                dto.setCategoryName(post.getBoard().getCategoryName() != null ? post.getBoard().getCategoryName() : null);
             }
         }
         // HTML에 포함된 태그를 제거하고 텍스트만 추출한 후, 30자까지 잘라서 content로 설정

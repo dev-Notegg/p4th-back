@@ -39,8 +39,11 @@ public class SearchService {
                 result.setUserId(post.getUser() != null ? post.getUser().getUserId() : null);
                 result.setNickname(post.getUser() != null ? post.getUser().getNickname() : null);
                 result.setTitle(post.getTitle());
-                result.setCategory(post.getBoard() != null && post.getBoard().getCategory() != null ?
-                        post.getBoard().getCategory().getCategoryName() : null);
+                if (post.getBoard().getCategory() != null) {
+                    result.setCategoryName(post.getBoard().getCategory().getCategoryName());
+                }else{
+                    result.setCategoryName(post.getBoard().getCategoryName() != null ? post.getBoard().getCategoryName() : null);
+                }
                 result.setBoardName(post.getBoard() != null ? post.getBoard().getBoardName() : null);
                 result.setViewCount(post.getViewCount());
                 result.setCommentCount(post.getCommentCount());
