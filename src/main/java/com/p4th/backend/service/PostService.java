@@ -102,7 +102,7 @@ public class PostService {
 
 
     @Transactional
-    public void updatePost(String postId, String boardId, String userId, String title, String content) {
+    public void updatePost(String postId, String userId, String title, String content) {
         try {
             Post existing = postMapper.getPostDetail(postId);
             if (existing == null) {
@@ -114,10 +114,9 @@ public class PostService {
             if (!existing.getUserId().equals(userId)) {
                 throw new CustomException(ErrorCode.UNAUTHORIZED_ACCESS, "본인이 작성한 게시글만 수정할 수 있습니다.");
             }
-            String processedContent = HtmlImageUtils.processInlineMedia(content, boardId, s3Service);
+            String processedContent = HtmlImageUtils.processInlineMedia(content, existing.getBoardId(), s3Service);
             Post post = new Post();
             post.setPostId(postId);
-            post.setBoardId(boardId);
             post.setUserId(userId);
             post.setTitle(title);
             post.setContent(processedContent);

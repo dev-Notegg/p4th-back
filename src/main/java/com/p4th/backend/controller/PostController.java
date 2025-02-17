@@ -107,7 +107,7 @@ public class PostController {
             @RequestBody UpdatePostRequest request,
             HttpServletRequest httpRequest) {
         String userId = jwtProvider.resolveUserId(httpRequest);
-        postService.updatePost(postId, request.getBoardId(), userId, request.getTitle(), request.getContent());
+        postService.updatePost(postId, userId, request.getTitle(), request.getContent());
         UpdatePostResponse response = new UpdatePostResponse(postId);
         return ResponseEntity.ok().body(response);
     }

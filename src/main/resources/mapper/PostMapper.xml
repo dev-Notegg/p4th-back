@@ -90,7 +90,6 @@
     <update id="updatePost">
         UPDATE post
         SET
-            board_id = #{boardId},
             title = #{title},
             content = #{content},
             updated_by = #{userId}

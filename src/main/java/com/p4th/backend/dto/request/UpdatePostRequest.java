@@ -6,9 +6,6 @@ import lombok.Data;
 @Data
 @Schema(description = "게시글 수정 요청 DTO")
 public class UpdatePostRequest {
-    @Schema(description = "게시판 ID", example = "01HXYA4V8D5N1PZQF8KZBHY7XT")
-    private String boardId;
-
     @Schema(description = "게시글 제목", example = "수정된 게시글 제목")
     private String title;
 
