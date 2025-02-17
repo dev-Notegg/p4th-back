@@ -7,7 +7,7 @@
     <select id="getPopularBoards" resultType="com.p4th.backend.dto.response.board.PopularBoardResponse">
         SELECT
             b.board_id AS boardId,
-            c.category_name AS category,
+            c.category_name AS categoryName,
             b.board_name AS boardName
         FROM board b
                  JOIN category c ON b.category_id = c.category_id

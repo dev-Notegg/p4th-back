@@ -9,6 +9,7 @@
         <id property="postId" column="postId" />
         <result property="boardId" column="boardId"/>
         <result property="userId" column="userId"/>
+        <result property="nickname" column="nickname"/>
         <result property="title" column="title"/>
         <result property="content" column="content"/>
         <result property="pinnedYn" column="pinnedYn"/>
@@ -126,7 +127,7 @@
             u.nickname AS nickname,
             p.title AS title,
             p.status AS status,
-            c.category_name AS category,
+            c.category_name AS categoryName,
             b.board_name AS boardName,
             p.view_count AS viewCount,
             p.comment_count AS commentCount,
@@ -173,6 +174,7 @@
             p.post_id        AS postId,
             p.board_id       AS boardId,
             p.user_id        AS userId,
+            u.nickname       AS nickname,
             p.title          AS title,
             p.content        AS content,
             p.pinned_yn      AS pinnedYn,
@@ -191,6 +193,7 @@
             c.category_name  AS c_categoryName
         FROM post_view pv
                  JOIN post p ON pv.post_id = p.post_id
+                 LEFT JOIN user_info u ON p.user_id = u.user_id
                  LEFT JOIN board b ON p.board_id = b.board_id
                  LEFT JOIN category c ON b.category_id = c.category_id
         WHERE pv.user_id = #{userId}

@@ -5,6 +5,6 @@ import lombok.Data;
 @Data
 public class PopularBoardResponse {
     private String boardId;
-    private String category;
+    private String categoryName;
     private String boardName;
 }

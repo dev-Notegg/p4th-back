@@ -14,7 +14,7 @@ public class PopularPostResponse {
     private String boardId;
 
     @Schema(description = "카테고리명", example = "일반 카테고리")
-    private String category;
+    private String categoryName;
 
     @Schema(description = "게시판명", example = "자유게시판")
     private String boardName;

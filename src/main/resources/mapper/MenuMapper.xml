@@ -7,20 +7,22 @@
 
     <select id="getCommentsByUser" resultType="com.p4th.backend.domain.Comment">
         SELECT
-            comment_id,
-            post_id,
-            parent_comment_id,
-            user_id,
-            content,
-            status,
-            status_changed_at,
-            created_by,
-            created_at AS createdAt,
-            updated_by,
-            updated_at AS updatedAt
-        FROM comment
-        WHERE user_id = #{userId}
-        ORDER BY created_at DESC
+            c.comment_id,
+            c.post_id,
+            c.parent_comment_id,
+            c.user_id,
+            u.nickname AS nickname,
+            c.content,
+            c.status,
+            c.status_changed_at,
+            c.created_by,
+            c.created_at AS createdAt,
+            c.updated_by,
+            c.updated_at AS updatedAt
+        FROM comment c
+                 LEFT JOIN user_info u ON c.user_id = u.user_id
+        WHERE c.user_id = #{userId}
+        ORDER BY c.created_at DESC
     </select>
 
     <!-- 전체 카테고리 목록 조회 -->
