@@ -55,6 +55,8 @@ public class SearchService {
                         RelativeTimeFormatter.formatRelativeTime(post.getCreatedAt()) : null);
                 return result;
             });
+        } catch (CustomException ce) {
+            throw ce;
         } catch (Exception e) {
             throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR, "검색 처리 중 오류 발생: " + e.getMessage());
         }

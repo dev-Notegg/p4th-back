@@ -38,6 +38,8 @@ public class MainService {
                 throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR, "인기 게시판 목록 조회 실패");
             }
             return boards;
+        } catch (CustomException ce) {
+            throw ce;
         } catch (Exception e) {
             throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR, "인기 게시판 목록 조회 중 오류: " + e.getMessage());
         }
@@ -50,6 +52,8 @@ public class MainService {
                 throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR, "배너 목록 조회 실패");
             }
             return banners;
+        } catch (CustomException ce) {
+            throw ce;
         } catch (Exception e) {
             throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR, "배너 목록 조회 중 오류: " + e.getMessage());
         }
@@ -103,11 +107,15 @@ public class MainService {
                         LocalDateTime createdTime = LocalDateTime.parse(response.getCreatedAt(), originalFormatter);
                         response.setCreatedAt(RelativeTimeFormatter.formatRelativeTime(createdTime));
                     }
+                } catch (CustomException ce) {
+                    throw ce;
                 } catch (Exception e) {
                     throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR, "인기 게시글 처리 중 오류: " + e.getMessage());
                 }
             });
             return responses;
+        } catch (CustomException ce) {
+            throw ce;
         } catch (Exception e) {
             throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR, "인기 게시글 조회 중 오류: " + e.getMessage());
         }

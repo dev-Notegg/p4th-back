@@ -31,6 +31,8 @@ public class PostService {
         try {
             Page<Post> posts = postRepository.findByBoardId(boardId, pageable);
             return posts.map(PostListResponse::from);
+        } catch (CustomException ce) {
+            throw ce;
         } catch (Exception e) {
             throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR, "게시글 목록 조회 중 오류: " + e.getMessage());
         }
@@ -95,6 +97,8 @@ public class PostService {
                 throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR, "게시글 등록 실패");
             }
             return postId;
+        } catch (CustomException ce) {
+            throw ce;
         } catch (Exception e) {
             throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR, "게시글 등록 중 오류: " + e.getMessage());
         }
@@ -124,6 +128,8 @@ public class PostService {
             if (updated != 1) {
                 throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR, "게시글 수정 실패");
             }
+        } catch (CustomException ce) {
+            throw ce;
         } catch (Exception e) {
             throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR, "게시글 수정 중 오류: " + e.getMessage());
         }
@@ -155,6 +161,8 @@ public class PostService {
                     throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR, "게시글 삭제 실패");
                 }
             }
+        } catch (CustomException ce) {
+            throw ce;
         } catch (Exception e) {
             throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR, "게시글 삭제 중 오류: " + e.getMessage());
         }

@@ -185,6 +185,8 @@ public class AuthService {
                 throw new CustomException(ErrorCode.USER_NOT_FOUND, "사용자를 찾을 수 없습니다.");
             }
             return UserProfileResponse.from(user);
+        } catch (CustomException ce) {
+            throw ce;
         } catch (Exception e) {
             throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR, "내 계정 조회 중 오류: " + e.getMessage());
         }

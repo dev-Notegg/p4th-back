@@ -37,6 +37,8 @@ public class MenuService {
             return recentPosts.stream()
                     .map(PostListResponse::from)
                     .collect(Collectors.toList());
+        } catch (CustomException ce) {
+            throw ce;
         } catch (Exception e) {
             throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR, "최근 본 게시물 조회 중 오류: " + e.getMessage());
         }
@@ -50,6 +52,8 @@ public class MenuService {
                     .map(PostListResponse::from)
                     .collect(Collectors.toList());
             return new PageImpl<>(dtoList, pageable, posts.getTotalElements());
+        } catch (CustomException ce) {
+            throw ce;
         } catch (Exception e) {
             throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR, "내가 작성한 글 조회 중 오류: " + e.getMessage());
         }
@@ -81,6 +85,8 @@ public class MenuService {
                     .filter(Objects::nonNull)
                     .collect(Collectors.toList());
             return new PageImpl<>(responses, pageable, responses.size());
+        } catch (CustomException ce) {
+            throw ce;
         } catch (Exception e) {
             throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR, "내가 쓴 댓글 조회 중 오류: " + e.getMessage());
         }
@@ -89,6 +95,8 @@ public class MenuService {
     public List<Category> getAllCategories() {
         try {
             return menuMapper.getAllCategories();
+        } catch (CustomException ce) {
+            throw ce;
         } catch (Exception e) {
             throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR, "전체 카테고리 조회 중 오류: " + e.getMessage());
         }
@@ -112,6 +120,8 @@ public class MenuService {
                 dto.setUpdatedAt(board.getUpdatedAt());
                 return dto;
             }).collect(Collectors.toList());
+        } catch (CustomException ce) {
+            throw ce;
         } catch (Exception e) {
             throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR, "카테고리 내 게시판 조회 중 오류: " + e.getMessage());
         }
