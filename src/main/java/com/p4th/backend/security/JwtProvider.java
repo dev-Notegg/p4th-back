@@ -90,19 +90,19 @@ public class JwtProvider {
                     .getBody();
             return claims.getSubject();
         } catch (SecurityException e) {
-            logger.error("Invalid JWT signature.");
+//            logger.error("Invalid JWT signature.");
             throw new CustomException(ErrorCode.AUTHENTICATION_FAILED);
         } catch (MalformedJwtException e) {
-            logger.error("Invalid JWT token: {}", token);
+//            logger.error("Invalid JWT token: {}", token);
             throw new CustomException(ErrorCode.AUTHENTICATION_FAILED);
         } catch (ExpiredJwtException e) {
-            logger.error("Expired JWT token.");
+//            logger.error("Expired JWT token.");
             throw new CustomException(ErrorCode.AUTHENTICATION_FAILED);
         } catch (UnsupportedJwtException e) {
-            logger.error("Unsupported JWT token.");
+//            logger.error("Unsupported JWT token.");
             throw new CustomException(ErrorCode.AUTHENTICATION_FAILED);
         } catch (IllegalArgumentException e) {
-            logger.error("JWT token compact of handler are invalid.");
+//            logger.error("JWT token compact of handler are invalid.");
             throw new CustomException(ErrorCode.AUTHENTICATION_FAILED);
         }
     }

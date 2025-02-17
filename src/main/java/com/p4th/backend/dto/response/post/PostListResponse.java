@@ -18,8 +18,8 @@ public class PostListResponse {
     private String boardId;
     private String userId;
     private String nickname;
-    private String category;    // 게시판의 카테고리명
-    private String boardName;   // 게시판명
+    private String categoryName; // 게시판의 카테고리명
+    private String boardName;    // 게시판명
     private String title;
     private String content;
     private PostStatus status;
@@ -41,7 +41,9 @@ public class PostListResponse {
         if (post.getBoard() != null) {
             dto.boardName = post.getBoard().getBoardName();
             if (post.getBoard().getCategory() != null) {
-                dto.category = post.getBoard().getCategory().getCategoryName();
+                dto.categoryName = post.getBoard().getCategory().getCategoryName();
+            }else{
+                dto.categoryName = post.getBoard().getCategoryName() != null ? post.getBoard().getCategoryName() : null;
             }
         }
         dto.status = post.getStatus();
