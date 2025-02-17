@@ -36,7 +36,11 @@ public class PostListResponse {
         dto.postId = post.getPostId();
         dto.boardId = post.getBoardId();
         dto.userId = post.getUserId();
-        dto.nickname = post.getUser() != null ? post.getUser().getNickname() : "";
+        if(post.getUser() != null) {
+            dto.nickname = post.getUser().getNickname();
+        }else{
+            dto.nickname = post.getNickname() != null ? post.getNickname() : null;
+        }
         dto.title = post.getTitle();
         if (post.getBoard() != null) {
             dto.boardName = post.getBoard().getBoardName();
