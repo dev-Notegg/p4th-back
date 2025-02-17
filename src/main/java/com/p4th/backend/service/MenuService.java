@@ -101,7 +101,7 @@ public class MenuService {
                 BoardResponse dto = new BoardResponse();
                 dto.setBoardId(board.getBoardId());
                 dto.setCategoryId(board.getCategoryId());
-                dto.setCategoryName(board.getCategoryName());
+                dto.setCategoryName(board.getCategory().getCategoryName());
                 dto.setBoardName(board.getBoardName());
                 dto.setBoardLevel(board.getBoardLevel());
                 dto.setSortOrder(board.getSortOrder());

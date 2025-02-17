@@ -13,16 +13,14 @@ public enum ErrorCode {
 
     // JWT, 인증 관련
     AUTHENTICATION_FAILED(HttpStatus.UNAUTHORIZED, 10100, "인증에 실패하였습니다."),
+    UNAUTHORIZED_ACCESS(HttpStatus.UNAUTHORIZED, 40300, "권한이 없습니다."),
+    LOGIN_REQUIRED(HttpStatus.UNAUTHORIZED, 40301, "로그인 후 이용가능한 메뉴입니다."),
 
     // S3 업로드 실패
     S3_UPLOAD_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, 50100, "S3 업로드에 실패하였습니다."),
 
     // 내부 서버 오류
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, 50000, "내부 서버 오류가 발생하였습니다."),
-
-    // 권한 없음
-    UNAUTHORIZED_ACCESS(HttpStatus.FORBIDDEN, 40300, "권한이 없습니다."),
-    LOGIN_REQUIRED(HttpStatus.FORBIDDEN, 40301, "로그인 후 이용가능한 메뉴입니다."),
 
     //게시글 관련
     POST_NOT_FOUND(HttpStatus.NOT_FOUND, 40400, "게시글을 찾을 수 없습니다."),

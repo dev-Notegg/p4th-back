@@ -1,13 +1,13 @@
 package com.p4th.backend.security;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
+import com.p4th.backend.common.exception.ErrorCode;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
-import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import com.p4th.backend.domain.User;
+import com.p4th.backend.common.exception.CustomException;
 
 import javax.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
@@ -82,26 +82,48 @@ public class JwtProvider {
 
     // JWT 토큰에서 사용자 ID 추출
     public String getUserIdFromToken(String token) {
-        Claims claims = Jwts.parserBuilder()
-                .setSigningKey(hmacKey)
-                .build()
-                .parseClaimsJws(token)
-                .getBody();
-        return claims.getSubject();
+        try {
+            Claims claims = Jwts.parserBuilder()
+                    .setSigningKey(hmacKey)
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
+            return claims.getSubject();
+        } catch (SecurityException e) {
+            logger.error("Invalid JWT signature.");
+            throw new CustomException(ErrorCode.AUTHENTICATION_FAILED);
+        } catch (MalformedJwtException e) {
+            logger.error("Invalid JWT token: {}", token);
+            throw new CustomException(ErrorCode.AUTHENTICATION_FAILED);
+        } catch (ExpiredJwtException e) {
+            logger.error("Expired JWT token.");
+            throw new CustomException(ErrorCode.AUTHENTICATION_FAILED);
+        } catch (UnsupportedJwtException e) {
+            logger.error("Unsupported JWT token.");
+            throw new CustomException(ErrorCode.AUTHENTICATION_FAILED);
+        } catch (IllegalArgumentException e) {
+            logger.error("JWT token compact of handler are invalid.");
+            throw new CustomException(ErrorCode.AUTHENTICATION_FAILED);
+        }
     }
 
     // 추가: HttpServletRequest에서 Authorization 헤더를 분석하여 토큰에서 userId를 추출하는 메서드
     public String resolveUserId(HttpServletRequest request) {
-        String header = request.getHeader("Authorization");
-        if (header != null) {
-            header = header.trim();
-            // "Bearer " 접두사가 있으면 제거하고 토큰 추출
-            if (header.startsWith("Bearer ")) {
-                String token = header.substring("Bearer ".length()).trim();
-                return getUserIdFromToken(token);
+        try {
+            String header = request.getHeader("Authorization");
+            if (header != null) {
+                header = header.trim();
+                // "Bearer " 접두사가 있으면 제거하고 토큰 추출
+                if (header.startsWith("Bearer ")) {
+                    String token = header.substring("Bearer ".length()).trim();
+                    return getUserIdFromToken(token);
+                }
+                // 만약 접두사가 없다면, 그대로 토큰으로 간주
+                return getUserIdFromToken(header);
             }
-            // 만약 접두사가 없다면, 그대로 토큰으로 간주
-            return getUserIdFromToken(header);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            throw new CustomException(ErrorCode.AUTHENTICATION_FAILED);
         }
         return null;
     }
