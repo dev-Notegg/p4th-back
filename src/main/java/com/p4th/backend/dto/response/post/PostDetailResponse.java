@@ -25,6 +25,10 @@ public class PostDetailResponse {
     @Schema(description = "작성자 닉네임", example = "닉네임")
     private String nickname;
 
+    private String categoryName;
+
+    private String boardName;
+
     @Schema(description = "게시글 제목", example = "첫 번째 게시글")
     private String title;
 
@@ -56,6 +60,14 @@ public class PostDetailResponse {
         dto.setBoardId(post.getBoardId());
         dto.setUserId(post.getUserId());
         dto.setNickname(post.getNickname());
+        if (post.getBoard() != null) {
+            dto.boardName = post.getBoard().getBoardName();
+            if (post.getBoard().getCategory() != null) {
+                dto.categoryName = post.getBoard().getCategory().getCategoryName();
+            }else{
+                dto.categoryName = post.getBoard().getCategoryName() != null ? post.getBoard().getCategoryName() : null;
+            }
+        }
         dto.setTitle(post.getTitle());
         dto.setContent(post.getContent());
         dto.setStatus(post.getStatus());

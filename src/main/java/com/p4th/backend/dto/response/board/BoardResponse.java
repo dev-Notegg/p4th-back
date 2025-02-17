@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 public class BoardResponse {
     private String boardId;
     private String categoryId;
+    private String categoryName;
     private String boardName;
     private int boardLevel;
     private int sortOrder;
@@ -16,5 +17,4 @@ public class BoardResponse {
     private LocalDateTime createdAt;
     private String updatedBy;
     private LocalDateTime updatedAt;
-    private String categoryName;
 }
