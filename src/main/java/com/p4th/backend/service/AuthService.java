@@ -133,14 +133,20 @@ public class AuthService {
         }
         User user = authMapper.selectByUserId(userId);
         if (user == null) {
-            throw new CustomException(ErrorCode.USER_NOT_FOUND, "사용자를 찾을 수 없습니다.");
+            throw new CustomException(ErrorCode.USER_NOT_FOUND);
         }
+        //닉네임 중복 체크
+        User checkNickname = authMapper.selectByNickname(newNickname);
+        if(checkNickname == null){
+            throw new CustomException(ErrorCode.NICKNAME_ALREADY_EXISTS);
+        }
+
         // 닉네임 변경 후 10일 이내 재변경 불가 체크
         if (user.getNicknameChangedAt() != null) {
             long daysSinceChange = ChronoUnit.DAYS.between(user.getNicknameChangedAt(), LocalDateTime.now());
             if (daysSinceChange < 10) {
                 throw new CustomException(ErrorCode.NICKNAME_CHANGE_NOT_ALLOWED,
-                        "닉네임은 변경 후 10일간 재변경이 불가합니다. 재변경을 원하시면 10일 이후에 시도해주세요.");
+                        "닉네임은 변경 후 10일간 재변경이 불가합니다.");
             }
         }
         user.setNickname(newNickname);
@@ -157,10 +163,10 @@ public class AuthService {
         }
         User user = authMapper.selectByUserId(userId);
         if (user == null) {
-            throw new CustomException(ErrorCode.USER_NOT_FOUND, "사용자를 찾을 수 없습니다.");
+            throw new CustomException(ErrorCode.USER_NOT_FOUND);
         }
         if (!PasswordUtil.matches(oldPassword, user.getPassword())) {
-            throw new CustomException(ErrorCode.INVALID_PASSWORD, "현재 비밀번호가 일치하지 않습니다.");
+            throw new CustomException(ErrorCode.INVALID_PASSWORD);
         }
         user.setPassword(PasswordUtil.encode(newPassword));
         authMapper.updatePassword(user);
@@ -171,7 +177,7 @@ public class AuthService {
     public UserProfileResponse deleteAccount(String userId) {
         User user = authMapper.selectByUserId(userId);
         if (user == null) {
-            throw new CustomException(ErrorCode.USER_NOT_FOUND, "사용자를 찾을 수 없습니다.");
+            throw new CustomException(ErrorCode.USER_NOT_FOUND);
         }
         authMapper.deleteUser(userId);
         return UserProfileResponse.from(user);
@@ -182,7 +188,7 @@ public class AuthService {
         try {
             User user = authMapper.selectByUserId(userId);
             if (user == null) {
-                throw new CustomException(ErrorCode.USER_NOT_FOUND, "사용자를 찾을 수 없습니다.");
+                throw new CustomException(ErrorCode.USER_NOT_FOUND);
             }
             return UserProfileResponse.from(user);
         } catch (CustomException ce) {

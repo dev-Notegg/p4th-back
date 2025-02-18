@@ -10,6 +10,7 @@ public enum ErrorCode {
     INVALID_PASSWORD(HttpStatus.BAD_REQUEST, 10203, "비밀번호가 올바르지 않습니다."),
     INVALID_PASSCODE(HttpStatus.BAD_REQUEST, 10204, "패쓰코드가 올바르지 않습니다."),
     NICKNAME_CHANGE_NOT_ALLOWED(HttpStatus.BAD_REQUEST, 10205, "닉네임은 변경 후 10일간 재변경이 불가합니다."),
+    NICKNAME_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, 10205, "중복된 닉네임입니다."),
 
     // JWT, 인증 관련
     AUTHENTICATION_FAILED(HttpStatus.UNAUTHORIZED, 10100, "인증에 실패하였습니다."),

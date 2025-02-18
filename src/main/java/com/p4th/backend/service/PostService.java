@@ -49,7 +49,7 @@ public class PostService {
             }
             Post post = postMapper.getPostDetail(postId);
             if (post == null) {
-                throw new CustomException(ErrorCode.POST_NOT_FOUND, "게시글을 찾을 수 없습니다.");
+                throw new CustomException(ErrorCode.POST_NOT_FOUND);
             }
             post.setComments(commentMapper.getCommentsByPost(postId));
             if (PostStatus.DELETED.equals(post.getStatus())) {
@@ -79,7 +79,7 @@ public class PostService {
         try {
             User user = authMapper.selectByUserId(userId);
             if (user == null) {
-                throw new CustomException(ErrorCode.USER_NOT_FOUND, "사용자 정보를 찾을 수 없습니다.");
+                throw new CustomException(ErrorCode.USER_NOT_FOUND);
             }
             // HTML 콘텐츠 내의 inline 미디어 처리
             String processedContent = HtmlImageUtils.processInlineMedia(content, boardId, s3Service);
@@ -110,10 +110,10 @@ public class PostService {
         try {
             Post existing = postMapper.getPostDetail(postId);
             if (existing == null) {
-                throw new CustomException(ErrorCode.POST_NOT_FOUND, "게시글을 찾을 수 없습니다.");
+                throw new CustomException(ErrorCode.POST_NOT_FOUND);
             }
             if (PostStatus.DELETED.equals(existing.getStatus())) {
-                throw new CustomException(ErrorCode.POST_ALREADY_DELETED, "이미 삭제된 게시글입니다.");
+                throw new CustomException(ErrorCode.POST_ALREADY_DELETED);
             }
             if (!existing.getUserId().equals(userId)) {
                 throw new CustomException(ErrorCode.UNAUTHORIZED_ACCESS, "본인이 작성한 게시글만 수정할 수 있습니다.");
@@ -140,11 +140,11 @@ public class PostService {
         try {
             Post existing = postMapper.getPostDetail(postId);
             if (existing == null) {
-                throw new CustomException(ErrorCode.POST_NOT_FOUND, "게시글을 찾을 수 없습니다.");
+                throw new CustomException(ErrorCode.POST_NOT_FOUND);
             }
             // 이미 삭제 상태인 경우 에러 발생
             if (PostStatus.DELETED.equals(existing.getStatus())) {
-                throw new CustomException(ErrorCode.POST_ALREADY_DELETED, "이미 삭제된 게시글입니다.");
+                throw new CustomException(ErrorCode.POST_ALREADY_DELETED);
             }
             User requester = authMapper.selectByUserId(requesterUserId);
             if (!existing.getUserId().equals(requesterUserId) && (requester == null || requester.getAdminRole() != 1)) {

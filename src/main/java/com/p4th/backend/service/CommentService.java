@@ -65,7 +65,7 @@ public class CommentService {
         // 사용자 유효성 검사
         User user = authMapper.selectByUserId(userId);
         if (user == null) {
-            throw new CustomException(ErrorCode.USER_NOT_FOUND, "사용자를 찾을 수 없습니다.");
+            throw new CustomException(ErrorCode.USER_NOT_FOUND);
         }
         Comment comment = new Comment();
         String commentId = ULIDUtil.getULID();
@@ -89,10 +89,10 @@ public class CommentService {
         // 댓글 조회 및 권한 체크
         Comment comment = commentMapper.getCommentById(commentId);
         if (comment == null) {
-            throw new CustomException(ErrorCode.COMMENT_NOT_FOUND, "댓글을 찾을 수 없습니다.");
+            throw new CustomException(ErrorCode.COMMENT_NOT_FOUND);
         }
         if (CommentStatus.DELETED.equals(comment.getStatus())) {
-            throw new CustomException(ErrorCode.COMMENT_ALREADY_DELETED, "이미 삭제된 댓글입니다.");
+            throw new CustomException(ErrorCode.COMMENT_ALREADY_DELETED);
         }
         if (!comment.getUserId().equals(userId)) {
             throw new CustomException(ErrorCode.UNAUTHORIZED_ACCESS, "본인이 작성한 댓글만 수정할 수 있습니다.");
@@ -106,11 +106,11 @@ public class CommentService {
         // 댓글 조회
         Comment comment = commentMapper.getCommentById(commentId);
         if (comment == null) {
-            throw new CustomException(ErrorCode.COMMENT_NOT_FOUND, "댓글을 찾을 수 없습니다.");
+            throw new CustomException(ErrorCode.COMMENT_NOT_FOUND);
         }
         // 이미 삭제 상태인 경우 에러 발생
         if (CommentStatus.DELETED.equals(comment.getStatus())) {
-            throw new CustomException(ErrorCode.COMMENT_ALREADY_DELETED, "이미 삭제된 댓글입니다.");
+            throw new CustomException(ErrorCode.COMMENT_ALREADY_DELETED);
         }
         // 권한 체크: 요청자가 댓글 작성자이거나, 관리자인 경우
         User requester = authMapper.selectByUserId(userId);
