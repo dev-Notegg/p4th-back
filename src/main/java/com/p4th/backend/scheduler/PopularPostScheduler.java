@@ -35,7 +35,6 @@ public class PopularPostScheduler {
             log.setViewCount(post.getViewCount());
             log.setCommentCount(post.getCommentCount());
             log.setPopularityScore(popularityScore);
-            log.setCreatedBy("SYSTEM");
             postHistoryLogMapper.insertHistoryLog(log);
         }
     }

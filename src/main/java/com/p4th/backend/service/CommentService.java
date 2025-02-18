@@ -97,7 +97,7 @@ public class CommentService {
         if (!comment.getUserId().equals(userId)) {
             throw new CustomException(ErrorCode.UNAUTHORIZED_ACCESS, "본인이 작성한 댓글만 수정할 수 있습니다.");
         }
-        int updated = commentMapper.updateComment(commentId, content);
+        int updated = commentMapper.updateComment(commentId, content, userId);
         return updated == 1;
     }
 
@@ -127,7 +127,7 @@ public class CommentService {
             }
         } else {
             // 자식 댓글이 있으면 상태 업데이트 처리
-            int updated = commentMapper.deleteComment(commentId);
+            int updated = commentMapper.deleteComment(commentId, userId);
             if (updated != 1) {
                 throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR, "댓글 삭제 실패");
             }

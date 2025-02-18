@@ -16,7 +16,7 @@ public interface PostMapper {
     int updatePost(Post post);
 
     //상태값 변경
-    int deletePost(@Param("postId") String postId);
+    int deletePost(@Param("postId") String postId, @Param("userId") String userId);
 
     //실제 데이터 삭제
     int physicalDeletePost(@Param("postId") String postId);

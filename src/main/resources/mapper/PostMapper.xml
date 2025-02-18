@@ -106,7 +106,8 @@
     <update id="deletePost">
         UPDATE post
         SET status = 'DELETED',
-            status_changed_at = NOW()
+            status_changed_at = NOW(),
+            updated_by = #{userId}
         WHERE post_id = #{postId}
     </update>
 

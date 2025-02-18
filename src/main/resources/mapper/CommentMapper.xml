@@ -48,7 +48,7 @@
     <update id="updateComment">
         UPDATE comment
         SET content = #{content},
-            updated_at = NOW()
+            updated_by = #{userId}
         WHERE comment_id = #{commentId}
     </update>
 
@@ -69,7 +69,8 @@
     <update id="deleteComment">
         UPDATE comment
         SET status = 'DELETED',
-            status_changed_at = NOW()
+            status_changed_at = NOW(),
+            updated_by = #{userId}
         WHERE comment_id = #{commentId}
     </update>
 

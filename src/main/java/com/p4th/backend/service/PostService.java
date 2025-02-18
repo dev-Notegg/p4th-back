@@ -136,7 +136,7 @@ public class PostService {
     }
 
     @Transactional
-    public void deletePost(String postId, String requesterUserId) {
+    public void deletePost(String postId, String userId) {
         try {
             Post existing = postMapper.getPostDetail(postId);
             if (existing == null) {
@@ -146,8 +146,8 @@ public class PostService {
             if (PostStatus.DELETED.equals(existing.getStatus())) {
                 throw new CustomException(ErrorCode.POST_ALREADY_DELETED);
             }
-            User requester = authMapper.selectByUserId(requesterUserId);
-            if (!existing.getUserId().equals(requesterUserId) && (requester == null || requester.getAdminRole() != 1)) {
+            User requester = authMapper.selectByUserId(userId);
+            if (!existing.getUserId().equals(userId) && (requester == null || requester.getAdminRole() != 1)) {
                 throw new CustomException(ErrorCode.UNAUTHORIZED_ACCESS, "본인이 작성한 게시글만 삭제할 수 있습니다.");
             }
             if (existing.getCommentCount() == 0) {
@@ -156,7 +156,7 @@ public class PostService {
                     throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR, "게시글 삭제 실패");
                 }
             } else {
-                int updated = postMapper.deletePost(postId); // 상태를 DELETED로 업데이트
+                int updated = postMapper.deletePost(postId, userId); // 상태를 DELETED로 업데이트
                 if (updated != 1) {
                     throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR, "게시글 삭제 실패");
                 }
