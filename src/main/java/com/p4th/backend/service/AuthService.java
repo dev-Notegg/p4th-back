@@ -137,7 +137,7 @@ public class AuthService {
         }
         //닉네임 중복 체크
         User checkNickname = authMapper.selectByNickname(newNickname);
-        if(checkNickname == null){
+        if(checkNickname != null){
             throw new CustomException(ErrorCode.NICKNAME_ALREADY_EXISTS);
         }
 
