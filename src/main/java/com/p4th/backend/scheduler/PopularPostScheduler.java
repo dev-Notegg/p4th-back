@@ -24,7 +24,14 @@ public class PopularPostScheduler {
 
     private void processPopularity(String periodType, String periodStart, String periodEnd) {
         List<Post> posts = postMapper.getAllPosts();
-        for (Post post : posts) {
+
+        // 모든 게시글의 인기도 점수를 계산한 후, 내림차순으로 정렬하여 상위 20개 선택
+        List<Post> topPosts = posts.stream()
+                .sorted((p1, p2) -> Float.compare(calculatePopularity(p2), calculatePopularity(p1)))
+                .limit(20)
+                .toList();
+
+        for (Post post : topPosts) {
             float popularityScore = calculatePopularity(post);
             PostHistoryLog log = new PostHistoryLog();
             log.setHistoryId(ULIDUtil.getULID());
