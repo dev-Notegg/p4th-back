@@ -20,6 +20,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static com.p4th.backend.util.RelativeTimeFormatter.formatRelativeTime;
+
 @Service
 @RequiredArgsConstructor
 public class CommentService {
@@ -52,8 +54,7 @@ public class CommentService {
                         comment.setContent("삭제된 댓글입니다");
                     }
                     // 작성일시 변환
-                    String relativeTime = comment.getCreatedAt() != null ?
-                            com.p4th.backend.util.RelativeTimeFormatter.formatRelativeTime(comment.getCreatedAt()) : null;
+                    String relativeTime = comment.getCreatedAt() != null ? formatRelativeTime(comment.getCreatedAt()) : null;
                     CommentResponse response = CommentResponse.from(comment);
                     response.setCreatedAt(relativeTime);
                     return response;
