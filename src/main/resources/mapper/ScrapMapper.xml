@@ -3,29 +3,27 @@
 <mapper namespace="com.p4th.backend.mapper.ScrapMapper">
 
     <select id="getScrapsByUserId" resultType="com.p4th.backend.domain.Scrap">
-        SELECT scrap_id, scrap_folder_id, post_id, scrapped_at
+        SELECT scrap_id, user_id, scrap_folder_id, post_id, scrapped_at
         FROM scrap
-        WHERE post_id IN (
-            SELECT p.post_id FROM post p WHERE p.user_id = #{userId}
-        )
+        WHERE user_id = #{userId}
         ORDER BY scrapped_at DESC
     </select>
 
     <select id="getScrapsByFolderId" resultType="com.p4th.backend.domain.Scrap">
-        SELECT scrap_id, scrap_folder_id, post_id, scrapped_at
+        SELECT scrap_id, user_id, scrap_folder_id, post_id, scrapped_at
         FROM scrap
-        WHERE scrap_folder_id = #{scrapFolderId}
+        WHERE user_id = #{userId} AND scrap_folder_id = #{scrapFolderId}
         ORDER BY scrapped_at DESC
     </select>
 
     <insert id="insertScrap" parameterType="com.p4th.backend.domain.Scrap">
-        INSERT INTO scrap (scrap_id, scrap_folder_id, post_id)
-        VALUES (#{scrapId}, #{scrapFolderId}, #{postId})
+        INSERT INTO scrap (scrap_id, user_id, scrap_folder_id, post_id)
+        VALUES (#{scrapId}, #{userId}, #{scrapFolderId}, #{postId})
     </insert>
 
     <delete id="deleteScrap" parameterType="String">
         DELETE FROM scrap
-        WHERE scrap_id = #{scrapId}
+        WHERE user_id = #{userId} AND scrap_id = #{scrapId}
     </delete>
 
 </mapper>

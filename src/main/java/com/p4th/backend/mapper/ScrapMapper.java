@@ -11,5 +11,5 @@ public interface ScrapMapper {
     List<Scrap> getScrapsByUserId(@Param("userId") String userId);
     List<Scrap> getScrapsByFolderId(@Param("userId") String userId, @Param("scrapFolderId") String scrapFolderId);
     int insertScrap(Scrap scrap);
-    int deleteScrap(@Param("scrapId") String scrapId);
+    int deleteScrap(@Param("scrapId") String scrapId, @Param("userId") String userId);
 }

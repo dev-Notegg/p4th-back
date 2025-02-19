@@ -82,7 +82,7 @@ public class ScrapController {
         if (userId == null) {
             throw new CustomException(ErrorCode.LOGIN_REQUIRED);
         }
-        String deletedScrapId = scrapService.deleteScrap(scrapId);
+        String deletedScrapId = scrapService.deleteScrap(scrapId, userId);
         return ResponseEntity.ok("{\"deleted\": \"" + deletedScrapId + "\"}");
     }
 

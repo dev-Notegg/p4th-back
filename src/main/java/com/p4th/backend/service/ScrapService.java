@@ -26,8 +26,8 @@ public class ScrapService {
     }
 
     @Transactional
-    public String deleteScrap(String scrapId) {
-        int deleted = scrapMapper.deleteScrap(scrapId);
+    public String deleteScrap(String scrapId, String userId) {
+        int deleted = scrapMapper.deleteScrap(scrapId, userId);
         if (deleted != 1) {
             throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR, "게시글 스크랩 삭제 실패");
         }
@@ -39,9 +39,9 @@ public class ScrapService {
         Scrap scrap = new Scrap();
         String scrapId = ULIDUtil.getULID();
         scrap.setScrapId(scrapId);
+        scrap.setUserId(userId);
         scrap.setScrapFolderId(scrapFolderId);
         scrap.setPostId(postId);
-        scrap.setScrapFolderId(userId);
         int inserted = scrapMapper.insertScrap(scrap);
         if (inserted != 1) {
             throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR, "게시글 스크랩 실패");

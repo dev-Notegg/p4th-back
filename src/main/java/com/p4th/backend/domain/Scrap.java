@@ -9,6 +9,7 @@ import java.time.LocalDateTime;
 @Setter
 public class Scrap {
     private String scrapId;
+    private String userId;
     private String scrapFolderId;
     private String postId;
     private LocalDateTime scrappedAt;
