@@ -32,7 +32,7 @@
             password_changed_at AS passwordChangedAt,
             pass_code AS passCode,
             nickname,
-            nickname_changed_at AS nicknameChangeAt,
+            nickname_changed_at AS nicknameChangedAt,
             membership_level AS membershipLevel,
             admin_role AS adminRole,
             warning_count AS warningCount,
