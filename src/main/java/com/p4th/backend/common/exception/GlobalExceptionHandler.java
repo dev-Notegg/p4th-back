@@ -21,10 +21,9 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(CustomException.class)
     public ResponseEntity<ErrorResponse> handleCustomException(CustomException ex) {
         ErrorCode code = ex.getErrorCode();
-        logger.error("CustomException: {}", ex.getMessage());
         ErrorResponse errorResponse = ErrorResponse.builder()
                 .errorCode(code.getCode())
-                .errorMessage(code.getMessage())
+                .errorMessage(ex.getMessage()) // 여기서 getMessage()를 사용하여 extraMessage 포함 메시지 반환
                 .status(code.getHttpStatus().name())
                 .timestamp(LocalDateTime.now())
                 .build();

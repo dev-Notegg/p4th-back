@@ -145,8 +145,7 @@ public class AuthService {
         if (user.getNicknameChangedAt() != null) {
             long daysSinceChange = ChronoUnit.DAYS.between(user.getNicknameChangedAt(), LocalDateTime.now());
             if (daysSinceChange < 10) {
-                throw new CustomException(ErrorCode.NICKNAME_CHANGE_NOT_ALLOWED,
-                        "닉네임은 변경 후 10일간 재변경이 불가합니다.");
+                throw new CustomException(ErrorCode.NICKNAME_CHANGE_NOT_ALLOWED);
             }
         }
         user.setNickname(newNickname);
