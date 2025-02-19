@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.p4th.backend.mapper.ScrapFolderMapper">
+
+    <select id="getScrapFoldersByUserId" resultType="com.p4th.backend.domain.ScrapFolder">
+        SELECT scrap_folder_id, user_id, folder_name, sort_order, created_at, created_by, updated_at, updated_by
+        FROM scrap_folder
+        WHERE user_id = #{userId}
+        ORDER BY sort_order
+    </select>
+
+    <insert id="insertScrapFolder" parameterType="com.p4th.backend.domain.ScrapFolder">
+        INSERT INTO scrap_folder (scrap_folder_id, user_id, folder_name, sort_order, created_by)
+        VALUES (#{scrapFolderId}, #{userId}, #{folderName}, #{sortOrder}, #{createdBy})
+    </insert>
+
+    <update id="updateScrapFolder" parameterType="com.p4th.backend.domain.ScrapFolder">
+        UPDATE scrap_folder
+        SET folder_name = #{folderName}, updated_by = #{updatedBy}
+        WHERE scrap_folder_id = #{scrapFolderId}
+    </update>
+
+    <update id="updateScrapFolderOrder">
+        UPDATE scrap_folder
+        SET sort_order = #{sortOrder}
+          , updated_by = #{userId}
+        WHERE scrap_folder_id = #{scrapFolderId}
+    </update>
+
+    <delete id="deleteScrapFolder" parameterType="String">
+        DELETE FROM scrap_folder
+        WHERE scrap_folder_id = #{scrapFolderId}
+    </delete>
+
+    <select id="getMaxSortOrderByUserId" resultType="int" parameterType="String">
+        SELECT COALESCE(MAX(sort_order), -1) FROM scrap_folder WHERE user_id = #{userId}
+    </select>
+</mapper>
