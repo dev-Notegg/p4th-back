@@ -1,8 +1,8 @@
 package com.p4th.backend.dto.response.scrap;
 
+import com.p4th.backend.domain.ScrapFolder;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
-
 import java.time.LocalDateTime;
 
 @Data
@@ -19,4 +19,13 @@ public class ScrapFolderResponse {
     
     @Schema(description = "생성일시", example = "2025-02-04 09:00:00")
     private LocalDateTime createdAt;
+
+    public static ScrapFolderResponse from(ScrapFolder folder) {
+        ScrapFolderResponse response = new ScrapFolderResponse();
+        response.setScrapFolderId(folder.getScrapFolderId());
+        response.setFolderName(folder.getFolderName());
+        response.setSortOrder(folder.getSortOrder());
+        response.setCreatedAt(folder.getCreatedAt());
+        return response;
+    }
 }

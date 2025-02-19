@@ -16,4 +16,16 @@ public class ScrapResponse {
     
     @Schema(description = "스크랩 일시", example = "2025-02-04 10:10:00")
     private LocalDateTime scrappedAt;
+
+    @Schema(description = "스크랩 폴더 ID (null이면 전체)")
+    private String scrapFolderId;
+
+    public static ScrapResponse from(String scrapId, String postId, String scrapFolderId) {
+        ScrapResponse response = new ScrapResponse();
+        response.setScrapId(scrapId);
+        response.setPostId(postId);
+        response.setScrapFolderId(scrapFolderId);
+        response.setScrappedAt(LocalDateTime.now());
+        return response;
+    }
 }

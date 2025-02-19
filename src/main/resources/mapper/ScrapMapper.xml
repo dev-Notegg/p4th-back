@@ -11,9 +11,16 @@
         ORDER BY scrapped_at DESC
     </select>
 
+    <select id="getScrapsByFolderId" resultType="com.p4th.backend.domain.Scrap">
+        SELECT scrap_id, scrap_folder_id, post_id, scrapped_at
+        FROM scrap
+        WHERE scrap_folder_id = #{scrapFolderId}
+        ORDER BY scrapped_at DESC
+    </select>
+
     <insert id="insertScrap" parameterType="com.p4th.backend.domain.Scrap">
-        INSERT INTO scrap (scrap_id, scrap_folder_id, post_id, scrapped_at)
-        VALUES (#{scrapId}, #{scrapFolderId}, #{postId}, #{scrappedAt})
+        INSERT INTO scrap (scrap_id, scrap_folder_id, post_id)
+        VALUES (#{scrapId}, #{scrapFolderId}, #{postId})
     </insert>
 
     <delete id="deleteScrap" parameterType="String">

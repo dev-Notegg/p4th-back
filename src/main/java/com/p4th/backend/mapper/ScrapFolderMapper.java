@@ -11,7 +11,8 @@ public interface ScrapFolderMapper {
     List<ScrapFolder> getScrapFoldersByUserId(@Param("userId") String userId);
     int insertScrapFolder(ScrapFolder folder);
     int updateScrapFolder(ScrapFolder folder);
-    int updateScrapFolderOrder(@Param("scrapFolderId") String scrapFolderId, @Param("sortOrder") int sortOrder,@Param("userId") String userId);
-    int deleteScrapFolder(@Param("scrapFolderId") String scrapFolderId);
+    int updateScrapFolderOrder(@Param("scrapFolderId") String scrapFolderId, @Param("sortOrder") int sortOrder, @Param("userId") String userId);
+    int deleteScrapFolder(@Param("scrapFolderId") String scrapFolderId, @Param("userId") String userId);
     Integer getMaxSortOrderByUserId(@Param("userId") String userId);
+    ScrapFolder getDefaultScrapFolderByUserId(@Param("userId") String userId);
 }
