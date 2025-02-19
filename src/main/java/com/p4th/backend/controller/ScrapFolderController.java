@@ -4,6 +4,7 @@ import com.p4th.backend.common.exception.CustomException;
 import com.p4th.backend.common.exception.ErrorCode;
 import com.p4th.backend.common.exception.ErrorResponse;
 import com.p4th.backend.domain.ScrapFolder;
+import com.p4th.backend.dto.request.ScrapFolderNameRequest;
 import com.p4th.backend.dto.response.scrap.ScrapFolderResponse;
 import com.p4th.backend.security.JwtProvider;
 import com.p4th.backend.service.ScrapFolderService;
@@ -12,6 +13,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +23,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Tag(name = "스크랩폴더 API", description = "스크랩폴더 관련 API")
 @RestController
 @RequestMapping("/api/users/scrap-folders")
 @RequiredArgsConstructor
@@ -60,7 +63,7 @@ public class ScrapFolderController {
     })
     @PostMapping
     public ResponseEntity<ScrapFolderResponse> createScrapFolder(
-            @RequestBody ScrapFolderResponse requestBody,
+            @RequestBody ScrapFolderNameRequest requestBody,
             HttpServletRequest request) {
         String userId = jwtProvider.resolveUserId(request);
         if (userId == null) {
@@ -82,7 +85,7 @@ public class ScrapFolderController {
     @PutMapping(value = "/{scrapFolderId}")
     public ResponseEntity<ScrapFolderResponse> updateScrapFolderName(
             @PathVariable("scrapFolderId") String scrapFolderId,
-            @RequestBody ScrapFolderResponse requestBody,
+            @RequestBody ScrapFolderNameRequest requestBody,
             HttpServletRequest request) {
         String userId = jwtProvider.resolveUserId(request);
         if (userId == null) {

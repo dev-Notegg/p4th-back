@@ -24,12 +24,12 @@
         UPDATE scrap_folder
         SET sort_order = #{sortOrder}
           , updated_by = #{userId}
-        WHERE user_id = #{userId} AND scrap_folder_id = #{folderId}
+        WHERE user_id = #{userId} AND scrap_folder_id = #{scrapFolderId}
     </update>
 
     <delete id="deleteScrapFolder" parameterType="String">
         DELETE FROM scrap_folder
-        WHERE user_id = #{userId} AND scrap_folder_id = #{folderId}
+        WHERE user_id = #{userId} AND scrap_folder_id = #{scrapFolderId}
     </delete>
 
     <select id="getMaxSortOrderByUserId" resultType="int" parameterType="String">

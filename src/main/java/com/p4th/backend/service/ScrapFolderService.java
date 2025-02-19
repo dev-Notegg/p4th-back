@@ -64,8 +64,8 @@ public class ScrapFolderService {
     @Transactional
     public boolean updateScrapFolderOrder(List<String> orderedFolderIds, String userId) {
         for (int i = 0; i < orderedFolderIds.size(); i++) {
-            String folderId = orderedFolderIds.get(i);
-            int updated = scrapFolderMapper.updateScrapFolderOrder(folderId, i, userId);
+            String scrapFolderId = orderedFolderIds.get(i);
+            int updated = scrapFolderMapper.updateScrapFolderOrder(scrapFolderId, i, userId);
             if (updated != 1) {
                 throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR, "스크랩 폴더 순서 변경 실패");
             }
