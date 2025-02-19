@@ -17,7 +17,7 @@
     <update id="updateScrapFolder" parameterType="com.p4th.backend.domain.ScrapFolder">
         UPDATE scrap_folder
         SET folder_name = #{folderName}, updated_by = #{userId}
-        WHERE user_id = #{userId} AND scrap_folder_id = #{folderId}
+        WHERE user_id = #{userId} AND scrap_folder_id = #{scrapFolderId}
     </update>
 
     <update id="updateScrapFolderOrder">
