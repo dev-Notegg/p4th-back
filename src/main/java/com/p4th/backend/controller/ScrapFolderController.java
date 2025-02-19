@@ -5,6 +5,7 @@ import com.p4th.backend.common.exception.ErrorCode;
 import com.p4th.backend.common.exception.ErrorResponse;
 import com.p4th.backend.domain.ScrapFolder;
 import com.p4th.backend.dto.request.ScrapFolderNameRequest;
+import com.p4th.backend.dto.request.ScrapFolderOrderUpdateRequest;
 import com.p4th.backend.dto.response.scrap.ScrapFolderResponse;
 import com.p4th.backend.security.JwtProvider;
 import com.p4th.backend.service.ScrapFolderService;
@@ -106,13 +107,13 @@ public class ScrapFolderController {
     })
     @PutMapping(value = "/order")
     public ResponseEntity<?> updateScrapFolderOrder(
-            @RequestBody List<String> order,
+            @RequestBody ScrapFolderOrderUpdateRequest requestDto,
             HttpServletRequest request) {
         String userId = jwtProvider.resolveUserId(request);
         if (userId == null) {
             throw new CustomException(ErrorCode.LOGIN_REQUIRED);
         }
-        boolean updated = scrapFolderService.updateScrapFolderOrder(order, userId);
+        boolean updated = scrapFolderService.updateScrapFolderOrder(requestDto.getOrder(), userId);
         return ResponseEntity.ok("{\"updated\": " + updated + "}");
     }
 
