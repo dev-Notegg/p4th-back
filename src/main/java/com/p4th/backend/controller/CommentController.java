@@ -47,7 +47,8 @@ public class CommentController {
     @Operation(summary = "댓글 작성", description = "게시글에 댓글을 작성한다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "댓글 작성 성공"),
-            @ApiResponse(responseCode = "400", description = "사용자를 찾을 수 없음", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+            @ApiResponse(responseCode = "400", description = "사용자를 찾을 수 없음", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "게시글을 찾을 수 없음", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
     })
     @PostMapping(value = "/posts/{postId}/comments")
     public ResponseEntity<CommentCreateResponse> createComment(

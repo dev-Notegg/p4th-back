@@ -4,6 +4,7 @@ import com.p4th.backend.common.exception.CustomException;
 import com.p4th.backend.common.exception.ErrorCode;
 import com.p4th.backend.domain.Comment;
 import com.p4th.backend.domain.CommentStatus;
+import com.p4th.backend.domain.Post;
 import com.p4th.backend.domain.User;
 import com.p4th.backend.dto.request.CommentCreateRequest;
 import com.p4th.backend.dto.response.comment.CommentResponse;
@@ -67,6 +68,11 @@ public class CommentService {
         if (user == null) {
             throw new CustomException(ErrorCode.USER_NOT_FOUND);
         }
+        // 게시글 존재 여부 확인
+        Post post = postMapper.getPostDetail(postId);
+        if (post == null) {
+            throw new CustomException(ErrorCode.POST_NOT_FOUND);
+        }
         Comment comment = new Comment();
         String commentId = ULIDUtil.getULID();
         comment.setCommentId(commentId);
@@ -115,7 +121,7 @@ public class CommentService {
         // 권한 체크: 요청자가 댓글 작성자이거나, 관리자인 경우
         User requester = authMapper.selectByUserId(userId);
         if (!comment.getUserId().equals(userId) && (requester == null || requester.getAdminRole() != 1)) {
-            throw new CustomException(ErrorCode.UNAUTHORIZED_ACCESS, "권한이 없습니다.");
+            throw new CustomException(ErrorCode.UNAUTHORIZED_ACCESS);
         }
         // 자식 댓글이 있는지 확인
         int childCount = commentMapper.countChildComments(commentId);
