@@ -3,12 +3,8 @@ package com.p4th.backend.controller;
 import com.p4th.backend.common.exception.CustomException;
 import com.p4th.backend.common.exception.ErrorCode;
 import com.p4th.backend.common.exception.ErrorResponse;
-import com.p4th.backend.domain.Post;
-import com.p4th.backend.domain.Scrap;
 import com.p4th.backend.dto.response.scrap.ScrapPostListResponse;
-import com.p4th.backend.mapper.PostMapper;
 import com.p4th.backend.dto.response.scrap.ScrapResponse;
-import com.p4th.backend.dto.response.scrap.UserScrapResponse;
 import com.p4th.backend.security.JwtProvider;
 import com.p4th.backend.service.ScrapService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -19,12 +15,15 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.servlet.http.HttpServletRequest;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Tag(name = "스크랩 API", description = "게시글 스크랩 관련 API")
 @RestController
@@ -34,34 +33,31 @@ public class ScrapController {
 
     private final ScrapService scrapService;
     private final JwtProvider jwtProvider;
-    private final PostMapper postMapper;
 
-    @Operation(summary = "게시글 스크랩 목록 조회", description = "사용자의 스크랩 목록을 조회한다. 폴더 ID를 제공하면 해당 폴더의 스크랩 목록을, 제공하지 않으면 전체 스크랩 목록을 조회한다.")
+    @Operation(
+            summary = "게시글 스크랩 목록 조회",
+            description = "사용자의 스크랩 게시글 목록을 조회한다. " +
+                    "스크랩 폴더 ID를 제공하면 해당 폴더의 스크랩 목록을, 제공하지 않으면 전체 스크랩 목록을 조회한다."
+    )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "게시글 스크랩 목록 조회 성공",
-                    content = @Content(schema = @Schema(implementation = ScrapResponse.class))),
+                    content = @Content(schema = @Schema(implementation = ScrapPostListResponse.class))),
             @ApiResponse(responseCode = "403", description = "로그인 후 이용가능한 메뉴",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "500", description = "스크랩 게시글 목록 조회 중 내부 서버 오류",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @GetMapping(value = "/users/scraps")
-    public ResponseEntity<UserScrapResponse> getScraps(
+    public ResponseEntity<Page<ScrapPostListResponse>> getScrapPosts(
             @Parameter(name = "scrapFolderId", description = "스크랩 폴더 ID (옵션)")
             @RequestParam(value = "scrapFolderId", required = false) String scrapFolderId,
+            @ParameterObject @PageableDefault(sort = "scrappedAt", direction = Sort.Direction.DESC) Pageable pageable,
             HttpServletRequest request) {
         String userId = jwtProvider.resolveUserId(request);
         if (userId == null) {
             throw new CustomException(ErrorCode.LOGIN_REQUIRED);
         }
-        List<Scrap> scraps = scrapService.getScraps(userId, scrapFolderId);
-        List<ScrapPostListResponse> scrapPosts = scraps.stream()
-                .map(scrapPost -> {
-                    Post post = postMapper.getPostDetail(scrapPost.getPostId());
-                    return ScrapPostListResponse.from(post, scrapPost.getScrapId());
-                })
-                .collect(Collectors.toList());
-        UserScrapResponse response = new UserScrapResponse();
-        response.setScrapFolderId(scrapFolderId);
-        response.setScrapPosts(scrapPosts);
+        Page<ScrapPostListResponse> response = scrapService.getScrapPosts(userId, scrapFolderId, pageable);
         return ResponseEntity.ok(response);
     }
 

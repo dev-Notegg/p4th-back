@@ -2,20 +2,6 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.p4th.backend.mapper.ScrapMapper">
 
-    <select id="getScrapsByUserId" resultType="com.p4th.backend.domain.Scrap">
-        SELECT scrap_id, user_id, scrap_folder_id, post_id, scrapped_at
-        FROM scrap
-        WHERE user_id = #{userId}
-        ORDER BY scrapped_at DESC
-    </select>
-
-    <select id="getScrapsByFolderId" resultType="com.p4th.backend.domain.Scrap">
-        SELECT scrap_id, user_id, scrap_folder_id, post_id, scrapped_at
-        FROM scrap
-        WHERE user_id = #{userId} AND scrap_folder_id = #{scrapFolderId}
-        ORDER BY scrapped_at DESC
-    </select>
-
     <insert id="insertScrap" parameterType="com.p4th.backend.domain.Scrap">
         INSERT INTO scrap (scrap_id, user_id, scrap_folder_id, post_id)
         VALUES (#{scrapId}, #{userId}, #{scrapFolderId}, #{postId})

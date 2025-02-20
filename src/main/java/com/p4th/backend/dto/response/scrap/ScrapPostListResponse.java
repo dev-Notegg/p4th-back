@@ -14,8 +14,10 @@ import lombok.EqualsAndHashCode;
 public class ScrapPostListResponse extends PostListResponse {
     @Schema(description = "스크랩 ID", example = "01JKQ90E6N6FP7YRWCVVC52KW0")
     private String scrapId;
+    @Schema(description = "스크랩 폴더 ID", example = "01JKQ90E6N6FP7YRWCVVC52KW0")
+    private String scrapFolderId;
 
-    public static ScrapPostListResponse from(Post post, String scrapId) {
+    public static ScrapPostListResponse from(Post post, String scrapId, String scrapFolderId) {
         ScrapPostListResponse response = new ScrapPostListResponse();
         response.setPostId(post.getPostId());
         response.setBoardId(post.getBoardId());
@@ -37,6 +39,7 @@ public class ScrapPostListResponse extends PostListResponse {
         response.setImageUrl(PostListResponse.extractFirstImageUrl(post.getContent()));
         response.setImageCount(PostListResponse.countInlineImages(post.getContent()));
         response.setCreatedAt(RelativeTimeFormatter.formatRelativeTime(post.getCreatedAt()));
+        response.setScrapFolderId(scrapFolderId);
         response.setScrapId(scrapId);
         return response;
     }
