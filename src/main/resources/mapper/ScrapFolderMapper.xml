@@ -62,4 +62,18 @@
         FROM scrap
         WHERE scrap_folder_id = #{scrapFolderId}
     </select>
+
+    <select id="selectScrapFolderById" parameterType="map" resultType="com.p4th.backend.domain.ScrapFolder">
+        SELECT
+            scrap_folder_id,
+            user_id,
+            folder_name,
+            sort_order,
+            created_at,
+            created_by,
+            updated_at,
+            updated_by
+        FROM scrap_folder
+        WHERE scrap_folder_id = #{scrapFolderId} AND user_id = #{userId}
+    </select>
 </mapper>

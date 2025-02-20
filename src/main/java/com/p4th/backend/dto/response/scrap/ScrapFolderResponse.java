@@ -19,7 +19,7 @@ public class ScrapFolderResponse {
 
     @Schema(description = "해당 폴더에 속한 스크랩 게시글 개수", example = "3")
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    private int scrapCount;
+    private Integer scrapCount;
 
     public static ScrapFolderResponse from(ScrapFolder folder) {
         ScrapFolderResponse response = new ScrapFolderResponse();

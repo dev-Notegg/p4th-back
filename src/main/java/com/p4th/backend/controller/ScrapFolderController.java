@@ -76,6 +76,8 @@ public class ScrapFolderController {
                     content = @Content(schema = @Schema(implementation = ScrapFolderResponse.class))),
             @ApiResponse(responseCode = "403", description = "로그인 후 이용가능한 메뉴",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "해당 스크랩 폴더가 존재하지 않는 경우",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "500", description = "스크랩 폴더명 변경 중 내부 서버 오류",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
@@ -120,6 +122,8 @@ public class ScrapFolderController {
             @ApiResponse(responseCode = "200", description = "스크랩 폴더 삭제 성공",
                     content = @Content(schema = @Schema(implementation = Boolean.class))),
             @ApiResponse(responseCode = "403", description = "로그인 후 이용가능한 메뉴",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "해당 스크랩 폴더가 존재하지 않는 경우",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "500", description = "스크랩 폴더 삭제 중 내부 서버 오류",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))

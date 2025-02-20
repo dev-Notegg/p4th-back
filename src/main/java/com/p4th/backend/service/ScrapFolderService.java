@@ -59,6 +59,12 @@ public class ScrapFolderService {
         if (newFolderName == null || newFolderName.trim().isEmpty()) {
             throw new CustomException(ErrorCode.INVALID_INPUT, "폴더명은 빈값일 수 없습니다.");
         }
+        // 스크랩 폴더 존재 여부 확인
+        ScrapFolder folderCheck = scrapFolderMapper.selectScrapFolderById(scrapFolderId, userId);
+        if (folderCheck == null) {
+            throw new CustomException(ErrorCode.SCRAP_FOLDER_NOT_FOUND);
+        }
+
         ScrapFolder folder = new ScrapFolder();
         folder.setScrapFolderId(scrapFolderId);
         folder.setFolderName(newFolderName);
@@ -99,6 +105,12 @@ public class ScrapFolderService {
 
     @Transactional
     public boolean deleteScrapFolder(String scrapFolderId, String userId) {
+        // 스크랩 폴더 존재 여부 확인
+        ScrapFolder folderCheck = scrapFolderMapper.selectScrapFolderById(scrapFolderId, userId);
+        if (folderCheck == null) {
+            throw new CustomException(ErrorCode.SCRAP_FOLDER_NOT_FOUND);
+        }
+
         int deleted = scrapFolderMapper.deleteScrapFolder(scrapFolderId, userId);
         if (deleted != 1) {
             throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR, "스크랩 폴더 삭제 실패");

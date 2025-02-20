@@ -31,6 +31,9 @@ public enum ErrorCode {
     COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND, 40500, "댓글을 찾을 수 없습니다."),
     COMMENT_ALREADY_DELETED(HttpStatus.BAD_REQUEST, 40501, "이미 삭제된 댓글입니다."),
 
+    //스크랩 관련
+    SCRAP_FOLDER_NOT_FOUND(HttpStatus.NOT_FOUND, 40600, "해당 스크랩 폴더가 존재하지 않습니다."),
+
     INVALID_INPUT(HttpStatus.BAD_REQUEST, 40001, "유효하지 않은 입력입니다.");
 
     private final HttpStatus httpStatus;
