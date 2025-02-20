@@ -17,12 +17,19 @@ public class ScrapPostListResponse extends PostListResponse {
 
     public static ScrapPostListResponse from(Post post, String scrapId) {
         ScrapPostListResponse response = new ScrapPostListResponse();
-        response.setScrapId(scrapId);
         response.setPostId(post.getPostId());
         response.setBoardId(post.getBoardId());
         response.setUserId(post.getUserId());
         response.setNickname(post.getUser() != null ? post.getUser().getNickname() : "");
         response.setTitle(post.getTitle());
+        if (post.getBoard() != null) {
+            response.setBoardName(post.getBoard().getBoardName());
+            if (post.getBoard().getCategory() != null) {
+                response.setCategoryName(post.getBoard().getCategory().getCategoryName());
+            } else {
+                response.setCategoryName(post.getBoard().getCategoryName());
+            }
+        }
         response.setContent(HtmlContentUtils.extractPlainText(post.getContent(), 50));
         response.setStatus(post.getStatus());
         response.setViewCount(post.getViewCount());
@@ -30,6 +37,7 @@ public class ScrapPostListResponse extends PostListResponse {
         response.setImageUrl(PostListResponse.extractFirstImageUrl(post.getContent()));
         response.setImageCount(PostListResponse.countInlineImages(post.getContent()));
         response.setCreatedAt(RelativeTimeFormatter.formatRelativeTime(post.getCreatedAt()));
+        response.setScrapId(scrapId);
         return response;
     }
 }
