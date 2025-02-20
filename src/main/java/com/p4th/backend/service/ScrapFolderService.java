@@ -55,7 +55,7 @@ public class ScrapFolderService {
     }
 
     @Transactional
-    public ScrapFolder updateScrapFolderName(String scrapFolderId, String newFolderName, String userId) {
+    public boolean updateScrapFolderName(String scrapFolderId, String newFolderName, String userId) {
         if (newFolderName == null || newFolderName.trim().isEmpty()) {
             throw new CustomException(ErrorCode.INVALID_INPUT, "폴더명은 빈값일 수 없습니다.");
         }
@@ -68,7 +68,7 @@ public class ScrapFolderService {
         if (updated != 1) {
             throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR, "스크랩 폴더명 변경 실패");
         }
-        return folder;
+        return true;
     }
 
     @Transactional

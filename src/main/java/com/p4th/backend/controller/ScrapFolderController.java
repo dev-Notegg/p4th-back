@@ -80,7 +80,7 @@ public class ScrapFolderController {
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @PutMapping(value = "/{scrapFolderId}")
-    public ResponseEntity<ScrapFolderResponse> updateScrapFolderName(
+    public ResponseEntity<?> updateScrapFolderName(
             @PathVariable("scrapFolderId") String scrapFolderId,
             @RequestBody ScrapFolderNameRequest requestBody,
             HttpServletRequest request) {
@@ -88,8 +88,8 @@ public class ScrapFolderController {
         if (userId == null) {
             throw new CustomException(ErrorCode.LOGIN_REQUIRED);
         }
-        ScrapFolder folder = scrapFolderService.updateScrapFolderName(scrapFolderId, requestBody.getFolderName(), userId);
-        return ResponseEntity.ok(ScrapFolderResponse.from(folder));
+        boolean updated = scrapFolderService.updateScrapFolderName(scrapFolderId, requestBody.getFolderName(), userId);
+        return ResponseEntity.ok("{\"updated\": " + updated + "}");
     }
 
     @Operation(summary = "스크랩 폴더 순서 변경", description = "스크랩 폴더의 순서를 변경한다. 스크랩 폴더ID를 배열로 순서대로 보내준다.")
