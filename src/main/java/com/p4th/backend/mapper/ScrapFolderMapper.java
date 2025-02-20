@@ -15,4 +15,6 @@ public interface ScrapFolderMapper {
     int deleteScrapFolder(@Param("scrapFolderId") String scrapFolderId, @Param("userId") String userId);
     Integer getMaxSortOrderByUserId(@Param("userId") String userId);
     ScrapFolder getDefaultScrapFolderByUserId(@Param("userId") String userId);
+    List<String> findScrapFolderIdsByUser(@Param("userId") String userId);
+    List<ScrapFolder> findScrapFoldersByUser(@Param("userId") String userId);
 }

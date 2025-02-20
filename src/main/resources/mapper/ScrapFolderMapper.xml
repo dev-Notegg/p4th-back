@@ -42,4 +42,18 @@
         WHERE user_id = #{userId} AND folder_name = '기본'
         LIMIT 1
     </select>
+
+    <select id="findScrapFolderIdsByUser" resultType="String" parameterType="String">
+        SELECT scrap_folder_id
+        FROM scrap_folder
+        WHERE user_id = #{userId}
+        ORDER BY sort_order
+    </select>
+
+    <select id="findScrapFoldersByUser" resultType="com.p4th.backend.domain.ScrapFolder" parameterType="String">
+        SELECT *
+        FROM scrap_folder
+        WHERE user_id = #{userId}
+        ORDER BY sort_order
+    </select>
 </mapper>
