@@ -99,7 +99,7 @@ public class MainService {
                     }
                     // HTML 태그 제거 후 순수 텍스트 추출, 최대 30자까지 표시
                     if (response.getContent() != null && !response.getContent().isEmpty()) {
-                        String plainText = HtmlContentUtils.extractPlainText(response.getContent(), 30);
+                        String plainText = HtmlContentUtils.extractPlainText(response.getContent(), 50);
                         response.setContent(plainText);
                     }
                     // 생성일시 변환 (상대 시간 형식)

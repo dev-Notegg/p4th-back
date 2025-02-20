@@ -5,8 +5,8 @@ import com.p4th.backend.common.exception.ErrorCode;
 import com.p4th.backend.common.exception.ErrorResponse;
 import com.p4th.backend.domain.Post;
 import com.p4th.backend.domain.Scrap;
+import com.p4th.backend.dto.response.scrap.ScrapPostListResponse;
 import com.p4th.backend.mapper.PostMapper;
-import com.p4th.backend.dto.response.post.PostListResponse;
 import com.p4th.backend.dto.response.scrap.ScrapResponse;
 import com.p4th.backend.dto.response.scrap.UserScrapResponse;
 import com.p4th.backend.security.JwtProvider;
@@ -53,15 +53,15 @@ public class ScrapController {
             throw new CustomException(ErrorCode.LOGIN_REQUIRED);
         }
         List<Scrap> scraps = scrapService.getScraps(userId, scrapFolderId);
-        List<PostListResponse> content = scraps.stream()
-                .map(scrap -> {
-                    Post post = postMapper.getPostDetail(scrap.getPostId());
-                    return PostListResponse.from(post);
+        List<ScrapPostListResponse> scrapPosts = scraps.stream()
+                .map(scrapPost -> {
+                    Post post = postMapper.getPostDetail(scrapPost.getPostId());
+                    return ScrapPostListResponse.from(post, scrapPost.getScrapId());
                 })
                 .collect(Collectors.toList());
         UserScrapResponse response = new UserScrapResponse();
         response.setScrapFolderId(scrapFolderId);
-        response.setContent(content);
+        response.setScrapPosts(scrapPosts);
         return ResponseEntity.ok(response);
     }
 
