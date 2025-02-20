@@ -45,13 +45,14 @@ public class ScrapController {
     })
     @GetMapping(value = "/users/scraps")
     public ResponseEntity<UserScrapResponse> getScraps(
-            @RequestParam(value = "folderId", required = false) String folderId,
+            @Parameter(name = "scrapFolderId", description = "스크랩 폴더 ID (옵션)")
+            @RequestParam(value = "scrapFolderId", required = false) String scrapFolderId,
             HttpServletRequest request) {
         String userId = jwtProvider.resolveUserId(request);
         if (userId == null) {
             throw new CustomException(ErrorCode.LOGIN_REQUIRED);
         }
-        List<Scrap> scraps = scrapService.getScraps(userId, folderId);
+        List<Scrap> scraps = scrapService.getScraps(userId, scrapFolderId);
         List<PostListResponse> content = scraps.stream()
                 .map(scrap -> {
                     Post post = postMapper.getPostDetail(scrap.getPostId());
@@ -59,7 +60,7 @@ public class ScrapController {
                 })
                 .collect(Collectors.toList());
         UserScrapResponse response = new UserScrapResponse();
-        response.setScrapFolderId(folderId);
+        response.setScrapFolderId(scrapFolderId);
         response.setContent(content);
         return ResponseEntity.ok(response);
     }
