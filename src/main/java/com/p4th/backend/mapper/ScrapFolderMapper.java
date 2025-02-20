@@ -17,4 +17,5 @@ public interface ScrapFolderMapper {
     ScrapFolder getDefaultScrapFolderByUserId(@Param("userId") String userId);
     List<String> findScrapFolderIdsByUser(@Param("userId") String userId);
     List<ScrapFolder> findScrapFoldersByUser(@Param("userId") String userId);
+    int countByScrapFolderId(@Param("scrapFolderId") String scrapFolderId);
 }

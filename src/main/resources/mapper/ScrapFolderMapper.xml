@@ -56,4 +56,10 @@
         WHERE user_id = #{userId}
         ORDER BY sort_order
     </select>
+
+    <select id="countByScrapFolderId" resultType="int">
+        SELECT COUNT(*)
+        FROM scrap
+        WHERE scrap_folder_id = #{scrapFolderId}
+    </select>
 </mapper>

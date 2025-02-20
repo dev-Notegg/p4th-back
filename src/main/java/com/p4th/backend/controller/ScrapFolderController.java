@@ -22,7 +22,6 @@ import org.springframework.web.bind.annotation.*;
 
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Tag(name = "스크랩폴더 API", description = "스크랩폴더 관련 API")
 @RestController
@@ -33,7 +32,7 @@ public class ScrapFolderController {
     private final ScrapFolderService scrapFolderService;
     private final JwtProvider jwtProvider;
 
-    @Operation(summary = "스크랩 폴더 목록 조회", description = "사용자의 스크랩 폴더 목록을 조회한다.")
+    @Operation(summary = "스크랩 폴더 목록 조회", description = "사용자의 스크랩 폴더 목록을 조회한다. 각 폴더에는 해당 폴더에 속한 스크랩 게시글 개수가 포함된다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "스크랩 폴더 목록 조회 성공",
                     content = @Content(schema = @Schema(implementation = ScrapFolderResponse.class))),
@@ -46,10 +45,7 @@ public class ScrapFolderController {
         if (userId == null) {
             throw new CustomException(ErrorCode.LOGIN_REQUIRED);
         }
-        List<ScrapFolder> folders = scrapFolderService.getScrapFolders(userId);
-        List<ScrapFolderResponse> responses = folders.stream()
-                .map(ScrapFolderResponse::from)
-                .collect(Collectors.toList());
+        List<ScrapFolderResponse> responses = scrapFolderService.getScrapFolders(userId);
         return ResponseEntity.ok(responses);
     }
 
@@ -96,7 +92,7 @@ public class ScrapFolderController {
         return ResponseEntity.ok(ScrapFolderResponse.from(folder));
     }
 
-    @Operation(summary = "스크랩 폴더 순서 변경", description = "스크랩 폴더의 순서를 변경한다.")
+    @Operation(summary = "스크랩 폴더 순서 변경", description = "스크랩 폴더의 순서를 변경한다. 스크랩 폴더ID를 배열로 순서대로 보내준다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "스크랩 폴더 순서 변경 성공",
                     content = @Content(schema = @Schema(implementation = Boolean.class))),

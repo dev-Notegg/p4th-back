@@ -3,6 +3,7 @@ package com.p4th.backend.service;
 import com.p4th.backend.common.exception.CustomException;
 import com.p4th.backend.common.exception.ErrorCode;
 import com.p4th.backend.domain.ScrapFolder;
+import com.p4th.backend.dto.response.scrap.ScrapFolderResponse;
 import com.p4th.backend.mapper.ScrapFolderMapper;
 import com.p4th.backend.util.ULIDUtil;
 import lombok.RequiredArgsConstructor;
@@ -12,6 +13,7 @@ import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -20,8 +22,14 @@ public class ScrapFolderService {
     private final ScrapFolderMapper scrapFolderMapper;
 
     @Transactional(readOnly = true)
-    public List<ScrapFolder> getScrapFolders(String userId) {
-        return scrapFolderMapper.getScrapFoldersByUserId(userId);
+    public List<ScrapFolderResponse> getScrapFolders(String userId) {
+        List<ScrapFolder> folders = scrapFolderMapper.getScrapFoldersByUserId(userId);
+        return folders.stream()
+                .map(folder -> {
+                    int scrapCount = scrapFolderMapper.countByScrapFolderId(folder.getScrapFolderId());
+                    return ScrapFolderResponse.fromWithCount(folder, scrapCount);
+                })
+                .collect(Collectors.toList());
     }
 
     @Transactional
