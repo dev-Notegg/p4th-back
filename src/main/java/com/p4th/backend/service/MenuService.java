@@ -83,6 +83,8 @@ public class MenuService {
                         return dto;
                     })
                     .filter(Objects::nonNull)
+                    // 최종적으로 게시글 생성일시(createdAt) 내림차순으로 정렬
+                    .sorted((d1, d2) -> d2.getCreatedAt().compareTo(d1.getCreatedAt()))
                     .collect(Collectors.toList());
             return new PageImpl<>(responses, pageable, responses.size());
         } catch (CustomException ce) {
