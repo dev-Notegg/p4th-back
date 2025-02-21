@@ -23,7 +23,7 @@ public class ScrapPostListResponse extends PostListResponse {
         response.setBoardId(post.getBoardId());
         response.setUserId(post.getUserId());
         response.setNickname(post.getUser() != null ? post.getUser().getNickname() : "");
-        response.setTitle(post.getTitle());
+        response.setTitle(HtmlContentUtils.extractText(post.getTitle(), 30));
         if (post.getBoard() != null) {
             response.setBoardName(post.getBoard().getBoardName());
             if (post.getBoard().getCategory() != null) {
@@ -32,7 +32,6 @@ public class ScrapPostListResponse extends PostListResponse {
                 response.setCategoryName(post.getBoard().getCategoryName());
             }
         }
-        response.setContent(HtmlContentUtils.extractPlainText(post.getContent(), 50));
         response.setStatus(post.getStatus());
         response.setViewCount(post.getViewCount());
         response.setCommentCount(post.getCommentCount());

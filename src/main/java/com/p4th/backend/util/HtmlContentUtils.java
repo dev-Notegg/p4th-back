@@ -15,9 +15,13 @@ public class HtmlContentUtils {
             return "";
         }
         String plainText = Jsoup.parse(htmlContent).text();
-        if (plainText.length() > maxLength) {
-            plainText = plainText.substring(0, maxLength);
+        return extractText(plainText, maxLength);
+    }
+
+    public static String extractText(String text, int maxLength) {
+        if (text.length() > maxLength) {
+            text = text.substring(0, maxLength) + "...";
         }
-        return plainText;
+        return text;
     }
 }

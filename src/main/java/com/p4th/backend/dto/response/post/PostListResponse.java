@@ -1,5 +1,6 @@
 package com.p4th.backend.dto.response.post;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.p4th.backend.domain.Post;
 import com.p4th.backend.domain.PostStatus;
 import com.p4th.backend.util.RelativeTimeFormatter;
@@ -21,6 +22,7 @@ public class PostListResponse {
     private String categoryName; // 게시판의 카테고리명
     private String boardName;    // 게시판명
     private String title;
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private String content;
     private PostStatus status;
     private int viewCount;
@@ -41,7 +43,7 @@ public class PostListResponse {
         }else{
             dto.nickname = post.getNickname() != null ? post.getNickname() : null;
         }
-        dto.title = post.getTitle();
+        dto.title = HtmlContentUtils.extractText(post.getTitle(), 30);
         if (post.getBoard() != null) {
             dto.boardName = post.getBoard().getBoardName();
             if (post.getBoard().getCategory() != null) {

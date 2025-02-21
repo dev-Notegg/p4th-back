@@ -6,6 +6,7 @@ import com.p4th.backend.domain.PostStatus;
 import com.p4th.backend.dto.response.search.SearchResponse;
 import com.p4th.backend.domain.Post;
 import com.p4th.backend.repository.SearchRepository;
+import com.p4th.backend.util.HtmlContentUtils;
 import com.p4th.backend.util.HtmlImageUtils;
 import com.p4th.backend.util.RelativeTimeFormatter;
 import lombok.RequiredArgsConstructor;
@@ -38,7 +39,7 @@ public class SearchService {
                 result.setBoardId(post.getBoard() != null ? post.getBoard().getBoardId() : null);
                 result.setUserId(post.getUser() != null ? post.getUser().getUserId() : null);
                 result.setNickname(post.getUser() != null ? post.getUser().getNickname() : null);
-                result.setTitle(post.getTitle());
+                result.setTitle(HtmlContentUtils.extractText(post.getTitle(), 30));
                 if (post.getBoard().getCategory() != null) {
                     result.setCategoryName(post.getBoard().getCategory().getCategoryName());
                 }else{
