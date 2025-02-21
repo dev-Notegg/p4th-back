@@ -31,7 +31,7 @@ public class PostListResponse {
     private int imageCount;     // HTML 내 이미지 태그 개수
     private String createdAt;
 
-    private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    public static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     public static PostListResponse from(Post post) {
         PostListResponse dto = new PostListResponse();

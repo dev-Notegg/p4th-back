@@ -6,9 +6,9 @@ import com.p4th.backend.domain.Banner;
 import com.p4th.backend.domain.PostStatus;
 import com.p4th.backend.dto.response.board.PopularBoardResponse;
 import com.p4th.backend.dto.response.post.PopularPostResponse;
+import com.p4th.backend.dto.response.post.PostListResponse;
 import com.p4th.backend.mapper.MainMapper;
 import com.p4th.backend.mapper.PostHistoryLogMapper;
-import com.p4th.backend.util.HtmlImageUtils;
 import com.p4th.backend.util.RelativeTimeFormatter;
 import com.p4th.backend.util.HtmlContentUtils;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +17,6 @@ import org.springframework.stereotype.Service;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAdjusters;
 import java.util.HashMap;
 import java.util.List;
@@ -29,7 +28,6 @@ public class MainService {
 
     private final MainMapper mainMapper;
     private final PostHistoryLogMapper postHistoryLogMapper;
-    private static final DateTimeFormatter originalFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     public List<PopularBoardResponse> getPopularBoards() {
         try {
@@ -87,37 +85,40 @@ public class MainService {
             }
 
             List<PopularPostResponse> responses = postHistoryLogMapper.getPopularPostsByPeriod(params);
-            responses.forEach(response -> {
-                try {
-                    // 삭제된 게시글인 경우 이미지 처리를 하지 않음
-                    if (response.getContent() != null && !response.getContent().isEmpty() &&
-                            !PostStatus.DELETED.equals(response.getStatus())) {
-                        String imgUrl = HtmlImageUtils.extractFirstImageUrl(response.getContent());
-                        int imgCount = HtmlImageUtils.countInlineImages(response.getContent());
-                        response.setImageUrl(imgUrl);
-                        response.setImageCount(imgCount);
-                    }
-                    // HTML 태그 제거 후 순수 텍스트 추출, 최대 30자까지 표시
-                    if (response.getContent() != null && !response.getContent().isEmpty()) {
-                        String plainText = HtmlContentUtils.extractPlainText(response.getContent(), 50);
-                        response.setContent(plainText);
-                    }
-                    // 생성일시 변환 (상대 시간 형식)
-                    if (response.getCreatedAt() != null && !response.getCreatedAt().isEmpty()) {
-                        LocalDateTime createdTime = LocalDateTime.parse(response.getCreatedAt(), originalFormatter);
-                        response.setCreatedAt(RelativeTimeFormatter.formatRelativeTime(createdTime));
-                    }
-                } catch (CustomException ce) {
-                    throw ce;
-                } catch (Exception e) {
-                    throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR, "인기 게시글 처리 중 오류: " + e.getMessage());
-                }
-            });
+            responses.forEach(this::processPopularPostResponse);
             return responses;
         } catch (CustomException ce) {
             throw ce;
         } catch (Exception e) {
             throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR, "인기 게시글 조회 중 오류: " + e.getMessage());
+        }
+    }
+
+    /**
+     * 각 PopularPostResponse 객체에 대해 공통 처리 로직
+     */
+    private void processPopularPostResponse(PopularPostResponse response) {
+        // 이미지 처리 (삭제된 게시글이 아닌 경우에만)
+        if (response.getContent() != null && !response.getContent().isEmpty() &&
+                !PostStatus.DELETED.equals(response.getStatus())) {
+            String imgUrl = PostListResponse.extractFirstImageUrl(response.getContent());
+            int imgCount = PostListResponse.countInlineImages(response.getContent());
+            response.setImageUrl(imgUrl);
+            response.setImageCount(imgCount);
+        }
+        // HTML 태그 제거 후 순수 텍스트 추출 (최대 50자)
+        if (response.getContent() != null && !response.getContent().isEmpty()) {
+            String plainText = HtmlContentUtils.extractPlainText(response.getContent(), 50);
+            response.setContent(plainText);
+        }
+        // 제목 최대 30자 처리
+        if (response.getTitle() != null) {
+            response.setTitle(HtmlContentUtils.extractText(response.getTitle(), 30));
+        }
+        // 생성일시를 상대 시간 형식으로 변환
+        if (response.getCreatedAt() != null && !response.getCreatedAt().isEmpty()) {
+            LocalDateTime createdTime = LocalDateTime.parse(response.getCreatedAt(), PostListResponse.formatter);
+            response.setCreatedAt(RelativeTimeFormatter.formatRelativeTime(createdTime));
         }
     }
 }
