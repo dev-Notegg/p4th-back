@@ -39,7 +39,7 @@ public class SearchService {
                 result.setBoardId(post.getBoard() != null ? post.getBoard().getBoardId() : null);
                 result.setUserId(post.getUser() != null ? post.getUser().getUserId() : null);
                 result.setNickname(post.getUser() != null ? post.getUser().getNickname() : null);
-                result.setTitle(HtmlContentUtils.extractText(post.getTitle(), 30));
+                result.setTitle(HtmlContentUtils.extractText(post.getTitle(), 27));
                 if (post.getBoard().getCategory() != null) {
                     result.setCategoryName(post.getBoard().getCategory().getCategoryName());
                 }else{

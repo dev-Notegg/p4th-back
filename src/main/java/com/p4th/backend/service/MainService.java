@@ -113,7 +113,7 @@ public class MainService {
         }
         // 제목 최대 30자 처리
         if (response.getTitle() != null) {
-            response.setTitle(HtmlContentUtils.extractText(response.getTitle(), 30));
+            response.setTitle(HtmlContentUtils.extractText(response.getTitle(), 27));
         }
         // 생성일시를 상대 시간 형식으로 변환
         if (response.getCreatedAt() != null && !response.getCreatedAt().isEmpty()) {
