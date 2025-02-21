@@ -8,4 +8,5 @@ import org.apache.ibatis.annotations.Param;
 public interface ScrapMapper {
     int insertScrap(Scrap scrap);
     int deleteScrap(@Param("scrapId") String scrapId, @Param("userId") String userId);
+    Scrap getScrapById(@Param("scrapId") String scrapId, @Param("userId") String userId);
 }

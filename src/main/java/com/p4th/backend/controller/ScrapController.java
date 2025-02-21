@@ -67,6 +67,8 @@ public class ScrapController {
                     content = @Content(schema = @Schema(implementation = Boolean.class))),
             @ApiResponse(responseCode = "403", description = "로그인 후 이용가능한 메뉴",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "스크랩을 찾을 수 없음",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "500", description = "게시글 스크랩 삭제 중 내부 서버 오류",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
@@ -88,6 +90,10 @@ public class ScrapController {
             @ApiResponse(responseCode = "200", description = "게시글 스크랩 성공",
                     content = @Content(schema = @Schema(implementation = ScrapResponse.class))),
             @ApiResponse(responseCode = "403", description = "로그인 후 이용가능한 메뉴",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "게시글을 찾을 수 없음",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "스크랩 폴더를 찾을 수 없음",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "500", description = "게시글 스크랩 중 내부 서버 오류",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))

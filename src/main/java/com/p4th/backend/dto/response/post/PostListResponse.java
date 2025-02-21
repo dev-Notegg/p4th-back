@@ -43,7 +43,7 @@ public class PostListResponse {
         }else{
             dto.nickname = post.getNickname() != null ? post.getNickname() : null;
         }
-        dto.title = HtmlContentUtils.extractText(post.getTitle(), 27);
+        dto.title = HtmlContentUtils.extractText(post.getTitle(), 25);
         if (post.getBoard() != null) {
             dto.boardName = post.getBoard().getBoardName();
             if (post.getBoard().getCategory() != null) {

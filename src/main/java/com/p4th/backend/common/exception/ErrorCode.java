@@ -17,12 +17,6 @@ public enum ErrorCode {
     UNAUTHORIZED_ACCESS(HttpStatus.UNAUTHORIZED, 40300, "권한이 없습니다."),
     LOGIN_REQUIRED(HttpStatus.UNAUTHORIZED, 40301, "로그인 후 이용가능한 메뉴입니다."),
 
-    // S3 업로드 실패
-    S3_UPLOAD_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, 50100, "S3 업로드에 실패하였습니다."),
-
-    // 내부 서버 오류
-    INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, 50000, "내부 서버 오류가 발생하였습니다."),
-
     //게시글 관련
     POST_NOT_FOUND(HttpStatus.NOT_FOUND, 40400, "게시글을 찾을 수 없습니다."),
     POST_ALREADY_DELETED(HttpStatus.BAD_REQUEST, 40401, "이미 삭제된 게시글입니다."),
@@ -33,8 +27,16 @@ public enum ErrorCode {
 
     //스크랩 관련
     SCRAP_FOLDER_NOT_FOUND(HttpStatus.NOT_FOUND, 40600, "해당 스크랩 폴더가 존재하지 않습니다."),
+    SCRAP_NOT_FOUND(HttpStatus.NOT_FOUND, 40601, "해당 스크랩이 존재하지 않습니다."),
 
-    INVALID_INPUT(HttpStatus.BAD_REQUEST, 40001, "유효하지 않은 입력입니다.");
+    //공통
+    INVALID_INPUT(HttpStatus.BAD_REQUEST, 40001, "유효하지 않은 입력입니다."),
+
+    // S3 업로드 실패
+    S3_UPLOAD_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, 50100, "S3 업로드에 실패하였습니다."),
+
+    // 내부 서버 오류
+    INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, 50000, "내부 서버 오류가 발생하였습니다.");
 
     private final HttpStatus httpStatus;
     private final int code;

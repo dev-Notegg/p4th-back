@@ -12,4 +12,9 @@
         WHERE user_id = #{userId} AND scrap_id = #{scrapId}
     </delete>
 
+    <select id="getScrapById" resultType="com.p4th.backend.domain.Scrap" parameterType="map">
+        SELECT scrap_id, user_id, scrap_folder_id, post_id, scrapped_at
+        FROM scrap
+        WHERE scrap_id = #{scrapId} AND user_id = #{userId}
+    </select>
 </mapper>

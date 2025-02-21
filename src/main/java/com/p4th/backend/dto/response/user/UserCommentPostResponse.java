@@ -57,7 +57,7 @@ public class UserCommentPostResponse {
         dto.setBoardId(post.getBoardId());
         dto.setUserId(post.getUserId());
         dto.setNickname(post.getNickname() != null ? post.getNickname() : "");
-        dto.setTitle(HtmlContentUtils.extractText(post.getTitle(), 27));
+        dto.setTitle(HtmlContentUtils.extractText(post.getTitle(), 25));
         if (post.getBoard() != null) {
             dto.setBoardName(post.getBoard().getBoardName());
             if (post.getBoard().getCategory() != null) {
