@@ -21,6 +21,8 @@ import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -62,7 +64,7 @@ public class MenuController {
     })
     @GetMapping(value = "/{userId}/posts")
     public ResponseEntity<Page<PostListResponse>> getUserPosts(
-            @ParameterObject Pageable pageable,
+            @ParameterObject @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
             HttpServletRequest httpRequest) {
         String userId = jwtProvider.resolveUserId(httpRequest);
         if (userId == null) {
@@ -82,7 +84,7 @@ public class MenuController {
     })
     @GetMapping(value = "/{userId}/comments")
     public ResponseEntity<Page<UserCommentPostResponse>> getUserComments(
-            @ParameterObject Pageable pageable,
+            @ParameterObject @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
             HttpServletRequest httpRequest) {
         String userId = jwtProvider.resolveUserId(httpRequest);
         if (userId == null) {
