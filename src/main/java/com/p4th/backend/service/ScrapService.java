@@ -74,7 +74,7 @@ public class ScrapService {
         // 이미 스크랩된 게시글이면 오류 발생
         Scrap existingScrap = scrapMapper.getScrapByPostAndUser(postId, userId);
         if (existingScrap != null) {
-            throw new CustomException(ErrorCode.SCRAP_ALREADY_EXISTS, "이미 스크랩된 게시글입니다.");
+            throw new CustomException(ErrorCode.SCRAP_ALREADY_EXISTS);
         }
 
         Scrap scrap = new Scrap();
