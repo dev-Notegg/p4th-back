@@ -22,6 +22,13 @@
         FROM comment c
             JOIN user_info u ON u.user_id = c.user_id
         WHERE post_id = #{postId}
+        <if test="userId != null">
+            AND c.user_id NOT IN (
+                SELECT target_user_id
+                FROM block
+                WHERE user_id = #{userId}
+            )
+        </if>
         ORDER BY created_at DESC
     </select>
 
@@ -59,20 +66,11 @@
         WHERE parent_comment_id = #{commentId}
     </select>
 
-    <!-- 물리 삭제: 자식 댓글이 없는 경우 -->
+    <!-- 삭제 -->
     <delete id="physicalDeleteComment">
         DELETE FROM comment
         WHERE comment_id = #{commentId}
     </delete>
-
-    <!-- 상태 업데이트: 자식 댓글이 있는 경우 -->
-    <update id="deleteComment">
-        UPDATE comment
-        SET status = 'DELETED',
-            status_changed_at = NOW(),
-            updated_by = #{userId}
-        WHERE comment_id = #{commentId}
-    </update>
 
     <select id="getCommentById" resultType="com.p4th.backend.domain.Comment">
         SELECT

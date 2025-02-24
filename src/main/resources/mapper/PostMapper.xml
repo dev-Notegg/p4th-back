@@ -29,13 +29,6 @@
         </association>
     </resultMap>
 
-    <!-- 게시판별 게시글 개수 조회 -->
-    <select id="countPostsByBoard" resultType="int">
-        SELECT COUNT(*)
-        FROM post
-        WHERE board_id = #{boardId}
-    </select>
-
     <!-- 게시글 상세 조회 (작성자 닉네임 포함) -->
     <select id="getPostDetail" resultMap="PostResultMap" parameterType="String">
         SELECT
@@ -61,6 +54,13 @@
                  LEFT JOIN user_info u ON p.user_id = u.user_id
                  LEFT JOIN board b ON p.board_id = b.board_id
                  LEFT JOIN category c ON b.category_id = c.category_id
+        <if test="userId != null">
+            AND p.user_id NOT IN (
+                SELECT target_user_id
+                FROM block
+                WHERE user_id = #{userId}
+            )
+        </if>
         WHERE p.post_id = #{postId}
     </select>
 
@@ -96,20 +96,11 @@
         WHERE post_id = #{postId}
     </update>
 
-    <!-- 물리 삭제: 댓글이 없는 게시글에 대해 실제 삭제 -->
+    <!-- 삭제-->
     <delete id="physicalDeletePost">
         DELETE FROM post
         WHERE post_id = #{postId}
     </delete>
-
-    <!-- 상태 업데이트: 댓글이 있는 게시글은 상태를 DELETED로 업데이트 -->
-    <update id="deletePost">
-        UPDATE post
-        SET status = 'DELETED',
-            status_changed_at = NOW(),
-            updated_by = #{userId}
-        WHERE post_id = #{postId}
-    </update>
 
     <!-- 게시글 상세 조회 시 조회수 1증가 -->
     <update id="incrementViewCount">
@@ -117,29 +108,6 @@
         SET view_count = view_count + 1
         WHERE post_id = #{postId}
     </update>
-
-    <!-- 인기 게시글 조회 -->
-    <select id="getPopularPosts" resultType="com.p4th.backend.dto.response.post.PopularPostResponse">
-        SELECT
-            p.post_id AS postId,
-            p.board_id AS boardId,
-            p.user_id AS userId,
-            u.nickname AS nickname,
-            p.title AS title,
-            p.status AS status,
-            c.category_name AS categoryName,
-            b.board_name AS boardName,
-            p.view_count AS viewCount,
-            p.comment_count AS commentCount,
-            p.created_at AS createdAt
-        FROM post p
-                 LEFT JOIN user_info u ON p.user_id = u.user_id
-                 LEFT JOIN board b ON p.board_id = b.board_id
-                 LEFT JOIN category c ON b.category_id = c.category_id
-        WHERE p.status = 'NORMAL'
-        ORDER BY (p.view_count * 0.4 + p.comment_count * 0.2) DESC
-        LIMIT 20
-    </select>
 
     <!-- 전체 게시글 조회 -->
     <select id="getAllPosts" resultType="com.p4th.backend.domain.Post">
@@ -197,6 +165,13 @@
                  LEFT JOIN board b ON p.board_id = b.board_id
                  LEFT JOIN category c ON b.category_id = c.category_id
         WHERE pv.user_id = #{userId}
+        <if test="userId != null">
+            AND p.user_id NOT IN (
+                SELECT target_user_id
+                FROM block
+                WHERE user_id = #{userId}
+            )
+        </if>
         ORDER BY pv.viewed_at DESC
         LIMIT 15
     </select>

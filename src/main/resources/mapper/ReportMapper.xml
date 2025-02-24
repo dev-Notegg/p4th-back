@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.p4th.backend.mapper.ReportMapper">
+    <insert id="insertReport" parameterType="com.p4th.backend.domain.Report">
+        INSERT INTO report
+        (report_id, reporter_id, target_user_id, target_board_id, target_comment_id, type, status, reason, created_by)
+        VALUES
+            (#{reportId}, #{reporterId}, #{targetUserId}, #{targetBoardId}, #{targetCommentId}, #{type}, 'WAIT', #{reason}, #{reportId})
+    </insert>
+
+    <select id="getReportById" resultType="com.p4th.backend.domain.Report">
+        SELECT report_id, reporter_id, target_user_id, target_board_id, target_comment_id, type, status_changed_at, reason, created_at, created_by
+        FROM report
+        WHERE report_id = #{reportId}
+    </select>
+</mapper>

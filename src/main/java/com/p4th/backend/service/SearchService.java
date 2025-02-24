@@ -2,25 +2,30 @@ package com.p4th.backend.service;
 
 import com.p4th.backend.common.exception.CustomException;
 import com.p4th.backend.common.exception.ErrorCode;
-import com.p4th.backend.domain.PostStatus;
 import com.p4th.backend.dto.response.search.SearchResponse;
 import com.p4th.backend.domain.Post;
+import com.p4th.backend.mapper.BlockMapper;
 import com.p4th.backend.repository.SearchRepository;
 import com.p4th.backend.util.HtmlContentUtils;
 import com.p4th.backend.util.HtmlImageUtils;
 import com.p4th.backend.util.RelativeTimeFormatter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class SearchService {
 
     private final SearchRepository searchRepository;
+    private final BlockMapper blockMapper;
 
-    public Page<SearchResponse.SearchResult> search(String boardId, String query, Pageable pageable) {
+    public Page<SearchResponse.SearchResult> search(String boardId, String userId, String query, Pageable pageable) {
         try {
             Page<Post> posts;
             if (boardId == null || boardId.trim().isEmpty()) {
@@ -33,6 +38,16 @@ public class SearchService {
                         boardId, query,
                         pageable);
             }
+
+            // userId 존재하면, 차단된 작성자의 게시글을 필터링
+            if (userId != null && !userId.trim().isEmpty()) {
+                List<String> blockedUserIds = blockMapper.findBlockedByUserId(userId);
+                List<Post> filteredPosts = posts.getContent().stream()
+                        .filter(post -> !blockedUserIds.contains(post.getUserId()))
+                        .collect(Collectors.toList());
+                posts = new PageImpl<>(filteredPosts, pageable, filteredPosts.size());
+            }
+
             return posts.map(post -> {
                 SearchResponse.SearchResult result = new SearchResponse.SearchResult();
                 result.setPostId(post.getPostId());
@@ -48,10 +63,8 @@ public class SearchService {
                 result.setBoardName(post.getBoard() != null ? post.getBoard().getBoardName() : null);
                 result.setViewCount(post.getViewCount());
                 result.setCommentCount(post.getCommentCount());
-                if (!PostStatus.DELETED.equals(post.getStatus())) { //삭제된 게시글인 경우 이미지 처리하지 않음
-                    result.setImageCount(HtmlImageUtils.countInlineImages(post.getContent()));
-                    result.setImageUrl(HtmlImageUtils.extractFirstImageUrl(post.getContent()));
-                }
+                result.setImageCount(HtmlImageUtils.countInlineImages(post.getContent()));
+                result.setImageUrl(HtmlImageUtils.extractFirstImageUrl(post.getContent()));
                 result.setCreatedAt(post.getCreatedAt() != null ?
                         RelativeTimeFormatter.formatRelativeTime(post.getCreatedAt()) : null);
                 return result;

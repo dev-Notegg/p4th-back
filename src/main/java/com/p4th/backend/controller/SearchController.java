@@ -2,6 +2,7 @@ package com.p4th.backend.controller;
 
 import com.p4th.backend.common.exception.ErrorResponse;
 import com.p4th.backend.dto.response.search.SearchResponse;
+import com.p4th.backend.security.JwtProvider;
 import com.p4th.backend.service.SearchService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -10,6 +11,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
@@ -26,6 +28,7 @@ import org.springframework.web.bind.annotation.*;
 public class SearchController {
 
     private final SearchService searchService;
+    private final JwtProvider jwtProvider;
 
     @Operation(
             summary = "검색",
@@ -44,9 +47,11 @@ public class SearchController {
             @RequestParam(value = "boardId", required = false) String boardId,
             @Parameter(name = "query", description = "검색어", required = true)
             @RequestParam("query") String query,
+            HttpServletRequest request,
             @ParameterObject @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+        String userId = jwtProvider.resolveUserId(request);
         Page<SearchResponse.SearchResult> response;
-        response = searchService.search(boardId, query, pageable);
+        response = searchService.search(boardId, userId, query, pageable);
         return ResponseEntity.ok(response);
     }
 }

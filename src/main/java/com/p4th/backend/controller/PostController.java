@@ -43,9 +43,11 @@ public class PostController {
     public ResponseEntity<Page<PostListResponse>> getPostsByBoard(
             @Parameter(name = "board_id", description = "게시판 ID", required = true)
             @RequestParam("board_id") String boardId,
+            HttpServletRequest httpRequest,
             @ParameterObject
             @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
-        Page<PostListResponse> posts = postService.getPostsByBoard(boardId, pageable);
+        String userId = jwtProvider.resolveUserId(httpRequest);
+        Page<PostListResponse> posts = postService.getPostsByBoard(boardId, userId, pageable);
         return ResponseEntity.ok().body(posts);
     }
 

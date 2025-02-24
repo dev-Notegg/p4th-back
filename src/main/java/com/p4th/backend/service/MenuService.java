@@ -69,7 +69,7 @@ public class MenuService {
             List<UserCommentPostResponse> responses = grouped.entrySet().stream()
                     .map(entry -> {
                         String postId = entry.getKey();
-                        Post post = postMapper.getPostDetail(postId);
+                        Post post = postMapper.getPostDetail(postId, userId);
                         if (post == null) {
                             return null;
                         }

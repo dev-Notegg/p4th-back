@@ -60,7 +60,7 @@ public class ScrapService {
     @Transactional
     public String createScrap(String postId, String scrapFolderId, String userId) {
         // 게시글 존재 여부 체크
-        Post post = postMapper.getPostDetail(postId);
+        Post post = postMapper.getPostDetail(postId, userId);
         if (post == null) {
             throw new CustomException(ErrorCode.POST_NOT_FOUND);
         }

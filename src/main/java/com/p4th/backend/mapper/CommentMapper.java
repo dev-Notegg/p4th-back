@@ -7,13 +7,9 @@ import java.util.List;
 
 @Mapper
 public interface CommentMapper {
-    List<Comment> getCommentsByPost(@Param("postId") String postId);
-
+    List<Comment> getCommentsByPost(@Param("postId") String postId, @Param("userId") String userId);
     int insertComment(Comment comment);
-
     int updateComment(@Param("commentId") String commentId, @Param("content") String content, @Param("userId") String userId);
-    //상태값 업데이트
-    int deleteComment(@Param("commentId") String commentId, @Param("userId") String userId);
     //실제 데이터 삭제
     int physicalDeleteComment(@Param("commentId") String commentId);
     // 자식 댓글 개수 조회

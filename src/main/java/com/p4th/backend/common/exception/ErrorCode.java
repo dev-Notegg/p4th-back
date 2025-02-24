@@ -19,11 +19,9 @@ public enum ErrorCode {
 
     //게시글 관련
     POST_NOT_FOUND(HttpStatus.NOT_FOUND, 40400, "게시글을 찾을 수 없습니다."),
-    POST_ALREADY_DELETED(HttpStatus.BAD_REQUEST, 40401, "이미 삭제된 게시글입니다."),
         
     //댓글 관련
     COMMENT_NOT_FOUND(HttpStatus.NOT_FOUND, 40500, "댓글을 찾을 수 없습니다."),
-    COMMENT_ALREADY_DELETED(HttpStatus.BAD_REQUEST, 40501, "이미 삭제된 댓글입니다."),
 
     //스크랩 관련
     SCRAP_FOLDER_NOT_FOUND(HttpStatus.NOT_FOUND, 40600, "해당 스크랩 폴더가 존재하지 않습니다."),

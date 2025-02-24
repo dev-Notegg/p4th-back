@@ -39,8 +39,10 @@ public class CommentController {
     @GetMapping(value = "/posts/{postId}/comments")
     public ResponseEntity<List<CommentResponse>> getComments(
             @Parameter(name = "postId", description = "게시글 ID", required = true)
-            @PathVariable("postId") String postId) {
-        List<CommentResponse> comments = commentService.getCommentsByPost(postId);
+            @PathVariable("postId") String postId,
+            HttpServletRequest httpRequest) {
+        String userId = jwtProvider.resolveUserId(httpRequest);
+        List<CommentResponse> comments = commentService.getCommentsByPost(postId, userId);
         return ResponseEntity.ok(comments);
     }
 

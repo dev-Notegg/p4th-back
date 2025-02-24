@@ -3,7 +3,6 @@ package com.p4th.backend.service;
 import com.p4th.backend.common.exception.CustomException;
 import com.p4th.backend.common.exception.ErrorCode;
 import com.p4th.backend.domain.Banner;
-import com.p4th.backend.domain.PostStatus;
 import com.p4th.backend.dto.response.board.PopularBoardResponse;
 import com.p4th.backend.dto.response.post.PopularPostResponse;
 import com.p4th.backend.dto.response.post.PostListResponse;
@@ -57,11 +56,12 @@ public class MainService {
         }
     }
 
-    public List<PopularPostResponse> getPopularPosts(String period) {
+    public List<PopularPostResponse> getPopularPosts(String period, String userId) {
         try {
             // 현재 날짜 기준으로 조회 기간 계산 (전날, 전주, 전달)
             LocalDate today = LocalDate.now();
             Map<String, Object> params = new HashMap<>();
+            params.put("userId", userId);
             params.put("period", period);
 
             if ("DAILY".equalsIgnoreCase(period)) {
@@ -98,14 +98,11 @@ public class MainService {
      * 각 PopularPostResponse 객체에 대해 공통 처리 로직
      */
     private void processPopularPostResponse(PopularPostResponse response) {
-        // 이미지 처리 (삭제된 게시글이 아닌 경우에만)
-        if (response.getContent() != null && !response.getContent().isEmpty() &&
-                !PostStatus.DELETED.equals(response.getStatus())) {
-            String imgUrl = PostListResponse.extractFirstImageUrl(response.getContent());
-            int imgCount = PostListResponse.countInlineImages(response.getContent());
-            response.setImageUrl(imgUrl);
-            response.setImageCount(imgCount);
-        }
+        // 이미지 처리
+        String imgUrl = PostListResponse.extractFirstImageUrl(response.getContent());
+        int imgCount = PostListResponse.countInlineImages(response.getContent());
+        response.setImageUrl(imgUrl);
+        response.setImageCount(imgCount);
         // HTML 태그 제거 후 순수 텍스트 추출 (최대 50자)
         if (response.getContent() != null && !response.getContent().isEmpty()) {
             String plainText = HtmlContentUtils.extractPlainText(response.getContent(), 50);

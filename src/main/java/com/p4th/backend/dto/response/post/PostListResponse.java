@@ -63,10 +63,9 @@ public class PostListResponse {
         String unescapedContent = StringEscapeUtils.unescapeHtml4(post.getContent());
 
         // HTML 내 이미지 태그 처리
-        if (!PostStatus.DELETED.equals(post.getStatus())) {
-            dto.imageCount = countInlineImages(unescapedContent);
-            dto.imageUrl = extractFirstImageUrl(unescapedContent);
-        }
+        dto.imageCount = countInlineImages(unescapedContent);
+        dto.imageUrl = extractFirstImageUrl(unescapedContent);
+
         if (post.getCreatedAt() != null) {
             dto.createdAt = RelativeTimeFormatter.formatRelativeTime(post.getCreatedAt());
         }

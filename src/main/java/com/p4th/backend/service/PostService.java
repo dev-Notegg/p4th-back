@@ -27,9 +27,15 @@ public class PostService {
     private final S3Service s3Service;
 
     @Transactional(readOnly = true)
-    public Page<PostListResponse> getPostsByBoard(String boardId, Pageable pageable) {
+    public Page<PostListResponse> getPostsByBoard(String boardId, String userId, Pageable pageable) {
         try {
-            Page<Post> posts = postRepository.findByBoardId(boardId, pageable);
+            // userId가 제공되면 차단 조건 적용, 없으면 기존 메서드 호출
+            Page<Post> posts;
+            if (userId == null || userId.trim().isEmpty()) {
+                posts = postRepository.findByBoardId(boardId, pageable);
+            } else {
+                posts = postRepository.findByBoardIdExcludingBlocked(boardId, userId, pageable);
+            }
             return posts.map(PostListResponse::from);
         } catch (CustomException ce) {
             throw ce;
@@ -47,14 +53,11 @@ public class PostService {
             if (userId != null && !userId.trim().isEmpty()) {
                 postMapper.insertPostView(userId, postId);
             }
-            Post post = postMapper.getPostDetail(postId);
+            Post post = postMapper.getPostDetail(postId, userId);
             if (post == null) {
                 throw new CustomException(ErrorCode.POST_NOT_FOUND);
             }
-            post.setComments(commentMapper.getCommentsByPost(postId));
-            if (PostStatus.DELETED.equals(post.getStatus())) {
-                post.setContent("삭제된 게시글입니다");
-            }
+            post.setComments(commentMapper.getCommentsByPost(postId, userId));
             return post;
         } catch (CustomException ce) {
             throw ce;
@@ -108,12 +111,9 @@ public class PostService {
     @Transactional
     public void updatePost(String postId, String userId, String title, String content) {
         try {
-            Post existing = postMapper.getPostDetail(postId);
+            Post existing = postMapper.getPostDetail(postId, userId);
             if (existing == null) {
                 throw new CustomException(ErrorCode.POST_NOT_FOUND);
-            }
-            if (PostStatus.DELETED.equals(existing.getStatus())) {
-                throw new CustomException(ErrorCode.POST_ALREADY_DELETED);
             }
             if (!existing.getUserId().equals(userId)) {
                 throw new CustomException(ErrorCode.UNAUTHORIZED_ACCESS, "본인이 작성한 게시글만 수정할 수 있습니다.");
@@ -138,28 +138,17 @@ public class PostService {
     @Transactional
     public void deletePost(String postId, String userId) {
         try {
-            Post existing = postMapper.getPostDetail(postId);
+            Post existing = postMapper.getPostDetail(postId, userId);
             if (existing == null) {
                 throw new CustomException(ErrorCode.POST_NOT_FOUND);
-            }
-            // 이미 삭제 상태인 경우 에러 발생
-            if (PostStatus.DELETED.equals(existing.getStatus())) {
-                throw new CustomException(ErrorCode.POST_ALREADY_DELETED);
             }
             User requester = authMapper.selectByUserId(userId);
             if (!existing.getUserId().equals(userId) && (requester == null || requester.getAdminRole() != 1)) {
                 throw new CustomException(ErrorCode.UNAUTHORIZED_ACCESS, "본인이 작성한 게시글만 삭제할 수 있습니다.");
             }
-            if (existing.getCommentCount() == 0) {
-                int deleted = postMapper.physicalDeletePost(postId);
-                if (deleted != 1) {
-                    throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR, "게시글 삭제 실패");
-                }
-            } else {
-                int updated = postMapper.deletePost(postId, userId); // 상태를 DELETED로 업데이트
-                if (updated != 1) {
-                    throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR, "게시글 삭제 실패");
-                }
+            int deleted = postMapper.physicalDeletePost(postId);
+            if (deleted != 1) {
+                throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR, "게시글 삭제 실패");
             }
         } catch (CustomException ce) {
             throw ce;

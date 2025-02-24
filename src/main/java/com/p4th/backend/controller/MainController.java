@@ -3,6 +3,7 @@ package com.p4th.backend.controller;
 import com.p4th.backend.domain.Banner;
 import com.p4th.backend.dto.response.board.PopularBoardResponse;
 import com.p4th.backend.dto.response.post.PopularPostResponse;
+import com.p4th.backend.security.JwtProvider;
 import com.p4th.backend.service.MainService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -11,6 +12,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,6 +25,7 @@ import java.util.List;
 public class MainController {
 
     private final MainService mainService;
+    private final JwtProvider jwtProvider;
 
     @Operation(summary = "배너 목록 조회",
                description = "관리자 페이지에서 등록한 배너 목록을 조회한다." +
@@ -63,8 +66,10 @@ public class MainController {
     @GetMapping("/popular/posts")
     public ResponseEntity<List<?>> getPopularPosts(
             @Parameter(name = "period", description = "조회 기간 (DAILY, WEEKLY, MONTHLY)", example = "DAILY")
-            @RequestParam(value = "period", defaultValue = "DAILY") String period) {
-        List<?> popularPosts = mainService.getPopularPosts(period);
+            @RequestParam(value = "period", defaultValue = "DAILY") String period,
+            HttpServletRequest httpRequest) {
+        String userId = jwtProvider.resolveUserId(httpRequest);
+        List<?> popularPosts = mainService.getPopularPosts(period, userId);
         return ResponseEntity.ok().body(popularPosts);
     }
 }

@@ -54,6 +54,13 @@
         WHERE h.period_type = #{period}
           AND h.period_start_date = #{startDate}
           AND h.period_end_date = #{endDate}
+        <if test="userId != null">
+            AND p.user_id NOT IN (
+                SELECT target_user_id
+                FROM block
+                WHERE user_id = #{userId}
+            )
+        </if>
         ORDER BY h.popularity_score DESC
         LIMIT 20
     </select>

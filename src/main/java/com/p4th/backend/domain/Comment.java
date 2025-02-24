@@ -19,7 +19,7 @@ public class Comment {
     private String userId;
     private String content;
     // 상태를 ENUM으로 관리
-    private CommentStatus status;  // NORMAL, REPORTED, DELETED
+    private CommentStatus status;  // NORMAL, REPORTED
     private LocalDateTime statusChangedAt;
     private String createdBy;
     private LocalDateTime createdAt;
