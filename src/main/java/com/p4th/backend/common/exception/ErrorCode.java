@@ -26,6 +26,7 @@ public enum ErrorCode {
     //스크랩 관련
     SCRAP_FOLDER_NOT_FOUND(HttpStatus.NOT_FOUND, 40600, "해당 스크랩 폴더가 존재하지 않습니다."),
     SCRAP_NOT_FOUND(HttpStatus.NOT_FOUND, 40601, "해당 스크랩이 존재하지 않습니다."),
+    SCRAP_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, 40600, "이미 스크랩된 게시글입니다."),
 
     //공통
     INVALID_INPUT(HttpStatus.BAD_REQUEST, 40001, "유효하지 않은 입력입니다."),

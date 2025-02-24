@@ -17,4 +17,10 @@
         FROM scrap
         WHERE scrap_id = #{scrapId} AND user_id = #{userId}
     </select>
+
+    <select id="getScrapByPostAndUser" resultType="com.p4th.backend.domain.Scrap" parameterType="map">
+        SELECT *
+        FROM scrap
+        WHERE post_id = #{postId} AND user_id = #{userId}
+    </select>
 </mapper>

@@ -108,9 +108,9 @@ public class MainService {
             String plainText = HtmlContentUtils.extractPlainText(response.getContent(), 50);
             response.setContent(plainText);
         }
-        // 제목 최대 30자 처리
+        // 제목 최대 23자 처리
         if (response.getTitle() != null) {
-            response.setTitle(HtmlContentUtils.extractText(response.getTitle(), 25));
+            response.setTitle(HtmlContentUtils.extractText(response.getTitle(), 23));
         }
         // 생성일시를 상대 시간 형식으로 변환
         if (response.getCreatedAt() != null && !response.getCreatedAt().isEmpty()) {

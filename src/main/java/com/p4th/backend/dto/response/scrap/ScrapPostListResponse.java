@@ -23,7 +23,7 @@ public class ScrapPostListResponse extends PostListResponse {
         response.setBoardId(post.getBoardId());
         response.setUserId(post.getUserId());
         response.setNickname(post.getUser() != null ? post.getUser().getNickname() : "");
-        response.setTitle(HtmlContentUtils.extractText(post.getTitle(), 25));
+        response.setTitle(HtmlContentUtils.extractText(post.getTitle(), 23));
         if (post.getBoard() != null) {
             response.setBoardName(post.getBoard().getBoardName());
             if (post.getBoard().getCategory() != null) {

@@ -71,6 +71,11 @@ public class ScrapService {
                 throw new CustomException(ErrorCode.SCRAP_FOLDER_NOT_FOUND);
             }
         }
+        // 이미 스크랩된 게시글이면 오류 발생
+        Scrap existingScrap = scrapMapper.getScrapByPostAndUser(postId, userId);
+        if (existingScrap != null) {
+            throw new CustomException(ErrorCode.SCRAP_ALREADY_EXISTS, "이미 스크랩된 게시글입니다.");
+        }
 
         Scrap scrap = new Scrap();
         String scrapId = ULIDUtil.getULID();
