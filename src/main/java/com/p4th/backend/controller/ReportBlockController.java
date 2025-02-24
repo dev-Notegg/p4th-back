@@ -18,7 +18,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,50 +31,27 @@ public class ReportBlockController {
     private final ReportService reportService;
     private final BlockService blockService;
 
-    @Operation(summary = "게시글 신고", description = "게시글 신고 API")
+    @Operation(
+            summary = "신고",
+            description = "게시글 또는 댓글을 신고한다. 요청 본문에 신고 대상 타입, 신고 대상 ID, 신고 사유를 입력한다."
+    )
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "게시글 신고 성공",
-                content = @Content(schema = @Schema(implementation = ReportResponse.class))),
-        @ApiResponse(responseCode = "403", description = "로그인 후 이용가능한 메뉴",
-                content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-        @ApiResponse(responseCode = "500", description = "게시글 신고 중 내부 서버 오류",
-                content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+            @ApiResponse(responseCode = "200", description = "신고 성공",
+                    content = @Content(schema = @Schema(implementation = ReportResponse.class))),
+            @ApiResponse(responseCode = "403", description = "로그인 후 이용가능한 메뉴",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "500", description = "신고 중 내부 서버 오류",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
-    @PostMapping(value = "/report/{postId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ReportResponse> reportPost(
-            @Parameter(name = "postId", description = "신고할 게시글 ID", required = true)
-            @PathVariable("postId") String postId,
+    @PostMapping(value = "/report")
+    public ResponseEntity<ReportResponse> report(
             @RequestBody ReportRequest reportRequest,
             HttpServletRequest request) {
         String reporterId = jwtProvider.resolveUserId(request);
         if (reporterId == null) {
             throw new CustomException(ErrorCode.LOGIN_REQUIRED);
         }
-        String reportId = reportService.reportPost(postId, reporterId, reportRequest.getReason());
-        ReportResponse response = new ReportResponse(reportId);
-        return ResponseEntity.ok(response);
-    }
-
-    @Operation(summary = "댓글 신고", description = "댓글 신고 API")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "댓글 신고 성공",
-                content = @Content(schema = @Schema(implementation = ReportResponse.class))),
-        @ApiResponse(responseCode = "403", description = "로그인 후 이용가능한 메뉴",
-                content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-        @ApiResponse(responseCode = "500", description = "댓글 신고 중 내부 서버 오류",
-                content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
-    })
-    @PostMapping(value = "/report/comment/{commentId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<ReportResponse> reportComment(
-            @Parameter(name = "commentId", description = "신고할 댓글 ID", required = true)
-            @PathVariable("commentId") String commentId,
-            @RequestBody ReportRequest reportRequest,
-            HttpServletRequest request) {
-        String reporterId = jwtProvider.resolveUserId(request);
-        if (reporterId == null) {
-            throw new CustomException(ErrorCode.LOGIN_REQUIRED);
-        }
-        String reportId = reportService.reportComment(commentId, reporterId, reportRequest.getReason());
+        String reportId = reportService.report(reportRequest.getTargetType(), reportRequest.getTargetId(), reporterId, reportRequest.getReason());
         ReportResponse response = new ReportResponse(reportId);
         return ResponseEntity.ok(response);
     }
@@ -89,7 +65,7 @@ public class ReportBlockController {
         @ApiResponse(responseCode = "500", description = "작성자 차단 중 내부 서버 오류",
                 content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
-    @PostMapping(value = "/block/{targetUserId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/block/{targetUserId}")
     public ResponseEntity<BlockResponse> blockUser(
             @Parameter(name = "targetUserId", description = "차단할 사용자 ID", required = true)
             @PathVariable("targetUserId") String targetUserId,

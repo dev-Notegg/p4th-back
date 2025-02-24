@@ -16,35 +16,29 @@ public class ReportService {
     private final ReportMapper reportMapper;
 
     @Transactional
-    public String reportPost(String postId, String reporterId, String reason) {
+    public String report(String targetType, String targetId, String reporterId, String reason) {
         Report report = new Report();
         report.setReportId(ULIDUtil.getULID());
         report.setReporterId(reporterId);
-        report.setTargetBoardId(postId);
-        report.setTargetUserId(null);
-        report.setTargetCommentId(null);
-        report.setType(ReportType.POST);
-        report.setReason(reason);
-        int inserted = reportMapper.insertReport(report);
-        if (inserted != 1) {
-            throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR, "게시글 신고 실패");
-        }
-        return report.getReportId();
-    }
 
-    @Transactional
-    public String reportComment(String commentId, String reporterId, String reason) {
-        Report report = new Report();
-        report.setReportId(ULIDUtil.getULID());
-        report.setReporterId(reporterId);
-        report.setTargetCommentId(commentId);
-        report.setTargetBoardId(null);
-        report.setTargetUserId(null);
-        report.setType(ReportType.COMMENT);
+        if ("POST".equalsIgnoreCase(targetType)) {
+            report.setTargetBoardId(targetId);
+            report.setType(ReportType.POST);
+            report.setTargetCommentId(null);
+            report.setTargetUserId(null);
+        } else if ("COMMENT".equalsIgnoreCase(targetType)) {
+            report.setTargetCommentId(targetId);
+            report.setType(ReportType.COMMENT);
+            report.setTargetBoardId(null);
+            report.setTargetUserId(null);
+        } else {
+            throw new CustomException(ErrorCode.INVALID_INPUT, "유효하지 않은 신고 대상 타입입니다.");
+        }
+
         report.setReason(reason);
         int inserted = reportMapper.insertReport(report);
         if (inserted != 1) {
-            throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR, "댓글 신고 실패");
+            throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR, "신고 실패");
         }
         return report.getReportId();
     }
