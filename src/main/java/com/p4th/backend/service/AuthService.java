@@ -8,6 +8,7 @@ import com.p4th.backend.mapper.AuthMapper;
 import com.p4th.backend.security.JwtProvider;
 import com.p4th.backend.util.PassCodeUtil;
 import com.p4th.backend.util.PasswordUtil;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -60,7 +61,8 @@ public class AuthService {
     }
 
     // 로그인: 회원ID와 비밀번호 확인
-    public LoginResult login(String userId, String rawPassword, String clientIp) {
+    public LoginResult login(String userId, String rawPassword, HttpServletRequest request) {
+        String clientIp = extractClientIp(request);
         User user = authMapper.selectByUserId(userId);
         if (user == null) {
             throw new CustomException(ErrorCode.USER_NOT_FOUND);
@@ -218,5 +220,19 @@ public class AuthService {
             this.refreshToken = refreshToken;
             this.user = user;
         }
+    }
+
+    private String extractClientIp(HttpServletRequest request) {
+        String ip = request.getHeader("X-Forwarded-For");
+        if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getHeader("X-Real-IP");
+        }
+        if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getRemoteAddr();
+        } else {
+            // X-Forwarded-For can contain multiple IPs, take the first one.
+            ip = ip.split(",")[0].trim();
+        }
+        return ip;
     }
 }
