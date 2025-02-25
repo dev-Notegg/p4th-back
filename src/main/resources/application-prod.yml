@@ -77,3 +77,7 @@ logging:
 p4th:
   jwt:
     secret: "p4th_Secret_Key_20250203_p4th_Secret_Key_20250203"
+
+server:
+  tomcat:
+    max-http-form-post-size: 104857600
