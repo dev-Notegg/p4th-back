@@ -17,6 +17,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Arrays;
+
 @Service
 @RequiredArgsConstructor
 public class PostService {
@@ -42,7 +44,7 @@ public class PostService {
         } catch (CustomException ce) {
             throw ce;
         } catch (Exception e) {
-            throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR, "게시글 목록 조회 중 오류: " + e.getMessage());
+            throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR, "게시글 목록 조회 중 오류: " + Arrays.toString(e.getStackTrace()));
         }
     }
 
@@ -76,7 +78,7 @@ public class PostService {
         } catch (CustomException ce) {
             throw ce;
         } catch (Exception e) {
-            throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR, "게시글 상세 조회 중 오류: " + e.getMessage());
+            throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR, "게시글 상세 조회 중 오류: " + Arrays.toString(e.getStackTrace()));
         }
     }
 
@@ -117,7 +119,7 @@ public class PostService {
         } catch (CustomException ce) {
             throw ce;
         } catch (Exception e) {
-            throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR, "게시글 등록 중 오류: " + e.getMessage());
+            throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR, "게시글 등록 중 오류: " + Arrays.toString(e.getStackTrace()));
         }
     }
 
@@ -145,7 +147,7 @@ public class PostService {
         } catch (CustomException ce) {
             throw ce;
         } catch (Exception e) {
-            throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR, "게시글 수정 중 오류: " + e.getMessage());
+            throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR, "게시글 수정 중 오류: " + Arrays.toString(e.getStackTrace()));
         }
     }
 

@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.Arrays;
 
 @Service
 @RequiredArgsConstructor
@@ -34,7 +35,7 @@ public class AuthService {
         try {
             authMapper.insertUser(user);
         } catch (Exception e) {
-            throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR, "회원가입 중 오류 발생: " + e.getMessage());
+            throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR, "회원가입 중 오류 발생: " + Arrays.toString(e.getStackTrace()));
         }
 
         return new SignUpResult(userId, passCode);
@@ -193,7 +194,7 @@ public class AuthService {
         } catch (CustomException ce) {
             throw ce;
         } catch (Exception e) {
-            throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR, "내 계정 조회 중 오류: " + e.getMessage());
+            throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR, "내 계정 조회 중 오류: " + Arrays.toString(e.getStackTrace()));
         }
     }
 

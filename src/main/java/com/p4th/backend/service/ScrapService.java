@@ -17,6 +17,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Arrays;
+
 @Service
 @RequiredArgsConstructor
 public class ScrapService {
@@ -39,7 +41,7 @@ public class ScrapService {
                     ScrapPostListResponse.from(scrap.getPost(), scrap.getScrapId(), scrap.getScrapFolderId())
             );
         } catch (Exception e) {
-            throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR, "스크랩 게시글 목록 조회 중 오류: " + e.getMessage());
+            throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR, "스크랩 게시글 목록 조회 중 오류: " + Arrays.toString(e.getStackTrace()));
         }
     }
 

@@ -17,6 +17,8 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -40,7 +42,7 @@ public class MenuService {
         } catch (CustomException ce) {
             throw ce;
         } catch (Exception e) {
-            throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR, "최근 본 게시물 조회 중 오류: " + e.getMessage());
+            throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR, "최근 본 게시물 조회 중 오류: " + Arrays.toString(e.getStackTrace()));
         }
     }
 
@@ -55,7 +57,7 @@ public class MenuService {
         } catch (CustomException ce) {
             throw ce;
         } catch (Exception e) {
-            throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR, "내가 작성한 글 조회 중 오류: " + e.getMessage());
+            throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR, "내가 작성한 글 조회 중 오류: " + Arrays.toString(e.getStackTrace()));
         }
     }
 
@@ -90,7 +92,7 @@ public class MenuService {
         } catch (CustomException ce) {
             throw ce;
         } catch (Exception e) {
-            throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR, "내가 쓴 댓글 조회 중 오류: " + e.getMessage());
+            throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR, "내가 쓴 댓글 조회 중 오류: " + Arrays.toString(e.getStackTrace()));
         }
     }
 
@@ -100,7 +102,7 @@ public class MenuService {
         } catch (CustomException ce) {
             throw ce;
         } catch (Exception e) {
-            throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR, "전체 카테고리 조회 중 오류: " + e.getMessage());
+            throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR, "전체 카테고리 조회 중 오류: " + Arrays.toString(e.getStackTrace()));
         }
     }
 
