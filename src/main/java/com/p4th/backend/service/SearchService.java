@@ -29,14 +29,9 @@ public class SearchService {
         try {
             Page<Post> posts;
             if (boardId == null || boardId.trim().isEmpty()) {
-                posts = searchRepository.findByTitleContainingIgnoreCaseOrContentContainingIgnoreCaseOrUser_NicknameContainingIgnoreCase(
-                        query, query, query, pageable);
+                posts = searchRepository.searchPosts(query, pageable);
             } else {
-                posts = searchRepository.findByBoard_BoardIdAndTitleContainingIgnoreCaseOrBoard_BoardIdAndContentContainingIgnoreCaseOrBoard_BoardIdAndUser_NicknameContainingIgnoreCase(
-                        boardId, query,
-                        boardId, query,
-                        boardId, query,
-                        pageable);
+                posts = searchRepository.searchPostsByBoard(boardId, query, pageable);
             }
 
             // userId 존재하면, 차단된 작성자의 게시글을 필터링
