@@ -98,7 +98,7 @@ public class AuthController {
             @Parameter(name = "LoginRequest", description = "로그인 요청 DTO (userId, password)", required = true)
             @RequestBody LoginRequest request,
             HttpServletRequest httpRequest) {
-        LoginResult result = authService.login(request.getUserId(), request.getPassword(), httpRequest.getRemoteAddr());
+        LoginResult result = authService.login(request.getUserId(), request.getPassword(), httpRequest);
         LoginResponse response = new LoginResponse(result.getAccessToken(), result.getRefreshToken(), new UserResponse(result.getUser()));
         return ResponseEntity.ok().body(response);
     }
