@@ -57,6 +57,9 @@ public class PostDetailResponse {
     @Schema(description = "게시글이 스크랩 되었는지 여부", example = "true")
     private boolean scrapped;
 
+    @Schema(description = "스크랩 ID (해당 게시글이 스크랩된 경우)", example = "01JKQ90E6N6FP7YRWCVVC52KW0")
+    private String scrapId;
+
     public static PostDetailResponse from(Post post) {
         PostDetailResponse dto = new PostDetailResponse();
         dto.setPostId(post.getPostId());
@@ -85,6 +88,7 @@ public class PostDetailResponse {
                     .collect(Collectors.toList()));
         }
         dto.scrapped = post.isScrapped();
+        dto.scrapId = post.getScrapId();
         return dto;
     }
 }

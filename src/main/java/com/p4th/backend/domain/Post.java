@@ -34,6 +34,8 @@ public class Post {
     private LocalDateTime updatedAt;
     @Transient
     private boolean scrapped;
+    @Transient
+    private String scrapId;
 
     @OneToMany(mappedBy = "post", fetch = FetchType.LAZY)
     private List<Comment> comments;

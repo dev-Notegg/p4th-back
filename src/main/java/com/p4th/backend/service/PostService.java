@@ -64,7 +64,13 @@ public class PostService {
             // 스크랩 여부 체크: 로그인한 사용자인 경우만 처리
             if (userId != null && !userId.trim().isEmpty()) {
                 Scrap scrap = scrapMapper.getScrapByPostAndUser(postId, userId);
-                post.setScrapped(scrap != null);
+                if (scrap != null) {
+                    post.setScrapped(true);
+                    post.setScrapId(scrap.getScrapId());
+                } else {
+                    post.setScrapped(false);
+                    post.setScrapId(null);
+                }
             }
             return post;
         } catch (CustomException ce) {
