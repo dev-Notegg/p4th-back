@@ -2,6 +2,7 @@ package com.p4th.backend.service;
 
 import com.p4th.backend.domain.Post;
 import com.p4th.backend.domain.PostStatus;
+import com.p4th.backend.domain.Scrap;
 import com.p4th.backend.domain.User;
 import com.p4th.backend.dto.response.post.PostListResponse;
 import com.p4th.backend.mapper.*;
@@ -25,6 +26,7 @@ public class PostService {
     private final AuthMapper authMapper;
     private final PostRepository postRepository;
     private final S3Service s3Service;
+    private final ScrapMapper scrapMapper;
 
     @Transactional(readOnly = true)
     public Page<PostListResponse> getPostsByBoard(String boardId, String userId, Pageable pageable) {
@@ -58,6 +60,12 @@ public class PostService {
                 throw new CustomException(ErrorCode.POST_NOT_FOUND);
             }
             post.setComments(commentMapper.getCommentsByPost(postId, userId));
+
+            // 스크랩 여부 체크: 로그인한 사용자인 경우만 처리
+            if (userId != null && !userId.trim().isEmpty()) {
+                Scrap scrap = scrapMapper.getScrapByPostAndUser(postId, userId);
+                post.setScrapped(scrap != null);
+            }
             return post;
         } catch (CustomException ce) {
             throw ce;

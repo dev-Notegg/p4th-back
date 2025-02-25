@@ -54,6 +54,9 @@ public class PostDetailResponse {
     @Schema(description = "댓글 목록")
     private List<CommentResponse> comments;
 
+    @Schema(description = "게시글이 스크랩 되었는지 여부", example = "true")
+    private boolean scrapped;
+
     public static PostDetailResponse from(Post post) {
         PostDetailResponse dto = new PostDetailResponse();
         dto.setPostId(post.getPostId());
@@ -81,6 +84,7 @@ public class PostDetailResponse {
                     .map(CommentResponse::from)
                     .collect(Collectors.toList()));
         }
+        dto.scrapped = post.isScrapped();
         return dto;
     }
 }
