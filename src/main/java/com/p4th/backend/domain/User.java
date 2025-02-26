@@ -28,7 +28,6 @@ public class User {
     private LocalDateTime accountStatusChangedAt;
     private LocalDateTime lastLoginAt;
     private String lastLoginIp;
-    private String accessToken;
     private String refreshToken;
     private String createdBy;
     private LocalDateTime createdAt;

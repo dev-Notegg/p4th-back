@@ -72,7 +72,6 @@ public class AuthService {
         }
         String accessToken = jwtProvider.generateAccessToken(user);
         String refreshToken = jwtProvider.generateRefreshToken(user);
-        user.setAccessToken(accessToken);
         user.setRefreshToken(refreshToken);
         authMapper.updateTokens(user);
         user.setLastLoginIp(clientIp);
@@ -116,15 +115,12 @@ public class AuthService {
             // 리프레쉬 토큰 만료: 새 리프레쉬 토큰과 엑세스 토큰 발급
             String newRefreshToken = jwtProvider.generateRefreshToken(user);
             String newAccessToken = jwtProvider.generateAccessToken(user);
-            user.setAccessToken(newAccessToken);
             user.setRefreshToken(newRefreshToken);
             authMapper.updateTokens(user);
             return new LoginResult(newAccessToken, newRefreshToken, user);
         } else {
             // 유효한 리프레쉬 토큰: 새 엑세스 토큰 발급
             String newAccessToken = jwtProvider.generateAccessToken(user);
-            user.setAccessToken(newAccessToken);
-            authMapper.updateTokens(user);
             return new LoginResult(newAccessToken, refreshToken, user);
         }
     }

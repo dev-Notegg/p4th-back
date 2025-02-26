@@ -39,7 +39,6 @@
             account_status AS accountStatus,
             account_status_changed_at AS accountStatusChangedAt,
             last_login_ip AS lastLoginIp,
-            access_token AS accessToken,
             refresh_token AS refreshToken,
             created_by AS createdBy,
             created_at AS createdAt,
@@ -61,7 +60,6 @@
     <update id="updateTokens">
         UPDATE user_info
         SET
-            access_token = #{accessToken},
             refresh_token = #{refreshToken},
             updated_by = 'SYSTEM'
         WHERE user_id = #{userId}
