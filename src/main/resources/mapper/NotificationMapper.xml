@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.p4th.backend.mapper.NotificationMapper">
+
+    <resultMap id="notificationResultMap" type="com.p4th.backend.domain.Notification">
+        <id property="notificationId" column="notification_id"/>
+        <result property="userId" column="user_id"/>
+        <result property="postId" column="post_id"/>
+        <result property="commentId" column="comment_id"/>
+        <result property="type" column="type"/>
+        <result property="readYn" column="read_yn"/>
+        <result property="readAt" column="read_at"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="createdBy" column="created_by"/>
+    </resultMap>
+
+    <select id="getNotificationsByUserId" resultMap="notificationResultMap" parameterType="string">
+        SELECT
+            notification_id,
+            user_id,
+            post_id,
+            comment_id,
+            type,
+            read_yn,
+            read_at,
+            created_at,
+            created_by
+        FROM notification
+        WHERE user_id = #{userId}
+        ORDER BY created_at DESC
+    </select>
+
+    <update id="updateNotificationRead" parameterType="map">
+        UPDATE notification
+        SET read_yn = 'Y',
+            read_at = NOW()
+        WHERE notification_id = #{notificationId}
+    </update>
+
+    <select id="countUnreadNotifications" resultType="int" parameterType="string">
+        SELECT COUNT(*)
+        FROM notification
+        WHERE user_id = #{userId} AND read_yn = 0
+    </select>
+
+    <insert id="insertNotification" parameterType="com.p4th.backend.domain.Notification">
+        INSERT INTO notification (
+            notification_id,
+            user_id,
+            post_id,
+            comment_id,
+            type,
+            read_yn,
+            created_by
+        )
+        VALUES (
+                   #{notificationId},
+                   #{userId},
+                   #{postId},
+                   #{commentId},
+                   #{type},
+                   #{readYn},
+                   #{createdBy}
+               )
+    </insert>
+</mapper>

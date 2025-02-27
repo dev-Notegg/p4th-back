@@ -4,6 +4,8 @@ import com.p4th.backend.domain.User;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.List;
+
 @Mapper
 public interface AuthMapper {
     void insertUser(User user);
@@ -15,4 +17,5 @@ public interface AuthMapper {
     User selectByNickname(@Param("nickname") String nickname);
     void updateUserNickname(User user);
     void deleteUser(@Param("userId") String userId);
+    List<String> selectAllUserIds();
 }

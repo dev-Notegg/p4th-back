@@ -108,4 +108,8 @@
         DELETE FROM user_info
         WHERE user_id = #{userId}
     </delete>
+
+    <select id="selectAllUserIds" resultType="java.lang.String">
+        SELECT user_id FROM user_info
+    </select>
 </mapper>

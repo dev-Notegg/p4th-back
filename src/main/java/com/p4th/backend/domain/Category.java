@@ -30,4 +30,8 @@ public class Category {
     @JsonIgnore
     @OneToMany(mappedBy = "category", fetch = FetchType.LAZY)
     private List<Board> boards;
+
+    public boolean isNotice() {
+        return this.isNotice == 1;
+    }
 }

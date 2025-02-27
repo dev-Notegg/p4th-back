@@ -25,6 +25,7 @@ public class CommentService {
     private final CommentMapper commentMapper;
     private final AuthMapper authMapper;
     private final PostMapper postMapper;
+    private final NotificationService notificationService;
 
     @Transactional(readOnly = true)
     public List<CommentResponse> getCommentsByPost(String postId, String userId) {
@@ -59,6 +60,21 @@ public class CommentService {
         }
         // 댓글 생성 후 해당 게시글의 comment_count 증가
         postMapper.incrementCommentCount(postId);
+
+        // 알림 생성 로직
+        // 1. 대댓글인 경우: 부모 댓글 작성자에게 알림 생성 (자신이 작성한 댓글은 제외)
+        if (request.getParentCommentId() != null && !request.getParentCommentId().trim().isEmpty()) {
+            Comment parentComment = commentMapper.getCommentById(request.getParentCommentId());
+            if (parentComment != null && !userId.equals(parentComment.getUserId())) {
+                notificationService.notifyReplyOnMyComment(request.getParentCommentId(), commentId, userId);
+            }
+        } else {
+            // 2. 일반 댓글인 경우: 게시글 작성자에게 알림 생성 (자신이 작성한 댓글은 제외)
+            if (!userId.equals(post.getUserId())) {
+                notificationService.notifyCommentOnMyPost(postId, userId, commentId);
+            }
+        }
+
         return commentId;
     }
 

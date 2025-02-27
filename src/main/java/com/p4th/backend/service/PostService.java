@@ -29,6 +29,7 @@ public class PostService {
     private final PostRepository postRepository;
     private final S3Service s3Service;
     private final ScrapMapper scrapMapper;
+    private final NotificationService notificationService;
 
     @Transactional(readOnly = true)
     public Page<PostListResponse> getPostsByBoard(String boardId, String userId, Pageable pageable) {
@@ -115,6 +116,12 @@ public class PostService {
             if (inserted != 1) {
                 throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR, "게시글 등록 실패");
             }
+
+            // 만약 해당 게시판이 공지 게시판이면 공지 알림 생성
+            if (post.getBoard() != null && post.getBoard().getCategory().isNotice()) {
+                notificationService.notifyNoticePost(postId, userId);
+            }
+
             return postId;
         } catch (CustomException ce) {
             throw ce;
