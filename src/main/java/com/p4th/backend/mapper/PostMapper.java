@@ -1,5 +1,6 @@
 package com.p4th.backend.mapper;
 
+import com.p4th.backend.domain.Board;
 import com.p4th.backend.domain.Post;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -27,4 +28,6 @@ public interface PostMapper {
     List<Post> findRecentPostsByUserId(@Param("userId") String userId);
 
     int insertPostView(@Param("userId") String userId, @Param("postId") String postId);
+
+    Board getBoardWithCategory(@Param("boardId") String boardId);
 }

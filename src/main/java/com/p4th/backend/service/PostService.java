@@ -1,9 +1,6 @@
 package com.p4th.backend.service;
 
-import com.p4th.backend.domain.Post;
-import com.p4th.backend.domain.PostStatus;
-import com.p4th.backend.domain.Scrap;
-import com.p4th.backend.domain.User;
+import com.p4th.backend.domain.*;
 import com.p4th.backend.dto.response.post.PostListResponse;
 import com.p4th.backend.mapper.*;
 import com.p4th.backend.common.exception.CustomException;
@@ -118,7 +115,8 @@ public class PostService {
             }
 
             // 만약 해당 게시판이 공지 게시판이면 공지 알림 생성
-            if (post.getBoard() != null && post.getBoard().getCategory().isNotice()) {
+            Board board = postMapper.getBoardWithCategory(boardId);
+            if (board != null && board.getCategory() != null && board.getCategory().isNotice()) {
                 notificationService.notifyNoticePost(postId, userId);
             }
 
