@@ -30,4 +30,6 @@ public interface PostMapper {
     int insertPostView(@Param("userId") String userId, @Param("postId") String postId);
 
     Board getBoardWithCategory(@Param("boardId") String boardId);
+
+    int updateCommentCount(@Param("postId") String postId, @Param("count") int count);
 }

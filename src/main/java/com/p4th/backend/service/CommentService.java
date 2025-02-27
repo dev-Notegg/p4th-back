@@ -109,8 +109,9 @@ public class CommentService {
         if (deleted != 1) {
             throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR, "댓글 삭제 실패");
         }
-        // 댓글 삭제 후 해당 게시글의 comment_count 감소
-        postMapper.decrementCommentCount(comment.getPostId());
+        // 댓글 삭제 후, 해당 게시글의 댓글 수를 재계산하여 업데이트
+        int remainingCount = commentMapper.countCommentsByPost(comment.getPostId());
+        postMapper.updateCommentCount(comment.getPostId(), remainingCount);
         return true;
     }
 }

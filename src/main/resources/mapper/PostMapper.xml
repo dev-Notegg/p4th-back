@@ -221,4 +221,9 @@
         WHERE b.board_id = #{boardId}
     </select>
 
+    <update id="updateCommentCount" parameterType="map">
+        UPDATE post
+        SET comment_count = #{count}
+        WHERE post_id = #{postId}
+    </update>
 </mapper>

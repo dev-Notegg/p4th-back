@@ -15,4 +15,5 @@ public interface CommentMapper {
     // 자식 댓글 개수 조회
     int countChildComments(@Param("commentId") String commentId);
     Comment getCommentById(@Param("commentId") String commentId);
+    int countCommentsByPost(@Param("postId") String postId);
 }

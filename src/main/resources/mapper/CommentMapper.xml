@@ -88,4 +88,7 @@
         WHERE comment_id = #{commentId}
     </select>
 
+    <select id="countCommentsByPost" resultType="int" parameterType="String">
+        SELECT COUNT(*) FROM comment WHERE post_id = #{postId}
+    </select>
 </mapper>
