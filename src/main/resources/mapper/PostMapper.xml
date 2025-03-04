@@ -227,14 +227,6 @@
         WHERE post_id = #{postId}
     </update>
 
-    <select id="getLastViewedPostId" resultType="String" parameterType="String">
-        SELECT post_id
-        FROM post_view
-        WHERE user_id = #{userId}
-        ORDER BY viewed_at DESC
-        LIMIT 1
-    </select>
-
     <select id="getDistinctUserIdsFromPostView" resultType="string">
         SELECT DISTINCT user_id
         FROM post_view

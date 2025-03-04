@@ -11,6 +11,9 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import java.time.format.DateTimeFormatter;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.apache.commons.text.StringEscapeUtils;
 
 @Data
@@ -84,12 +87,20 @@ public class PostListResponse {
             return null;
         }
         Document doc = Jsoup.parse(htmlContent);
-        // 여러 <img> 태그가 있을 경우 조건에 맞는 첫 번째 태그의 src 반환
-        Elements imgs = doc.select("img[src]");
-        for (Element img : imgs) {
-            String src = img.attr("src");
+        // img와 iframe 태그 모두 선택
+        Elements elements = doc.select("img[src], iframe[src]");
+        for (Element element : elements) {
+            String src = element.attr("src");
+            // 먼저 일반 이미지 URL 확인
             if (isImageUrl(src)) {
                 return src;
+            }
+            // YouTube URL인 경우 영상 ID를 추출하여 썸네일 URL 반환
+            if (src.toLowerCase().contains("youtube") || src.toLowerCase().contains("youtu.be")) {
+                String videoId = extractYoutubeVideoId(src);
+                if (videoId != null) {
+                    return "https://img.youtube.com/vi/" + videoId + "/hqdefault.jpg";
+                }
             }
         }
         return null;
@@ -135,5 +146,18 @@ public class PostListResponse {
                 !src.toLowerCase().contains("youtu.be") &&
                 !src.toLowerCase().contains("vimeo") &&
                 !src.toLowerCase().contains("dailymotion");
+    }
+
+    /**
+     * YouTube URL에서 영상 ID를 추출한다.
+     */
+    public static String extractYoutubeVideoId(String url) {
+        // 정규표현식을 사용하여 영상 ID 추출
+        Pattern pattern = Pattern.compile("(?<=v=|/embed/|youtu\\.be/)[^&\\n?#]+");
+        Matcher matcher = pattern.matcher(url);
+        if (matcher.find()) {
+            return matcher.group();
+        }
+        return null;
     }
 }

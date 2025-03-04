@@ -25,8 +25,6 @@ public interface PostMapper {
 
     void incrementCommentCount(String postId);
 
-    void decrementCommentCount(String postId);
-
     List<Post> findRecentPostsByUserId(@Param("userId") String userId);
 
     int insertPostView(@Param("userId") String userId, @Param("postId") String postId);
@@ -34,8 +32,6 @@ public interface PostMapper {
     Board getBoardWithCategory(@Param("boardId") String boardId);
 
     int updateCommentCount(@Param("postId") String postId, @Param("count") int count);
-
-    String getLastViewedPostId(@Param("userId") String userId);
 
     List<String> getDistinctUserIdsFromPostView();
 
