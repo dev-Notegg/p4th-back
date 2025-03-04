@@ -54,13 +54,13 @@ public class PostService {
     public Post getPostDetail(String postId, String userId, HttpServletRequest request) {
         try {
             if (userId != null && !userId.trim().isEmpty()) {
-                // 사용자가 로그인한 경우에만 최근 본 게시글 체크
+                // 로그인한 사용자의 경우, 가장 마지막에 조회한 게시글 ID를 조회
                 String lastViewedPostId = postMapper.getLastViewedPostId(userId);
-                // 만약 가장 최근 본 게시글이 현재 게시글과 다른 경우만 증가
                 if (!postId.equals(lastViewedPostId)) {
-                    postMapper.insertPostView(userId, postId);
+                    // 직전 조회 게시글과 다른 경우만 조회수 증가
                     postMapper.incrementViewCount(postId);
                 }
+                postMapper.insertPostView(userId, postId);
             } else {
                 // 로그인하지 않은 경우: 세션에 저장된 조회 기록을 확인
                 HttpSession session = request.getSession();
