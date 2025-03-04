@@ -1,6 +1,7 @@
 package com.p4th.backend.dto.response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.p4th.backend.domain.NotificationType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import java.time.LocalDateTime;
@@ -21,7 +22,7 @@ public class NotificationResponse {
     private String commentId;
 
     @Schema(description = "알림 타입", example = "COMMENT")
-    private String type;
+    private NotificationType type;
 
     @Schema(description = "읽음 여부", example = "0")
     private int readYn;
@@ -33,4 +34,8 @@ public class NotificationResponse {
     @Schema(description = "생성일시", example = "2025-02-04 12:00:00")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createdAt;
+
+    private String imageUrl;
+    private String title;
+    private String content;
 }

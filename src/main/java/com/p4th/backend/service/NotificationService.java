@@ -4,6 +4,7 @@ import com.p4th.backend.common.exception.CustomException;
 import com.p4th.backend.common.exception.ErrorCode;
 import com.p4th.backend.domain.Comment;
 import com.p4th.backend.domain.Notification;
+import com.p4th.backend.domain.NotificationType;
 import com.p4th.backend.domain.Post;
 import com.p4th.backend.dto.response.NotificationResponse;
 import com.p4th.backend.dto.response.UnreadCountResponse;
@@ -11,6 +12,8 @@ import com.p4th.backend.mapper.AuthMapper;
 import com.p4th.backend.mapper.CommentMapper;
 import com.p4th.backend.mapper.NotificationMapper;
 import com.p4th.backend.mapper.PostMapper;
+import com.p4th.backend.util.HtmlImageUtils;
+import com.p4th.backend.util.HtmlContentUtils;
 import com.p4th.backend.util.ULIDUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -41,8 +44,78 @@ public class NotificationService {
             response.setReadYn(notification.getReadYn());
             response.setReadAt(notification.getReadAt());
             response.setCreatedAt(notification.getCreatedAt());
+
+            // 공통적으로 이미지 URL 설정 (예: 게시글 관련 이미지 URL)
+            if (notification.getPostId() != null) {
+                response.setImageUrl(getPostImageUrl(notification.getPostId()));
+            }
+
+            // 알림 종류에 따른 제목 및 내용 설정
+            switch (notification.getType()) {
+                case COMMENT:
+                    // 댓글 알림: 작성자의 닉네임, 댓글 내용
+                    String commenterNickname = getCommenterNickname(notification.getCommentId());
+                    String commentContent = getCommentContent(notification.getCommentId());
+                    response.setTitle("[" + commenterNickname + "]님이 내 게시글에 댓글을 남겼습니다.");
+                    response.setContent(commentContent);
+                    break;
+                case RECOMMENT:
+                    // 대댓글 알림: 작성자의 닉네임, 대댓글 내용
+                    String recommenterNickname = getCommenterNickname(notification.getCommentId());
+                    String recommentContent = getCommentContent(notification.getCommentId());
+                    response.setTitle("[" + recommenterNickname + "]님이 내 댓글에 답글을 남겼습니다.");
+                    response.setContent(recommentContent);
+                    break;
+                case NOTICE:
+                    // 공지: 게시글 제목과 내용(최대 23자)
+                    String noticeTitle = getPostTitle(notification.getPostId());
+                    String noticeContent = getPostContent(notification.getPostId());
+                    response.setTitle("[공지] " + noticeTitle);
+                    response.setContent(noticeContent);
+                    break;
+                case ALERT:
+                    // 기타 알림: 기본 처리
+                    response.setTitle("알림");
+                    response.setContent("");
+                    break;
+                default:
+                    response.setTitle("");
+                    response.setContent("");
+                    break;
+            }
             return response;
         }).collect(Collectors.toList());
+    }
+
+    private String getPostImageUrl(String postId) {
+        Post post = postMapper.getPostDetail(postId, null);
+        if (post != null) {
+            return HtmlImageUtils.extractFirstImageUrl(post.getContent());
+        }
+        return null;
+    }
+
+    private String getCommenterNickname(String commentId) {
+        Comment comment = commentMapper.getCommentById(commentId);
+        if (comment != null) {
+            return comment.getNickname();
+        }
+        return "알 수 없음";
+    }
+
+    private String getCommentContent(String commentId) {
+        Comment comment = commentMapper.getCommentById(commentId);
+        return comment != null ? HtmlContentUtils.extractPlainText(comment.getContent(), 23) : "";
+    }
+
+    private String getPostTitle(String postId) {
+        Post post = postMapper.getPostDetail(postId, null);
+        return post != null ? HtmlContentUtils.extractPlainText(post.getTitle(), 23) : "";
+    }
+
+    private String getPostContent(String postId) {
+        Post post = postMapper.getPostDetail(postId, null);
+        return post != null ? HtmlContentUtils.extractPlainText(post.getContent(), 23) : "";
     }
 
     @Transactional
@@ -80,7 +153,7 @@ public class NotificationService {
         notification.setUserId(post.getUserId());
         notification.setPostId(postId);
         notification.setCommentId(commentId);
-        notification.setType("COMMENT");
+        notification.setType(NotificationType.COMMENT);
         notification.setReadYn(0);
         notification.setCreatedBy("SYSTEM");
         notificationMapper.insertNotification(notification);
@@ -103,7 +176,7 @@ public class NotificationService {
         notification.setUserId(parentComment.getUserId());
         notification.setPostId(parentComment.getPostId());
         notification.setCommentId(replyCommentId);
-        notification.setType("RECOMMENT");
+        notification.setType(NotificationType.RECOMMENT);
         notification.setReadYn(0);
         notification.setCreatedBy("SYSTEM");
         notificationMapper.insertNotification(notification);
@@ -129,7 +202,7 @@ public class NotificationService {
             notification.setUserId(getUserId);
             notification.setPostId(postId);
             notification.setCommentId(null);
-            notification.setType("NOTICE");
+            notification.setType(NotificationType.NOTICE);
             notification.setReadYn(0);
             notification.setCreatedBy("SYSTEM");
             notificationMapper.insertNotification(notification);
