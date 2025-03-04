@@ -59,6 +59,7 @@ public class PostService {
                 if (!postId.equals(lastViewedPostId)) {
                     // 직전 조회 게시글과 다른 경우만 조회수 증가
                     postMapper.incrementViewCount(postId);
+                    System.out.println("incrementViewCount1");
                 }
                 postMapper.insertPostView(userId, postId);
             } else {
@@ -72,6 +73,7 @@ public class PostService {
                 }
                 if (!viewedPosts.contains(postId)) {
                     postMapper.incrementViewCount(postId);
+                    System.out.println("incrementViewCount2");
                     viewedPosts.add(postId);
                 }
             }
