@@ -5,7 +5,6 @@ import com.p4th.backend.common.exception.ErrorCode;
 import com.p4th.backend.domain.Comment;
 import com.p4th.backend.domain.Notification;
 import com.p4th.backend.domain.Post;
-import com.p4th.backend.dto.request.NotificationReadRequest;
 import com.p4th.backend.dto.response.NotificationResponse;
 import com.p4th.backend.dto.response.UnreadCountResponse;
 import com.p4th.backend.mapper.AuthMapper;
@@ -47,8 +46,8 @@ public class NotificationService {
     }
 
     @Transactional
-    public void markNotificationAsRead(NotificationReadRequest request) {
-        int updated = notificationMapper.updateNotificationRead(request.getNotificationId());
+    public void markNotificationAsRead(String notificationId) {
+        int updated = notificationMapper.updateNotificationRead(notificationId);
         if (updated != 1) {
             throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR, "알림 읽음 처리 실패");
         }

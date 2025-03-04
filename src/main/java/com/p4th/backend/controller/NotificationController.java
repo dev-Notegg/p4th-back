@@ -2,7 +2,6 @@ package com.p4th.backend.controller;
 
 import com.p4th.backend.common.exception.CustomException;
 import com.p4th.backend.common.exception.ErrorCode;
-import com.p4th.backend.dto.request.NotificationReadRequest;
 import com.p4th.backend.dto.response.NotificationResponse;
 import com.p4th.backend.dto.response.UnreadCountResponse;
 import com.p4th.backend.security.JwtProvider;
@@ -59,16 +58,12 @@ public class NotificationController {
     public ResponseEntity<?> markNotificationAsRead(
             @Parameter(name = "notificationId", description = "알림 ID", required = true)
             @PathVariable("notificationId") String notificationId,
-            @RequestBody NotificationReadRequest requestDto,
             HttpServletRequest request) {
         String userId = jwtProvider.resolveUserId(request);
         if (userId == null) {
             throw new CustomException(ErrorCode.LOGIN_REQUIRED);
         }
-        if (!notificationId.equals(requestDto.getNotificationId())) {
-            throw new CustomException(ErrorCode.INVALID_INPUT, "경로의 알림 ID와 요청 본문의 알림 ID가 일치하지 않습니다.");
-        }
-        notificationService.markNotificationAsRead(requestDto);
+        notificationService.markNotificationAsRead(notificationId);
         return ResponseEntity.ok().build();
     }
 
