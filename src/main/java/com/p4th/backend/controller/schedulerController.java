@@ -1,4 +1,4 @@
-package com.p4th.backend.scheduler;
+package com.p4th.backend.controller;
 
 import com.p4th.backend.domain.Post;
 import com.p4th.backend.domain.PostHistoryLog;
@@ -8,12 +8,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import com.p4th.backend.util.ULIDUtil;
 
 @Component
 @RequiredArgsConstructor
-public class PopularPostScheduler {
+public class schedulerController {
 
     private final PostMapper postMapper;
     private final PostHistoryLogMapper postHistoryLogMapper;
@@ -68,5 +69,20 @@ public class PopularPostScheduler {
         LocalDate firstDayOfLastMonth = LocalDate.now().minusMonths(1).withDayOfMonth(1);
         LocalDate lastDayOfLastMonth = firstDayOfLastMonth.withDayOfMonth(firstDayOfLastMonth.lengthOfMonth());
         processPopularity("MONTHLY", firstDayOfLastMonth.toString(), lastDayOfLastMonth.toString());
+    }
+
+    // 유저마다 최근 본 게시글이 16개 이상인 경우 삭제
+    @Scheduled(cron = "0 0 0 * * *")
+    public void cleanupPostViews() {
+        // 모든 사용자 ID 조회
+        List<String> userIds = postMapper.getDistinctUserIdsFromPostView();
+        for (String userId : userIds) {
+            // 해당 사용자의 16번째 최신 조회일시를 구함
+            LocalDateTime cutoff = postMapper.get16thLatestViewedAt(userId);
+            if (cutoff != null) {
+                // cutoff보다 이전의 모든 post_view 레코드 삭제
+                postMapper.deletePostViewsOlderThan(userId, cutoff);
+            }
+        }
     }
 }

@@ -4,6 +4,8 @@ import com.p4th.backend.domain.Board;
 import com.p4th.backend.domain.Post;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Mapper
@@ -32,4 +34,12 @@ public interface PostMapper {
     Board getBoardWithCategory(@Param("boardId") String boardId);
 
     int updateCommentCount(@Param("postId") String postId, @Param("count") int count);
+
+    String getLastViewedPostId(@Param("userId") String userId);
+
+    List<String> getDistinctUserIdsFromPostView();
+
+    LocalDateTime get16thLatestViewedAt(@Param("userId") String userId);
+
+    int deletePostViewsOlderThan(@Param("userId") String userId, @Param("cutoff") LocalDateTime cutoff);
 }

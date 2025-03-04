@@ -8,6 +8,8 @@ import com.p4th.backend.common.exception.ErrorCode;
 import com.p4th.backend.repository.PostRepository;
 import com.p4th.backend.util.HtmlImageUtils;
 import com.p4th.backend.util.ULIDUtil;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -15,6 +17,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -47,13 +51,29 @@ public class PostService {
     }
 
     @Transactional
-    public Post getPostDetail(String postId, String userId) {
+    public Post getPostDetail(String postId, String userId, HttpServletRequest request) {
         try {
-            // 조회수 1증가
-            postMapper.incrementViewCount(postId);
-            // 최근 본 게시물 테이블에 기록 삽입
             if (userId != null && !userId.trim().isEmpty()) {
-                postMapper.insertPostView(userId, postId);
+                // 사용자가 로그인한 경우에만 최근 본 게시글 체크
+                String lastViewedPostId = postMapper.getLastViewedPostId(userId);
+                // 만약 가장 최근 본 게시글이 현재 게시글과 다른 경우만 증가
+                if (!postId.equals(lastViewedPostId)) {
+                    postMapper.insertPostView(userId, postId);
+                    postMapper.incrementViewCount(postId);
+                }
+            } else {
+                // 로그인하지 않은 경우: 세션에 저장된 조회 기록을 확인
+                HttpSession session = request.getSession();
+                @SuppressWarnings("unchecked")
+                Set<String> viewedPosts = (Set<String>) session.getAttribute("viewedPosts");
+                if (viewedPosts == null) {
+                    viewedPosts = new HashSet<>();
+                    session.setAttribute("viewedPosts", viewedPosts);
+                }
+                if (!viewedPosts.contains(postId)) {
+                    postMapper.incrementViewCount(postId);
+                    viewedPosts.add(postId);
+                }
             }
             Post post = postMapper.getPostDetail(postId, userId);
             if (post == null) {
