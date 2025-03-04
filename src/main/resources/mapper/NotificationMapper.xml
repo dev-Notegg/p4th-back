@@ -33,7 +33,7 @@
 
     <update id="updateNotificationRead" parameterType="map">
         UPDATE notification
-        SET read_yn = 'Y',
+        SET read_yn = 1,
             read_at = NOW()
         WHERE notification_id = #{notificationId}
     </update>

@@ -46,11 +46,12 @@ public class NotificationService {
     }
 
     @Transactional
-    public void markNotificationAsRead(String notificationId) {
+    public boolean markNotificationAsRead(String notificationId) {
         int updated = notificationMapper.updateNotificationRead(notificationId);
         if (updated != 1) {
             throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR, "알림 읽음 처리 실패");
         }
+        return true;
     }
 
     @Transactional(readOnly = true)

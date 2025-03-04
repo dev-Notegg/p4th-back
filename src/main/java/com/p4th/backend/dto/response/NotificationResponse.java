@@ -1,5 +1,6 @@
 package com.p4th.backend.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import java.time.LocalDateTime;
@@ -26,8 +27,10 @@ public class NotificationResponse {
     private int readYn;
 
     @Schema(description = "읽음 일시", example = "2025-02-04 12:10:00", nullable = true)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime readAt;
 
     @Schema(description = "생성일시", example = "2025-02-04 12:00:00")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createdAt;
 }
