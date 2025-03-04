@@ -53,29 +53,22 @@ public class PostService {
     @Transactional
     public Post getPostDetail(String postId, String userId, HttpServletRequest request) {
         try {
+            // 최근 본 게시물 테이블에 기록 삽입
             if (userId != null && !userId.trim().isEmpty()) {
-                // 로그인한 사용자의 경우, 가장 마지막에 조회한 게시글 ID를 조회
-                String lastViewedPostId = postMapper.getLastViewedPostId(userId);
-                if (!postId.equals(lastViewedPostId)) {
-                    // 직전 조회 게시글과 다른 경우만 조회수 증가
-                    postMapper.incrementViewCount(postId);
-                    System.out.println("incrementViewCount1");
-                }
                 postMapper.insertPostView(userId, postId);
-            } else {
-                // 로그인하지 않은 경우: 세션에 저장된 조회 기록을 확인
-                HttpSession session = request.getSession();
-                @SuppressWarnings("unchecked")
-                Set<String> viewedPosts = (Set<String>) session.getAttribute("viewedPosts");
-                if (viewedPosts == null) {
-                    viewedPosts = new HashSet<>();
-                    session.setAttribute("viewedPosts", viewedPosts);
-                }
-                if (!viewedPosts.contains(postId)) {
-                    postMapper.incrementViewCount(postId);
-                    System.out.println("incrementViewCount2");
-                    viewedPosts.add(postId);
-                }
+            }
+            
+            // 세션에 저장된 조회 기록을 확인하여 조회수 증가 처리
+            HttpSession session = request.getSession();
+            @SuppressWarnings("unchecked")
+            Set<String> viewedPosts = (Set<String>) session.getAttribute("viewedPosts");
+            if (viewedPosts == null) {
+                viewedPosts = new HashSet<>();
+                session.setAttribute("viewedPosts", viewedPosts);
+            }
+            if (!viewedPosts.contains(postId)) {
+                postMapper.incrementViewCount(postId);
+                viewedPosts.add(postId);
             }
             Post post = postMapper.getPostDetail(postId, userId);
             if (post == null) {
