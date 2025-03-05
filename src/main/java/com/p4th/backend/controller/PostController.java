@@ -136,4 +136,18 @@ public class PostController {
         return ResponseEntity.ok().body(response);
     }
 
+    @Operation(summary = "게시글 조회수 증가", description = "게시글의 조회수를 1 증가시킨다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "게시글 조회수 증가 성공"),
+            @ApiResponse(responseCode = "500", description = "내부 서버 오류",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    @PutMapping("/{postId}/view")
+    public ResponseEntity<?> incrementPostView(
+            @Parameter(name = "postId", description = "게시글 ID", required = true) @PathVariable("postId") String postId,
+            HttpServletRequest httpRequest) {
+        String userId = jwtProvider.resolveUserId(httpRequest);
+        postService.incrementPostViewCount(postId, userId);
+        return ResponseEntity.ok().build();
+    }
 }

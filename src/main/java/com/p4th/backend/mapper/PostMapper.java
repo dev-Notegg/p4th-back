@@ -21,7 +21,7 @@ public interface PostMapper {
 
     List<Post> getAllPosts();
 
-    void incrementViewCount(String postId);
+    int incrementViewCount(String postId);
 
     void incrementCommentCount(String postId);
 
