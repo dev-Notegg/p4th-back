@@ -3,6 +3,7 @@ package com.p4th.backend.dto.response.scrap;
 import com.p4th.backend.domain.Post;
 import com.p4th.backend.dto.response.post.PostListResponse;
 import com.p4th.backend.util.HtmlContentUtils;
+import com.p4th.backend.util.HtmlImageUtils;
 import com.p4th.backend.util.RelativeTimeFormatter;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
@@ -35,8 +36,8 @@ public class ScrapPostListResponse extends PostListResponse {
         response.setStatus(post.getStatus());
         response.setViewCount(post.getViewCount());
         response.setCommentCount(post.getCommentCount());
-        response.setImageUrl(PostListResponse.extractFirstImageUrl(post.getContent()));
-        response.setImageCount(PostListResponse.countInlineImages(post.getContent()));
+        response.setImageUrl(HtmlImageUtils.extractFirstImageUrl(post.getContent()));
+        response.setImageCount(HtmlImageUtils.countInlineImages(post.getContent()));
         response.setCreatedAt(RelativeTimeFormatter.formatRelativeTime(post.getCreatedAt()));
         response.setScrapFolderId(scrapFolderId);
         response.setScrapId(scrapId);

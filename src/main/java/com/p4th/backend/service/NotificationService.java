@@ -45,37 +45,34 @@ public class NotificationService {
             response.setReadAt(notification.getReadAt());
             response.setCreatedAt(notification.getCreatedAt());
 
-            // 공통적으로 이미지 URL 설정 (예: 게시글 관련 이미지 URL)
-            if (notification.getPostId() != null) {
-                response.setImageUrl(getPostImageUrl(notification.getPostId()));
+            Post post = postMapper.getPostDetail(notification.getPostId(), null);
+            String nickname = "";
+            // 게시글 ID가 있을 경우 이미지 URL 설정
+            if (post != null) {
+                nickname = post.getNickname();
+                response.setImageUrl(HtmlImageUtils.extractFirstImageUrl(post.getContent()));
             }
 
             // 알림 종류에 따른 제목 및 내용 설정
             switch (notification.getType()) {
                 case COMMENT:
                     // 댓글 알림: 작성자의 닉네임, 댓글 내용
-                    String commenterNickname = getCommenterNickname(notification.getCommentId());
-                    String commentContent = getCommentContent(notification.getCommentId());
-                    response.setTitle("[" + commenterNickname + "]님이 내 게시글에 댓글을 남겼습니다.");
-                    response.setContent(commentContent);
+                    response.setTitle("[" + nickname + "]님이 내 게시글에 댓글을 남겼습니다.");
+                    response.setContent(getCommentContent(notification.getCommentId()));
                     break;
                 case RECOMMENT:
                     // 대댓글 알림: 작성자의 닉네임, 대댓글 내용
-                    String recommenterNickname = getCommenterNickname(notification.getCommentId());
-                    String recommentContent = getCommentContent(notification.getCommentId());
-                    response.setTitle("[" + recommenterNickname + "]님이 내 댓글에 답글을 남겼습니다.");
-                    response.setContent(recommentContent);
+                    response.setTitle("[" + nickname + "]님이 내 댓글에 답글을 남겼습니다.");
+                    response.setContent(getCommentContent(notification.getCommentId()));
                     break;
                 case NOTICE:
                     // 공지: 게시글 제목과 내용(최대 23자)
-                    String noticeTitle = getPostTitle(notification.getPostId());
-                    String noticeContent = getPostContent(notification.getPostId());
-                    response.setTitle("[공지] " + noticeTitle);
-                    response.setContent(noticeContent);
+                    response.setTitle("[공지] " + getPostTitle(notification.getPostId()));
+                    response.setContent(getPostContent(notification.getPostId()));
                     break;
                 case ALERT:
-                    // 기타 알림: 기본 처리
-                    response.setTitle("알림");
+                    // 안내
+                    response.setTitle("[안내] CMS할때 추가 예정");
                     response.setContent("");
                     break;
                 default:
@@ -85,22 +82,6 @@ public class NotificationService {
             }
             return response;
         }).collect(Collectors.toList());
-    }
-
-    private String getPostImageUrl(String postId) {
-        Post post = postMapper.getPostDetail(postId, null);
-        if (post != null) {
-            return HtmlImageUtils.extractFirstImageUrl(post.getContent());
-        }
-        return null;
-    }
-
-    private String getCommenterNickname(String commentId) {
-        Comment comment = commentMapper.getCommentById(commentId);
-        if (comment != null) {
-            return comment.getNickname();
-        }
-        return "알 수 없음";
     }
 
     private String getCommentContent(String commentId) {

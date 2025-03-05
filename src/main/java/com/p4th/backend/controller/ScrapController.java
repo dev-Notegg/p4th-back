@@ -36,8 +36,8 @@ public class ScrapController {
 
     @Operation(
             summary = "게시글 스크랩 목록 조회",
-            description = "사용자의 스크랩 게시글 목록을 조회한다. " +
-                    "스크랩 폴더 ID를 제공하면 해당 폴더의 스크랩 목록을, 제공하지 않으면 전체 스크랩 목록을 조회한다."
+            description = "사용자의 스크랩 게시글 목록을 조회한다." +
+                    "\n 스크랩 폴더 ID를 제공하면 해당 폴더의 스크랩 목록을, 제공하지 않으면 전체 스크랩 목록을 조회한다."
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "게시글 스크랩 목록 조회 성공",

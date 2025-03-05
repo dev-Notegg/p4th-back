@@ -32,8 +32,8 @@ public class SearchController {
 
     @Operation(
             summary = "검색",
-            description = "작성자 닉네임, 게시글 내용, 제목을 포함한 게시글을 검색한다. " +
-                    "boardId(게시판ID)를 제공하면 해당 게시판 내에서 검색하고, 제공하지 않으면 전체 게시판에서 검색한다."
+            description = "작성자 닉네임, 게시글 내용, 제목을 포함한 게시글을 검색한다." +
+                    "\n boardId(게시판ID)를 제공하면 해당 게시판 내에서 검색하고, 제공하지 않으면 전체 게시판에서 검색한다."
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "검색 성공",

@@ -28,7 +28,9 @@ public class NotificationController {
     private final NotificationService notificationService;
     private final JwtProvider jwtProvider;
 
-    @Operation(summary = "알림 목록 조회", description = "사용자의 알림 목록을 조회한다.")
+    @Operation(summary = "알림 목록 조회",
+            description = "사용자의 알림 목록을 조회한다." +
+                    "\n 알림 타입:댓글(COMMENT)/대댓글(RECOMMENT)/공지(NOTICE)/안내(ALERT)")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "알림 목록 조회 성공",
                     content = @Content(schema = @Schema(implementation = NotificationResponse.class))),

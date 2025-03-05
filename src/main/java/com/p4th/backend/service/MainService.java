@@ -8,6 +8,7 @@ import com.p4th.backend.dto.response.post.PopularPostResponse;
 import com.p4th.backend.dto.response.post.PostListResponse;
 import com.p4th.backend.mapper.MainMapper;
 import com.p4th.backend.mapper.PostHistoryLogMapper;
+import com.p4th.backend.util.HtmlImageUtils;
 import com.p4th.backend.util.RelativeTimeFormatter;
 import com.p4th.backend.util.HtmlContentUtils;
 import lombok.RequiredArgsConstructor;
@@ -100,8 +101,8 @@ public class MainService {
      */
     private void processPopularPostResponse(PopularPostResponse response) {
         // 이미지 처리
-        String imgUrl = PostListResponse.extractFirstImageUrl(response.getContent());
-        int imgCount = PostListResponse.countInlineImages(response.getContent());
+        String imgUrl = HtmlImageUtils.extractFirstImageUrl(response.getContent());
+        int imgCount = HtmlImageUtils.countInlineImages(response.getContent());
         response.setImageUrl(imgUrl);
         response.setImageCount(imgCount);
         // HTML 태그 제거 후 순수 텍스트 추출 (최대 50자)
