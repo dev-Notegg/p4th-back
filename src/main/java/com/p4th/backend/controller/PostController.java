@@ -144,10 +144,8 @@ public class PostController {
     })
     @PutMapping("/{postId}/view")
     public ResponseEntity<?> incrementPostView(
-            @Parameter(name = "postId", description = "게시글 ID", required = true) @PathVariable("postId") String postId,
-            HttpServletRequest httpRequest) {
-        String userId = jwtProvider.resolveUserId(httpRequest);
-        postService.incrementPostViewCount(postId, userId);
+            @Parameter(name = "postId", description = "게시글 ID", required = true) @PathVariable("postId") String postId) {
+        postService.incrementPostViewCount(postId);
         return ResponseEntity.ok().build();
     }
 }

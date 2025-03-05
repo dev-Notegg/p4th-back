@@ -49,6 +49,10 @@ public class PostService {
     @Transactional
     public Post getPostDetail(String postId, String userId) {
         try {
+            // 최근 본 게시글 기록 삽입
+            if (userId != null && !userId.trim().isEmpty()) {
+                postMapper.insertPostView(userId, postId);
+            }
             Post post = postMapper.getPostDetail(postId, userId);
             if (post == null) {
                 throw new CustomException(ErrorCode.POST_NOT_FOUND);
@@ -173,12 +177,8 @@ public class PostService {
     }
 
     @Transactional
-    public void incrementPostViewCount(String postId, String userId) {
+    public void incrementPostViewCount(String postId) {
         try {
-            // 최근 본 게시물 테이블에 기록 삽입
-            if (userId != null && !userId.trim().isEmpty()) {
-                postMapper.insertPostView(userId, postId);
-            }
             // 조회수 증가
             int updated = postMapper.incrementViewCount(postId);
             if (updated != 1) {
