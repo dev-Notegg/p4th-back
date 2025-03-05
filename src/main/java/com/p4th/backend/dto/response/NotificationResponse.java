@@ -31,9 +31,8 @@ public class NotificationResponse {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime readAt;
 
-    @Schema(description = "생성일시", example = "2025-02-04 12:00:00")
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime createdAt;
+    @Schema(description = "알림 생성일 (0분 전, X분 전, X시간 전, 또는 날짜 형식)", example = "0분 전")
+    private String createdAt;
 
     private String imageUrl;
     private String title;

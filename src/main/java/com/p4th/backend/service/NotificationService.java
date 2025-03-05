@@ -14,6 +14,7 @@ import com.p4th.backend.mapper.NotificationMapper;
 import com.p4th.backend.mapper.PostMapper;
 import com.p4th.backend.util.HtmlImageUtils;
 import com.p4th.backend.util.HtmlContentUtils;
+import com.p4th.backend.util.RelativeTimeFormatter;
 import com.p4th.backend.util.ULIDUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -43,7 +44,7 @@ public class NotificationService {
             response.setType(notification.getType());
             response.setReadYn(notification.getReadYn());
             response.setReadAt(notification.getReadAt());
-            response.setCreatedAt(notification.getCreatedAt());
+            response.setCreatedAt(RelativeTimeFormatter.formatRelativeTime(notification.getCreatedAt()));
 
             Post post = postMapper.getPostDetail(notification.getPostId(), null);
             String nickname = "";
