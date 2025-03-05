@@ -14,7 +14,7 @@ import com.p4th.backend.util.ULIDUtil;
 
 @Component
 @RequiredArgsConstructor
-public class schedulerController {
+public class SchedulerController {
 
     private final PostMapper postMapper;
     private final PostHistoryLogMapper postHistoryLogMapper;

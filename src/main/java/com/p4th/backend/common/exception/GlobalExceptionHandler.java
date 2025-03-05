@@ -3,6 +3,8 @@ package com.p4th.backend.common.exception;
 import com.p4th.backend.dto.response.ErrorResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -12,18 +14,22 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Locale;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    @Autowired
+    private MessageSource messageSource;
     private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     @ExceptionHandler(CustomException.class)
-    public ResponseEntity<ErrorResponse> handleCustomException(CustomException ex) {
+    public ResponseEntity<ErrorResponse> handleCustomException(CustomException ex, Locale locale) {
         ErrorCode code = ex.getErrorCode();
+        String message = messageSource.getMessage(code.getMessage(), null, locale);
         ErrorResponse errorResponse = ErrorResponse.builder()
                 .errorCode(code.getCode())
-                .errorMessage(ex.getMessage()) // 여기서 getMessage()를 사용하여 extraMessage 포함 메시지 반환
+                .errorMessage(message)
                 .status(code.getHttpStatus().name())
                 .timestamp(LocalDateTime.now())
                 .build();

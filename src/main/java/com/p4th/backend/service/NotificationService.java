@@ -17,9 +17,12 @@ import com.p4th.backend.util.HtmlContentUtils;
 import com.p4th.backend.util.RelativeTimeFormatter;
 import com.p4th.backend.util.ULIDUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 @Service
@@ -30,11 +33,13 @@ public class NotificationService {
     private final PostMapper postMapper;
     private final CommentMapper commentMapper;
     private final AuthMapper authMapper;
-
+    @Autowired
+    private MessageSource messageSource;
 
     @Transactional(readOnly = true)
     public List<NotificationResponse> getNotifications(String userId) {
         List<Notification> notifications = notificationMapper.getNotificationsByUserId(userId);
+        Locale locale = Locale.getDefault();
         return notifications.stream().map(notification -> {
             NotificationResponse response = new NotificationResponse();
             response.setNotificationId(notification.getNotificationId());
@@ -57,23 +62,19 @@ public class NotificationService {
             // 알림 종류에 따른 제목 및 내용 설정
             switch (notification.getType()) {
                 case COMMENT:
-                    // 댓글 알림: 작성자의 닉네임, 댓글 내용
-                    response.setTitle("[" + nickname + "]님이 내 게시글에 댓글을 남겼습니다.");
+                    response.setTitle(messageSource.getMessage("notification.comment", new Object[]{nickname}, locale));
                     response.setContent(getCommentContent(notification.getCommentId()));
                     break;
                 case RECOMMENT:
-                    // 대댓글 알림: 작성자의 닉네임, 대댓글 내용
-                    response.setTitle("[" + nickname + "]님이 내 댓글에 답글을 남겼습니다.");
+                    response.setTitle(messageSource.getMessage("notification.recomment", new Object[]{nickname}, locale));
                     response.setContent(getCommentContent(notification.getCommentId()));
                     break;
                 case NOTICE:
-                    // 공지: 게시글 제목과 내용(최대 23자)
-                    response.setTitle("[공지] " + getPostTitle(notification.getPostId()));
+                    response.setTitle(messageSource.getMessage("notification.notice", new Object[]{getPostTitle(notification.getPostId())}, locale));
                     response.setContent(getPostContent(notification.getPostId()));
                     break;
                 case ALERT:
-                    // 안내
-                    response.setTitle("[안내] CMS할때 추가 예정");
+                    response.setTitle(messageSource.getMessage("notification.alert", null, locale));
                     response.setContent("");
                     break;
                 default:
