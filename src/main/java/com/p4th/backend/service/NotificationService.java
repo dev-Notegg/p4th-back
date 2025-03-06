@@ -139,14 +139,14 @@ public class NotificationService {
         notification.setUserId(user.getUserId());
         notification.setType(NotificationType.ALERT);
         if(!division.equals("POST")){// 게시글 삭제 안내
-            notification.setTitle(messageSource.getMessage("notification.delete.post", null, locale));
+            notification.setTitle(messageSource.getMessage("notification.delete", new Object[]{"게시글"}, locale));
             notification.setContent(
                     messageSource.getMessage("notification.alert.content",
                             new Object[]{"게시글", "게시글 제목", content},
                             locale)
             );
         }else{ // 댓글 삭제 안내
-            notification.setTitle(messageSource.getMessage("notification.delete.comment", null, locale));
+            notification.setTitle(messageSource.getMessage("notification.delete", new Object[]{"댓글"}, locale));
             notification.setContent(
                     messageSource.getMessage("notification.alert.content",
                             new Object[]{"댓글", "댓글 내용", content},
