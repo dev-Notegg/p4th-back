@@ -12,6 +12,8 @@ public class Notification {
     private String postId;
     private String commentId;
     private NotificationType type;      // COMMENT, RECOMMENT, NOTICE, ALERT 등
+    private String title;
+    private String content;
     private int readYn;       // 0: 읽지 않음, 1: 읽음
     private LocalDateTime readAt;
     private LocalDateTime createdAt;

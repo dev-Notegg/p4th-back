@@ -2,14 +2,10 @@ package com.p4th.backend.service;
 
 import com.p4th.backend.common.exception.CustomException;
 import com.p4th.backend.common.exception.ErrorCode;
-import com.p4th.backend.domain.Comment;
-import com.p4th.backend.domain.Notification;
-import com.p4th.backend.domain.NotificationType;
-import com.p4th.backend.domain.Post;
+import com.p4th.backend.domain.*;
 import com.p4th.backend.dto.response.NotificationResponse;
 import com.p4th.backend.dto.response.UnreadCountResponse;
 import com.p4th.backend.mapper.AuthMapper;
-import com.p4th.backend.mapper.CommentMapper;
 import com.p4th.backend.mapper.NotificationMapper;
 import com.p4th.backend.mapper.PostMapper;
 import com.p4th.backend.util.HtmlImageUtils;
@@ -31,15 +27,15 @@ public class NotificationService {
 
     private final NotificationMapper notificationMapper;
     private final PostMapper postMapper;
-    private final CommentMapper commentMapper;
     private final AuthMapper authMapper;
     @Autowired
     private MessageSource messageSource;
 
+    Locale locale = Locale.getDefault();
+
     @Transactional(readOnly = true)
     public List<NotificationResponse> getNotifications(String userId) {
         List<Notification> notifications = notificationMapper.getNotificationsByUserId(userId);
-        Locale locale = Locale.getDefault();
         return notifications.stream().map(notification -> {
             NotificationResponse response = new NotificationResponse();
             response.setNotificationId(notification.getNotificationId());
@@ -47,82 +43,26 @@ public class NotificationService {
             response.setPostId(notification.getPostId());
             response.setCommentId(notification.getCommentId());
             response.setType(notification.getType());
+            response.setTitle(HtmlContentUtils.extractPlainText(notification.getTitle(), 30));
+            response.setContent(HtmlContentUtils.extractPlainText(notification.getContent(), 30));
             response.setReadYn(notification.getReadYn());
             response.setReadAt(notification.getReadAt());
             response.setCreatedAt(RelativeTimeFormatter.formatRelativeTime(notification.getCreatedAt()));
 
-            // 게시글 ID가 있을 경우 이미지 URL 설정
+            // 게시글 ID가 있을 경우 이미지 URL 설정(삭제 안내는 제외)
             if (!notification.getType().equals(NotificationType.ALERT) && notification.getPostId() != null) {
                 Post post = postMapper.getPostDetail(notification.getPostId(), null);
                 if (post != null) {
                     response.setImageUrl(HtmlImageUtils.extractFirstImageUrl(post.getContent()));
                 }
             }
-
-            String nickname = "";
-            if (notification.getCommentId() != null) {
-                Comment comment = commentMapper.getCommentById(notification.getCommentId());
-                if (comment != null) {
-                    nickname = comment.getNickname() != null ? comment.getNickname() : "";
-                }
-            }
-
-            // 알림 종류에 따른 제목 및 내용 설정
-            switch (notification.getType()) {
-                case COMMENT:
-                    response.setTitle(messageSource.getMessage("notification.comment", new Object[]{nickname}, locale));
-                    response.setContent(getCommentContent(notification.getCommentId()));
-                    break;
-                case RECOMMENT:
-                    response.setTitle(messageSource.getMessage("notification.recomment", new Object[]{nickname}, locale));
-                    response.setContent(getCommentContent(notification.getCommentId()));
-                    break;
-                case NOTICE:
-                    response.setTitle(messageSource.getMessage("notification.notice", new Object[]{getPostTitle(notification.getPostId())}, locale));
-                    response.setContent(getPostContent(notification.getPostId()));
-                    break;
-                case ALERT:
-                    if(notification.getPostId() != null){ //게시글 삭제 안내
-                        response.setTitle(messageSource.getMessage("notification.delete.post", null, locale));
-                        String postTitle = getPostTitle(notification.getPostId());
-                        response.setContent(
-                                messageSource.getMessage("notification.alert.content",
-                                        new Object[]{"게시글", "게시글 제목", postTitle},
-                                        locale)
-                        );
-                    }else{ //댓글 삭제 안내
-                        response.setTitle(messageSource.getMessage("notification.delete.comment", null, locale));
-                        String commentContent = getCommentContent(notification.getCommentId());
-                        response.setContent(
-                                messageSource.getMessage("notification.alert.content",
-                                        new Object[]{"댓글", "댓글 내용", commentContent},
-                                        locale)
-                        );
-                        break;
-                    }
-                    break;
-                default:
-                    response.setTitle("");
-                    response.setContent("");
-                    break;
-            }
             return response;
         }).collect(Collectors.toList());
-    }
-
-    private String getCommentContent(String commentId) {
-        Comment comment = commentMapper.getCommentById(commentId);
-        return comment != null ? comment.getContent() : "";
     }
 
     private String getPostTitle(String postId) {
         Post post = postMapper.getPostDetail(postId, null);
         return post != null ? post.getTitle() : "";
-    }
-
-    private String getPostContent(String postId) {
-        Post post = postMapper.getPostDetail(postId, null);
-        return post != null ? HtmlContentUtils.extractPlainText(post.getContent(), 23) : "";
     }
 
     @Transactional
@@ -143,47 +83,22 @@ public class NotificationService {
     }
 
     /**
-     * 내 게시글에 댓글이 달렸을 때 알림 생성
+     * 내 게시글에 댓글 혹은 대댓글이 달렸을 때 알림 생성
      */
     @Transactional
-    public void notifyCommentOnMyPost(String postId, String userId, String commentId) {
-        Post post = postMapper.getPostDetail(postId, userId);
-        if (post == null) {
-            throw new CustomException(ErrorCode.POST_NOT_FOUND);
-        }
-        // 자기 자신의 글에 달린 댓글은 알림 처리하지 않음
-        if (userId.equals(post.getUserId())) {
-            return;
-        }
+    public void notifyComment(NotificationType type, Post post, User user, String commentId, String commentContent) {
         Notification notification = new Notification();
         notification.setNotificationId(ULIDUtil.getULID());
         notification.setUserId(post.getUserId());
-        notification.setPostId(postId);
+        notification.setPostId(post.getPostId());
         notification.setCommentId(commentId);
-        notification.setType(NotificationType.COMMENT);
-        notification.setReadYn(0);
-        notification.setCreatedBy("SYSTEM");
-        notificationMapper.insertNotification(notification);
-    }
-
-    /**
-     * 내가 남긴 댓글에 대댓글이 달렸을 때 알림 생성
-     */
-    @Transactional
-    public void notifyReplyOnMyComment(String parentCommentId, String replyCommentId, String replierId) {
-        Comment parentComment = commentMapper.getCommentById(parentCommentId);
-        if (parentComment == null) {
-            throw new CustomException(ErrorCode.COMMENT_NOT_FOUND);
+        notification.setType(type);
+        if(type.equals(NotificationType.COMMENT)) {
+            notification.setTitle(messageSource.getMessage("notification.comment", new Object[]{user.getNickname()}, locale));
+        }else{
+            notification.setTitle(messageSource.getMessage("notification.recomment", new Object[]{user.getNickname()}, locale));
         }
-        if (replierId.equals(parentComment.getUserId())) {
-            return;
-        }
-        Notification notification = new Notification();
-        notification.setNotificationId(ULIDUtil.getULID());
-        notification.setUserId(parentComment.getUserId());
-        notification.setPostId(parentComment.getPostId());
-        notification.setCommentId(replyCommentId);
-        notification.setType(NotificationType.RECOMMENT);
+        notification.setContent(commentContent);
         notification.setReadYn(0);
         notification.setCreatedBy("SYSTEM");
         notificationMapper.insertNotification(notification);
@@ -193,15 +108,11 @@ public class NotificationService {
      * 공지 게시글이 등록되었을 때 모든 유저에게 알림 생성 (게시글 작성자는 제외)
      */
     @Transactional
-    public void notifyNoticePost(String postId, String userId) {
-        Post post = postMapper.getPostDetail(postId, userId);
-        if (post == null) {
-            throw new CustomException(ErrorCode.POST_NOT_FOUND);
-        }
+    public void notifyNoticePost(String postId, String userId, String content) {
         List<String> userIds = authMapper.selectAllUserIds();
         for (String getUserId : userIds) {
             // 게시글 작성자는 알림 대상에서 제외
-            if (getUserId.equals(post.getUserId())) {
+            if (getUserId.equals(userId)) {
                 continue;
             }
             Notification notification = new Notification();
@@ -210,9 +121,40 @@ public class NotificationService {
             notification.setPostId(postId);
             notification.setCommentId(null);
             notification.setType(NotificationType.NOTICE);
+            notification.setTitle(messageSource.getMessage("notification.notice", new Object[]{getPostTitle(notification.getPostId())}, locale));
+            notification.setContent(HtmlContentUtils.extractPlainText(content, 30));
             notification.setReadYn(0);
             notification.setCreatedBy("SYSTEM");
             notificationMapper.insertNotification(notification);
         }
+    }
+
+    /**
+     * 관리자가 게시글/댓글을 삭제한 경우 메세지 알림 설정
+     */
+    @Transactional
+    public void notifyDeleteAlert(String division, User user, String content) {
+        Notification notification = new Notification();
+        notification.setNotificationId(ULIDUtil.getULID());
+        notification.setUserId(user.getUserId());
+        notification.setType(NotificationType.ALERT);
+        if(!division.equals("POST")){// 게시글 삭제 안내
+            notification.setTitle(messageSource.getMessage("notification.delete.post", null, locale));
+            notification.setContent(
+                    messageSource.getMessage("notification.alert.content",
+                            new Object[]{"게시글", "게시글 제목", content},
+                            locale)
+            );
+        }else{ // 댓글 삭제 안내
+            notification.setTitle(messageSource.getMessage("notification.delete.comment", null, locale));
+            notification.setContent(
+                    messageSource.getMessage("notification.alert.content",
+                            new Object[]{"댓글", "댓글 내용", content},
+                            locale)
+            );
+        }
+        notification.setReadYn(0);
+        notification.setCreatedBy("SYSTEM");
+        notificationMapper.insertNotification(notification);
     }
 }

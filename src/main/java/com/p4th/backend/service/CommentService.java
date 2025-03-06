@@ -3,6 +3,7 @@ package com.p4th.backend.service;
 import com.p4th.backend.common.exception.CustomException;
 import com.p4th.backend.common.exception.ErrorCode;
 import com.p4th.backend.domain.Comment;
+import com.p4th.backend.domain.NotificationType;
 import com.p4th.backend.domain.Post;
 import com.p4th.backend.domain.User;
 import com.p4th.backend.dto.request.CommentCreateRequest;
@@ -67,12 +68,12 @@ public class CommentService {
         if (request.getParentCommentId() != null && !request.getParentCommentId().trim().isEmpty()) {
             Comment parentComment = commentMapper.getCommentById(request.getParentCommentId());
             if (parentComment != null && !userId.equals(parentComment.getUserId())) {
-                notificationService.notifyReplyOnMyComment(request.getParentCommentId(), commentId, userId);
+                notificationService.notifyComment(NotificationType.RECOMMENT, post, user, commentId, request.getContent());
             }
         } else {
             // 2. 일반 댓글인 경우: 게시글 작성자에게 알림 생성 (자신이 작성한 댓글은 제외)
             if (!userId.equals(post.getUserId())) {
-                notificationService.notifyCommentOnMyPost(postId, userId, commentId);
+                notificationService.notifyComment(NotificationType.COMMENT, post, user, commentId, request.getContent());
             }
         }
 

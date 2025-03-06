@@ -115,7 +115,7 @@ public class PostService {
             // 만약 해당 게시판이 공지 게시판이면 공지 알림 생성
             Board board = postMapper.getBoardWithCategory(boardId);
             if (board != null && board.getCategory() != null && board.getCategory().isNotice()) {
-                notificationService.notifyNoticePost(postId, userId);
+                notificationService.notifyNoticePost(postId, userId, processedContent);
             }
 
             return postId;
