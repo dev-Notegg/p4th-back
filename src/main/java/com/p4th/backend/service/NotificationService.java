@@ -74,8 +74,10 @@ public class NotificationService {
                     response.setContent(getPostContent(notification.getPostId()));
                     break;
                 case ALERT:
-                    response.setTitle(messageSource.getMessage("notification.alert", null, locale));
-                    response.setContent("");
+                    boolean isPostDeleted = notification.getPostId() != null;
+                    String deleteMessageKey = isPostDeleted ? "notification.delete.post" : "notification.delete.comment";
+                    response.setTitle(messageSource.getMessage(deleteMessageKey, null, locale));
+                    response.setContent(messageSource.getMessage("notification.alert.content", null, locale));
                     break;
                 default:
                     response.setTitle("");
