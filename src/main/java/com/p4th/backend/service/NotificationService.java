@@ -52,7 +52,7 @@ public class NotificationService {
             response.setCreatedAt(RelativeTimeFormatter.formatRelativeTime(notification.getCreatedAt()));
 
             // 게시글 ID가 있을 경우 이미지 URL 설정
-            if (notification.getPostId() != null) {
+            if (!notification.getType().equals(NotificationType.NOTICE) && notification.getPostId() != null) {
                 Post post = postMapper.getPostDetail(notification.getPostId(), null);
                 if (post != null) {
                     response.setImageUrl(HtmlImageUtils.extractFirstImageUrl(post.getContent()));
