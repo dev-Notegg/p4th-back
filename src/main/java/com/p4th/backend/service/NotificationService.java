@@ -112,12 +112,12 @@ public class NotificationService {
 
     private String getCommentContent(String commentId) {
         Comment comment = commentMapper.getCommentById(commentId);
-        return comment != null ? HtmlContentUtils.extractPlainText(comment.getContent(), 23) : "";
+        return comment != null ? comment.getContent() : "";
     }
 
     private String getPostTitle(String postId) {
         Post post = postMapper.getPostDetail(postId, null);
-        return post != null ? HtmlContentUtils.extractPlainText(post.getTitle(), 23) : "";
+        return post != null ? post.getTitle() : "";
     }
 
     private String getPostContent(String postId) {
