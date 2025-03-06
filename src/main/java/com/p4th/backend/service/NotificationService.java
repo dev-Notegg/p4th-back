@@ -82,11 +82,24 @@ public class NotificationService {
                     response.setContent(getPostContent(notification.getPostId()));
                     break;
                 case ALERT:
-                    boolean isPostDeleted = notification.getPostId() != null;
-                    String deleteTitleKey = isPostDeleted ? "notification.delete.post" : "notification.delete.comment";
-                    response.setTitle(messageSource.getMessage(deleteTitleKey, null, locale));
-                    String deleteContent = isPostDeleted ? "게시글" : "댓글";
-                    response.setContent(messageSource.getMessage("notification.alert.content", new Object[]{deleteContent}, locale));
+                    if(notification.getPostId() != null){ //게시글 삭제 안내
+                        response.setTitle(messageSource.getMessage("notification.delete.post", null, locale));
+                        String postTitle = getPostTitle(notification.getPostId());
+                        response.setContent(
+                                messageSource.getMessage("notification.alert.content",
+                                        new Object[]{"게시글", "게시글 제목", postTitle},
+                                        locale)
+                        );
+                    }else{ //댓글 삭제 안내
+                        response.setTitle(messageSource.getMessage("notification.delete.comment", null, locale));
+                        String commentContent = getCommentContent(notification.getCommentId());
+                        response.setContent(
+                                messageSource.getMessage("notification.alert.content",
+                                        new Object[]{"댓글", "댓글 내용", commentContent},
+                                        locale)
+                        );
+                        break;
+                    }
                     break;
                 default:
                     response.setTitle("");
