@@ -51,6 +51,7 @@ public class CommentService {
         comment.setCommentId(commentId);
         comment.setPostId(postId);
         comment.setUserId(userId);
+        comment.setNickname(user.getNickname());
         comment.setContent(request.getContent());
         comment.setParentCommentId(request.getParentCommentId());
         comment.setCreatedBy(userId);

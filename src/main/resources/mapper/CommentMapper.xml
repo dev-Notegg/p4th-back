@@ -11,7 +11,7 @@
             c.post_id,
             c.parent_comment_id,
             c.user_id,
-            u.nickname,
+            c.nickname,
             c.content,
             c.status,
             c.status_changed_at,
@@ -20,7 +20,6 @@
             c.updated_by,
             c.updated_at
         FROM comment c
-            JOIN user_info u ON u.user_id = c.user_id
         WHERE post_id = #{postId}
         <if test="userId != null">
             AND c.user_id NOT IN (
@@ -78,6 +77,7 @@
             post_id,
             parent_comment_id,
             user_id,
+            nickname,
             content,
             status,
             created_at,

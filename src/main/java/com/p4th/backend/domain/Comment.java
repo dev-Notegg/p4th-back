@@ -17,6 +17,7 @@ public class Comment {
     private String postId;
     private String parentCommentId;
     private String userId;
+    private String nickname;
     private String content;
     // 상태를 ENUM으로 관리
     private CommentStatus status;  // NORMAL, REPORTED
@@ -25,8 +26,6 @@ public class Comment {
     private LocalDateTime createdAt;
     private String updatedBy;
     private LocalDateTime updatedAt;
-    @Transient
-    private String nickname;
     // 연관관계 필드 (읽기 전용)
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id", insertable = false, updatable = false)

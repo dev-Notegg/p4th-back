@@ -51,12 +51,20 @@ public class NotificationService {
             response.setReadAt(notification.getReadAt());
             response.setCreatedAt(RelativeTimeFormatter.formatRelativeTime(notification.getCreatedAt()));
 
-            Post post = postMapper.getPostDetail(notification.getPostId(), null);
-            String nickname = "";
             // 게시글 ID가 있을 경우 이미지 URL 설정
-            if (post != null) {
-                nickname = post.getNickname();
-                response.setImageUrl(HtmlImageUtils.extractFirstImageUrl(post.getContent()));
+            if (notification.getPostId() != null) {
+                Post post = postMapper.getPostDetail(notification.getPostId(), null);
+                if (post != null) {
+                    response.setImageUrl(HtmlImageUtils.extractFirstImageUrl(post.getContent()));
+                }
+            }
+
+            String nickname = "";
+            if (notification.getCommentId() != null) {
+                Comment comment = commentMapper.getCommentById(notification.getCommentId());
+                if (comment != null) {
+                    nickname = comment.getNickname() != null ? comment.getNickname() : "";
+                }
             }
 
             // 알림 종류에 따른 제목 및 내용 설정
@@ -75,9 +83,10 @@ public class NotificationService {
                     break;
                 case ALERT:
                     boolean isPostDeleted = notification.getPostId() != null;
-                    String deleteMessageKey = isPostDeleted ? "notification.delete.post" : "notification.delete.comment";
-                    response.setTitle(messageSource.getMessage(deleteMessageKey, null, locale));
-                    response.setContent(messageSource.getMessage("notification.alert.content", null, locale));
+                    String deleteTitleKey = isPostDeleted ? "notification.delete.post" : "notification.delete.comment";
+                    response.setTitle(messageSource.getMessage(deleteTitleKey, null, locale));
+                    String deleteContent = isPostDeleted ? "게시글" : "댓글";
+                    response.setContent(messageSource.getMessage("notification.alert.content", new Object[]{deleteContent}, locale));
                     break;
                 default:
                     response.setTitle("");
