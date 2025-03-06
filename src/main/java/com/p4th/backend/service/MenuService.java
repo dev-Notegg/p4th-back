@@ -114,6 +114,7 @@ public class MenuService {
                 dto.setBoardId(board.getBoardId());
                 dto.setCategoryId(board.getCategoryId());
                 dto.setCategoryName(board.getCategoryName());
+                dto.setIsNotice(board.getIsNotice());
                 dto.setBoardName(board.getBoardName());
                 dto.setBoardLevel(board.getBoardLevel());
                 dto.setSortOrder(board.getSortOrder());

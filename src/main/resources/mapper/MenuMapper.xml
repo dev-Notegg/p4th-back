@@ -47,6 +47,7 @@
             b.board_id,
             b.category_id,
             c.category_name,
+            c.is_notice,
             b.board_name,
             b.board_level,
             b.sort_order,

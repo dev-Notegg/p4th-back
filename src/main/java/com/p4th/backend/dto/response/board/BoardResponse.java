@@ -9,6 +9,7 @@ public class BoardResponse {
     private String boardId;
     private String categoryId;
     private String categoryName;
+    private int isNotice;
     private String boardName;
     private int boardLevel;
     private int sortOrder;

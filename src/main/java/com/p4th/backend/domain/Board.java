@@ -17,6 +17,8 @@ public class Board {
     private String categoryId;
     @Transient
     private String categoryName;
+    @Transient
+    private int isNotice;
     private String boardName;
     private int boardLevel;
     private int sortOrder;

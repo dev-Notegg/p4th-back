@@ -6,5 +6,6 @@ import lombok.Data;
 public class PopularBoardResponse {
     private String boardId;
     private String categoryName;
+    private int isNotice;
     private String boardName;
 }
