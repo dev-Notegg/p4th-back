@@ -22,6 +22,8 @@
             post_id,
             comment_id,
             type,
+            title,
+            content,
             read_yn,
             read_at,
             created_at,
