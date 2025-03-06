@@ -43,8 +43,8 @@ public class NotificationService {
             response.setPostId(notification.getPostId());
             response.setCommentId(notification.getCommentId());
             response.setType(notification.getType());
-            response.setTitle(HtmlContentUtils.extractPlainText(notification.getTitle(), 30));
-            response.setContent(HtmlContentUtils.extractPlainText(notification.getContent(), 30));
+            response.setTitle(notification.getTitle());
+            response.setContent(notification.getContent());
             response.setReadYn(notification.getReadYn());
             response.setReadAt(notification.getReadAt());
             response.setCreatedAt(RelativeTimeFormatter.formatRelativeTime(notification.getCreatedAt()));
