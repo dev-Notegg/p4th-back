@@ -1,13 +1,10 @@
 package com.p4th.backend.dto.response.post;
 
 import com.p4th.backend.domain.PostStatus;
-import com.p4th.backend.dto.response.comment.CommentResponse;
 import com.p4th.backend.util.RelativeTimeFormatter;
 import com.p4th.backend.domain.Post;
 import lombok.Data;
 import io.swagger.v3.oas.annotations.media.Schema;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Data
 @Schema(description = "게시글 상세 조회 응답 DTO")
@@ -51,9 +48,6 @@ public class PostDetailResponse {
     @Schema(description = "게시글 생성자", example = "user_001")
     private String createdBy;
 
-    @Schema(description = "댓글 목록")
-    private List<CommentResponse> comments;
-
     @Schema(description = "게시글이 스크랩 되었는지 여부", example = "true")
     private boolean scrapped;
 
@@ -82,11 +76,6 @@ public class PostDetailResponse {
         // createdAt을 RelativeTimeFormatter로 포맷
         dto.setCreatedAt(RelativeTimeFormatter.formatRelativeTime(post.getCreatedAt()));
         dto.setCreatedBy(post.getCreatedBy());
-        if (post.getComments() != null) {
-            dto.setComments(post.getComments().stream()
-                    .map(CommentResponse::from)
-                    .collect(Collectors.toList()));
-        }
         dto.scrapped = post.isScrapped();
         dto.scrapId = post.getScrapId();
         return dto;

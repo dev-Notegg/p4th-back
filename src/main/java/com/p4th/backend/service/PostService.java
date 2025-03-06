@@ -15,14 +15,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class PostService {
 
     private final PostMapper postMapper;
-    private final CommentMapper commentMapper;
     private final AuthMapper authMapper;
     private final PostRepository postRepository;
     private final S3Service s3Service;
@@ -58,13 +56,6 @@ public class PostService {
             if (post == null) {
                 throw new CustomException(ErrorCode.POST_NOT_FOUND);
             }
-            // 댓글 최근 10개만 설정
-            List<Comment> comments = commentMapper.getCommentsByPost(postId, userId);
-            if (comments.size() > 10) {
-                comments = comments.subList(0, 10);
-            }
-            post.setComments(comments);
-
             // 스크랩 여부 체크: 로그인한 사용자인 경우만 처리
             if (userId != null && !userId.trim().isEmpty()) {
                 Scrap scrap = scrapMapper.getScrapByPostAndUser(postId, userId);
