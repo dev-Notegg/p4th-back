@@ -9,6 +9,8 @@
         <result property="postId" column="post_id"/>
         <result property="commentId" column="comment_id"/>
         <result property="type" column="type"/>
+        <result property="title" column="title"/>
+        <result property="content" column="content"/>
         <result property="readYn" column="read_yn"/>
         <result property="readAt" column="read_at"/>
         <result property="createdAt" column="created_at"/>
@@ -53,6 +55,8 @@
             post_id,
             comment_id,
             type,
+            title,
+            content,
             read_yn,
             created_by
         )
@@ -62,6 +66,8 @@
                    #{postId},
                    #{commentId},
                    #{type},
+                   #{title},
+                   #{content},
                    #{readYn},
                    #{createdBy}
                )
