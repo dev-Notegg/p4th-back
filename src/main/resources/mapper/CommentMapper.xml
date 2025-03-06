@@ -38,6 +38,7 @@
             post_id,
             parent_comment_id,
             user_id,
+            nickname,
             content,
             created_by
         ) VALUES (
@@ -45,6 +46,7 @@
                      #{postId},
                      #{parentCommentId},
                      #{userId},
+                     #{nickname},
                      #{content},
                      #{createdBy}
                  )
