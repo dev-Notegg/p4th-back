@@ -107,6 +107,11 @@ public class CommentService {
             throw new CustomException(ErrorCode.UNAUTHORIZED_ACCESS);
         }
 
+        // 관리자가 타인의 댓글을 삭제하는 경우, 알림 전송
+        if (requester.getAdminRole() == 1 && !comment.getUserId().equals(userId)) {
+            notificationService.notifyDeleteAlert("COMMENT", comment.getUserId(), comment.getContent());
+        }
+
         int deleted = commentMapper.physicalDeleteComment(commentId);
         if (deleted != 1) {
             throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR, "댓글 삭제 실패");

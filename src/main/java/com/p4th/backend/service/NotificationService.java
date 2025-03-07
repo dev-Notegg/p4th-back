@@ -133,10 +133,10 @@ public class NotificationService {
      * 관리자가 게시글/댓글을 삭제한 경우 메세지 알림 설정
      */
     @Transactional
-    public void notifyDeleteAlert(String division, User user, String content) {
+    public void notifyDeleteAlert(String division, String userId, String content) {
         Notification notification = new Notification();
         notification.setNotificationId(ULIDUtil.getULID());
-        notification.setUserId(user.getUserId());
+        notification.setUserId(userId);
         notification.setType(NotificationType.ALERT);
         if(!division.equals("POST")){// 게시글 삭제 안내
             notification.setTitle(messageSource.getMessage("notification.delete", new Object[]{"게시글"}, locale));

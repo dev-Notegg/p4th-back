@@ -154,14 +154,20 @@ public class PostService {
     @Transactional
     public void deletePost(String postId, String userId) {
         try {
-            Post existing = postMapper.getPostDetail(postId, userId);
-            if (existing == null) {
+            Post post = postMapper.getPostDetail(postId, userId);
+            if (post == null) {
                 throw new CustomException(ErrorCode.POST_NOT_FOUND);
             }
             User requester = authMapper.selectByUserId(userId);
-            if (!existing.getUserId().equals(userId) && (requester == null || requester.getAdminRole() != 1)) {
+            if (!post.getUserId().equals(userId) && (requester == null || requester.getAdminRole() != 1)) {
                 throw new CustomException(ErrorCode.UNAUTHORIZED_ACCESS, "본인이 작성한 게시글만 삭제할 수 있습니다.");
             }
+
+            // 관리자가 타인의 게시글을 삭제하는 경우, 알림 전송
+            if (requester.getAdminRole() == 1 && !post.getUserId().equals(userId)) {
+                notificationService.notifyDeleteAlert("POST", post.getUserId(), post.getTitle());
+            }
+
             int deleted = postMapper.physicalDeletePost(postId);
             if (deleted != 1) {
                 throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR, "게시글 삭제 실패");
