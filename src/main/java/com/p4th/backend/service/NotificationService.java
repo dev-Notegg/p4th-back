@@ -138,7 +138,7 @@ public class NotificationService {
         notification.setNotificationId(ULIDUtil.getULID());
         notification.setUserId(userId);
         notification.setType(NotificationType.ALERT);
-        if(!division.equals("POST")){// 게시글 삭제 안내
+        if(division.equals("POST")){// 게시글 삭제 안내
             notification.setTitle(messageSource.getMessage("notification.delete", new Object[]{"게시글"}, locale));
             notification.setContent(
                     messageSource.getMessage("notification.alert.content",
