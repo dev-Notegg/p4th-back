@@ -4,12 +4,14 @@ import com.p4th.backend.common.exception.CustomException;
 import com.p4th.backend.common.exception.ErrorCode;
 import com.p4th.backend.domain.User;
 import com.p4th.backend.dto.response.user.UserProfileResponse;
+import com.p4th.backend.dto.response.auth.LoginResponse;
+import com.p4th.backend.dto.response.auth.SignUpResponse;
+import com.p4th.backend.dto.response.auth.UserResponse;
 import com.p4th.backend.mapper.AuthMapper;
 import com.p4th.backend.security.JwtProvider;
 import com.p4th.backend.util.PassCodeUtil;
 import com.p4th.backend.util.PasswordUtil;
 import jakarta.servlet.http.HttpServletRequest;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,8 +27,8 @@ public class AuthService {
     private final AuthMapper authMapper;
     private final JwtProvider jwtProvider;
 
-    // 회원가입: 입력받은 userId를 사용 (PK)
-    public SignUpResult signUp(String userId, String password, String nickname) {
+    // 회원가입: 회원가입 요청 후 바로 SignUpResponse 반환
+    public SignUpResponse signUp(String userId, String password, String nickname) {
         User user = new User();
         user.setUserId(userId);
         user.setPassword(PasswordUtil.encode(password));
@@ -39,7 +41,7 @@ public class AuthService {
             throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR, "회원가입 중 오류 발생: " + Arrays.toString(e.getStackTrace()));
         }
 
-        return new SignUpResult(userId, passCode);
+        return new SignUpResponse(userId, passCode);
     }
 
     // 회원ID 중복 체크
@@ -60,8 +62,8 @@ public class AuthService {
         return user == null;
     }
 
-    // 로그인: 회원ID와 비밀번호 확인
-    public LoginResult login(String userId, String rawPassword, HttpServletRequest request) {
+    // 로그인: 회원ID와 비밀번호 확인 후 바로 LoginResponse 반환
+    public LoginResponse login(String userId, String rawPassword, HttpServletRequest request) {
         String clientIp = extractClientIp(request);
         User user = authMapper.selectByUserId(userId);
         if (user == null) {
@@ -76,7 +78,7 @@ public class AuthService {
         authMapper.updateTokens(user);
         user.setLastLoginIp(clientIp);
         authMapper.updateLastLoginInfo(user);
-        return new LoginResult(accessToken, refreshToken, user);
+        return new LoginResponse(accessToken, refreshToken, new UserResponse(user));
     }
 
     // 아이디 찾기: passCode 기준 조회 후 userId 반환
@@ -104,24 +106,23 @@ public class AuthService {
     }
 
     /**
-     * 토큰 갱신: 컨트롤러에서 추출한 userId와 전달받은 리프레쉬 토큰을 이용하여 토큰 갱신을 수행한다.
+     * 토큰 갱신: userId와 전달받은 리프레쉬 토큰을 이용하여 토큰 갱신을 수행한다.
      */
-    public LoginResult refreshTokenForMember(String userId, String refreshToken) {
+    public LoginResponse refreshTokenForMember(String userId, String refreshToken) {
         User user = authMapper.selectByUserId(userId);
         if (user == null) {
             throw new CustomException(ErrorCode.USER_NOT_FOUND);
         }
         if (!jwtProvider.validateToken(refreshToken)) {
-            // 리프레쉬 토큰 만료: 새 리프레쉬 토큰과 엑세스 토큰 발급
+            // 리프레쉬 토큰 만료: 새 토큰 발급
             String newRefreshToken = jwtProvider.generateRefreshToken(user);
             String newAccessToken = jwtProvider.generateAccessToken(user);
             user.setRefreshToken(newRefreshToken);
             authMapper.updateTokens(user);
-            return new LoginResult(newAccessToken, newRefreshToken, user);
+            return new LoginResponse(newAccessToken, newRefreshToken, new UserResponse(user));
         } else {
-            // 유효한 리프레쉬 토큰: 새 엑세스 토큰 발급
             String newAccessToken = jwtProvider.generateAccessToken(user);
-            return new LoginResult(newAccessToken, refreshToken, user);
+            return new LoginResponse(newAccessToken, refreshToken, new UserResponse(user));
         }
     }
 
@@ -193,28 +194,6 @@ public class AuthService {
             throw ce;
         } catch (Exception e) {
             throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR, "내 계정 조회 중 오류: " + Arrays.toString(e.getStackTrace()));
-        }
-    }
-
-    @Getter
-    public static class SignUpResult {
-        private final String userId;
-        private final String passCode;
-        public SignUpResult(String userId, String passCode) {
-            this.userId = userId;
-            this.passCode = passCode;
-        }
-    }
-
-    @Getter
-    public static class LoginResult {
-        private final String accessToken;
-        private final String refreshToken;
-        private final User user;
-        public LoginResult(String accessToken, String refreshToken, User user) {
-            this.accessToken = accessToken;
-            this.refreshToken = refreshToken;
-            this.user = user;
         }
     }
 
