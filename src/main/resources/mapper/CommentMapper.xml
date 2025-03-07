@@ -11,7 +11,7 @@
             c.post_id,
             c.parent_comment_id,
             c.user_id,
-            c.nickname,
+            u.nickname,
             c.content,
             c.status,
             c.status_changed_at,
@@ -20,6 +20,7 @@
             c.updated_by,
             c.updated_at
         FROM comment c
+            JOIN user_info u ON u.user_id = c.user_id
         WHERE post_id = #{postId}
         <if test="userId != null">
             AND c.user_id NOT IN (
@@ -38,7 +39,6 @@
             post_id,
             parent_comment_id,
             user_id,
-            nickname,
             content,
             created_by
         ) VALUES (
@@ -46,7 +46,6 @@
                      #{postId},
                      #{parentCommentId},
                      #{userId},
-                     #{nickname},
                      #{content},
                      #{createdBy}
                  )
@@ -75,18 +74,19 @@
 
     <select id="getCommentById" resultType="com.p4th.backend.domain.Comment">
         SELECT
-            comment_id,
-            post_id,
-            parent_comment_id,
-            user_id,
-            nickname,
-            content,
-            status,
-            created_at,
-            created_by,
-            updated_at,
-            updated_by
-        FROM comment
+            c.comment_id,
+            c.post_id,
+            c.parent_comment_id,
+            c.user_id,
+            u.nickname,
+            c.content,
+            c.status,
+            c.created_at,
+            c.created_by,
+            c.updated_at,
+            c.updated_by
+        FROM comment c
+            JOIN user_info u ON u.user_id = c.user_id
         WHERE comment_id = #{commentId}
     </select>
 
