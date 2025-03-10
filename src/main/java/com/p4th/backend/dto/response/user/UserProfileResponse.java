@@ -7,6 +7,8 @@ import com.p4th.backend.util.RelativeTimeFormatter;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
+import java.time.format.DateTimeFormatter;
+
 @Data
 @Schema(description = "내 계정 조회 응답 DTO")
 public class UserProfileResponse {
@@ -28,6 +30,14 @@ public class UserProfileResponse {
     @JsonIgnore
     private String createdAt;
 
+    @JsonIgnore
+    @Schema(description = "패쓰코드", example = "abcdef12345")
+    private String passCode;
+
+    @JsonIgnore
+    @Schema(description = "가입일", example = "2025-10-01")
+    private String joinDate;
+
     public static UserProfileResponse from(User user) {
         UserProfileResponse dto = new UserProfileResponse(user);
         dto.setUserId(user.getUserId());
@@ -36,6 +46,15 @@ public class UserProfileResponse {
         dto.setAdminRole(user.getAdminRole());
         dto.setAccountStatus(user.getAccountStatus());
         dto.setCreatedAt(RelativeTimeFormatter.formatRelativeTime(user.getCreatedAt()));
+        return dto;
+    }
+
+    public static UserProfileResponse fromWithExtraInfo(User user) {
+        UserProfileResponse dto = from(user);
+        dto.setPassCode(user.getPassCode());
+        if (user.getCreatedAt() != null) {
+            dto.setJoinDate(user.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+        }
         return dto;
     }
 

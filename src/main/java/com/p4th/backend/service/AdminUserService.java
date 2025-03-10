@@ -22,7 +22,7 @@ public class AdminUserService {
     @Transactional(readOnly = true)
     public Page<UserProfileResponse> getUserList(String userId, String nickname, Pageable pageable) {
         Page<User> userPage = adminUserRepository.searchUsers(userId, nickname, pageable);
-        return userPage.map(UserProfileResponse::from);
+        return userPage.map(UserProfileResponse::fromWithExtraInfo);
     }
 
     @Transactional
