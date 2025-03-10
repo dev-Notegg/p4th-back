@@ -5,6 +5,7 @@ import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
+import org.springdoc.core.models.GroupedOpenApi;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -33,5 +34,21 @@ public class SwaggerConfig {
                 .components(components)
                 .addSecurityItem(securityRequirement)
                 .info(info);
+    }
+    @Bean
+    public GroupedOpenApi all(){
+        String[] pathsToMatch = {"/api/**"};
+        return GroupedOpenApi.builder()
+                .group("전체")
+                .pathsToMatch(pathsToMatch)
+                .build();
+    }
+    @Bean
+    public GroupedOpenApi adminManager(){
+        String[] pathsToMatch = {"/api/admin/**"};
+        return GroupedOpenApi.builder()
+                .group("CMS")
+                .pathsToMatch(pathsToMatch)
+                .build();
     }
 }

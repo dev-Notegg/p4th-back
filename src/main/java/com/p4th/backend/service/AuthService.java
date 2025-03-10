@@ -6,7 +6,6 @@ import com.p4th.backend.domain.User;
 import com.p4th.backend.dto.response.user.UserProfileResponse;
 import com.p4th.backend.dto.response.auth.LoginResponse;
 import com.p4th.backend.dto.response.auth.SignUpResponse;
-import com.p4th.backend.dto.response.auth.UserResponse;
 import com.p4th.backend.mapper.AuthMapper;
 import com.p4th.backend.security.JwtProvider;
 import com.p4th.backend.util.PassCodeUtil;
@@ -78,7 +77,7 @@ public class AuthService {
         authMapper.updateTokens(user);
         user.setLastLoginIp(clientIp);
         authMapper.updateLastLoginInfo(user);
-        return new LoginResponse(accessToken, refreshToken, new UserResponse(user));
+        return new LoginResponse(accessToken, refreshToken, new UserProfileResponse(user));
     }
 
     // 아이디 찾기: passCode 기준 조회 후 userId 반환
@@ -119,10 +118,10 @@ public class AuthService {
             String newAccessToken = jwtProvider.generateAccessToken(user);
             user.setRefreshToken(newRefreshToken);
             authMapper.updateTokens(user);
-            return new LoginResponse(newAccessToken, newRefreshToken, new UserResponse(user));
+            return new LoginResponse(newAccessToken, newRefreshToken, new UserProfileResponse(user));
         } else {
             String newAccessToken = jwtProvider.generateAccessToken(user);
-            return new LoginResponse(newAccessToken, refreshToken, new UserResponse(user));
+            return new LoginResponse(newAccessToken, refreshToken, new UserProfileResponse(user));
         }
     }
 

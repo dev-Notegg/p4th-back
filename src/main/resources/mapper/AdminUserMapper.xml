@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.p4th.backend.mapper.AdminUserMapper">
+
+    <update id="updateMembershipLevel">
+        UPDATE user_info
+        SET membership_level = #{membershipLevel},
+            updated_at = NOW()
+        WHERE user_id = #{userId}
+    </update>
+
+    <update id="updateAdminRole">
+        UPDATE user_info
+        SET admin_role = #{adminRole},
+            updated_at = NOW()
+        WHERE user_id = #{userId}
+    </update>
+
+    <select id="findAdminRoleByUserId" resultType="int">
+        SELECT admin_role
+        FROM user_info
+        WHERE user_id = #{userId}
+    </select>
+
+    <select id="countUserById" resultType="long">
+        SELECT COUNT(*)
+        FROM user_info
+        WHERE user_id = #{userId}
+    </select>
+</mapper>
