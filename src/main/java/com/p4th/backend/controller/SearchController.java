@@ -50,8 +50,7 @@ public class SearchController {
             HttpServletRequest request,
             @ParameterObject @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
         String userId = jwtProvider.resolveUserId(request);
-        Page<SearchResponse.SearchResult> response;
-        response = searchService.search(boardId, userId, query, pageable);
+        Page<SearchResponse.SearchResult> response = searchService.search(boardId, userId, query, pageable);
         return ResponseEntity.ok(response);
     }
 }

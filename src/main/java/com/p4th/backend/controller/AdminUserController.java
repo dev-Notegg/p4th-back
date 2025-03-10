@@ -16,7 +16,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-import org.springdoc.api.annotations.ParameterObject;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -42,12 +42,12 @@ public class AdminUserController {
     })
     @GetMapping
     public ResponseEntity<Page<UserProfileResponse>> getUsers(
-            @Parameter(description = "검색할 회원ID (옵션)")
-            @RequestParam(value = "user_id", required = false) String userId,
-            @Parameter(description = "검색할 닉네임 (옵션)")
+            @Parameter(name = "userId", description = "검색할 회원ID (옵션)")
+            @RequestParam(value = "userId", required = false) String userId,
+            @Parameter(name = "nickname", description = "검색할 닉네임 (옵션)")
             @RequestParam(value = "nickname", required = false) String nickname,
-            @ParameterObject @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
-            HttpServletRequest request
+            HttpServletRequest request,
+            @ParameterObject @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
     ) {
         authorization.checkAdmin(request);
         Page<UserProfileResponse> users = adminUserService.getUserList(userId, nickname, pageable);
