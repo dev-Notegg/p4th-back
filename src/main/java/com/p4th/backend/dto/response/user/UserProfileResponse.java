@@ -17,10 +17,10 @@ public class UserProfileResponse {
     private String nickname;
 
     @Schema(description = "회원 등급", example = "1")
-    private int membershipLevel;
+    private Integer membershipLevel;
 
     @Schema(description = "관리자 권한", example = "0")
-    private int adminRole;
+    private Integer adminRole;
 
     @Schema(description = "계정 상태", example = "ACTIVE")
     private AccountStatus accountStatus;

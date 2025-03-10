@@ -6,11 +6,9 @@ import com.p4th.backend.domain.User;
 import com.p4th.backend.dto.response.user.UserProfileResponse;
 import com.p4th.backend.mapper.AdminUserMapper;
 import com.p4th.backend.repository.AdminUserRepository;
-import jakarta.persistence.criteria.Predicate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,18 +21,7 @@ public class AdminUserService {
 
     @Transactional(readOnly = true)
     public Page<UserProfileResponse> getUserList(String userId, String nickname, Pageable pageable) {
-        Specification<User> spec = (root, query, cb) -> {
-            Predicate p = cb.conjunction();
-            if (userId != null && !userId.trim().isEmpty()) {
-                p = cb.and(p, cb.like(root.get("userId"), "%" + userId + "%"));
-            }
-            if (nickname != null && !nickname.trim().isEmpty()) {
-                p = cb.and(p, cb.like(root.get("nickname"), "%" + nickname + "%"));
-            }
-            return p;
-        };
-
-        Page<User> userPage = adminUserRepository.findAll(spec, pageable);
+        Page<User> userPage = adminUserRepository.searchUsers(userId, nickname, pageable);
         return userPage.map(UserProfileResponse::from);
     }
 
