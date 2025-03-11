@@ -2,7 +2,6 @@ package com.p4th.backend.dto.response.user;
 
 import com.p4th.backend.domain.User;
 import com.p4th.backend.domain.AccountStatus;
-import com.p4th.backend.util.RelativeTimeFormatter;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -26,8 +25,6 @@ public class UserProfileResponse {
     @Schema(description = "계정 상태", example = "ACTIVE")
     private AccountStatus accountStatus;
 
-    private String createdAt;
-
     @Schema(description = "패쓰코드", example = "abcdef12345")
     private String passCode;
 
@@ -41,7 +38,6 @@ public class UserProfileResponse {
         dto.setMembershipLevel(user.getMembershipLevel());
         dto.setAdminRole(user.getAdminRole());
         dto.setAccountStatus(user.getAccountStatus());
-        dto.setCreatedAt(RelativeTimeFormatter.formatRelativeTime(user.getCreatedAt()));
         return dto;
     }
 
