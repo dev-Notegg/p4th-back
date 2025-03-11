@@ -1,6 +1,5 @@
 package com.p4th.backend.dto.response.user;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.p4th.backend.domain.User;
 import com.p4th.backend.domain.AccountStatus;
 import com.p4th.backend.util.RelativeTimeFormatter;
@@ -27,14 +26,11 @@ public class UserProfileResponse {
     @Schema(description = "계정 상태", example = "ACTIVE")
     private AccountStatus accountStatus;
 
-    @JsonIgnore
     private String createdAt;
 
-    @JsonIgnore
     @Schema(description = "패쓰코드", example = "abcdef12345")
     private String passCode;
 
-    @JsonIgnore
     @Schema(description = "가입일", example = "2025-10-01")
     private String joinDate;
 
