@@ -7,8 +7,12 @@ import com.p4th.backend.mapper.PostMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAdjusters;
 import java.util.List;
 import com.p4th.backend.util.ULIDUtil;
 
@@ -24,13 +28,13 @@ public class SchedulerController {
         return viewCount * 0.4f + commentCount * 0.2f;
     }
 
-    private void processPopularity(String periodType, String periodStart, String periodEnd) {
+    private void processPopularity(String periodType, LocalDateTime periodStart, LocalDateTime periodBoundary) {
         List<Post> posts = postMapper.getAllPosts();
 
-        // 모든 게시글에 대해 기간 내 집계된 수치를 가져와 인기 점수를 계산
+        // 모든 게시글에 대해 해당 기간 내 집계 수치를 가져와 인기 점수를 계산
         List<PostPopularity> popularityList = posts.stream().map(post -> {
-            int periodViewCount = postMapper.getViewCountWithinPeriod(post.getPostId(), periodStart, periodEnd);
-            int periodCommentCount = postMapper.getCommentCountWithinPeriod(post.getPostId(), periodStart, periodEnd);
+            int periodViewCount = postMapper.getViewCountWithinPeriod(post.getPostId(), periodStart, periodBoundary);
+            int periodCommentCount = postMapper.getCommentCountWithinPeriod(post.getPostId(), periodStart, periodBoundary);
             float popularityScore = calculatePopularity(periodViewCount, periodCommentCount);
             return new PostPopularity(post, popularityScore, periodViewCount, periodCommentCount);
         }).toList();
@@ -47,9 +51,7 @@ public class SchedulerController {
             log.setHistoryId(ULIDUtil.getULID());
             log.setPostId(pp.post.getPostId());
             log.setPeriodType(periodType);
-            log.setPeriodStartDate(periodStart);
-            log.setPeriodEndDate(periodEnd);
-            // 기간 내 집계된 수치를 로그에 기록
+            log.setPeriodStartDate(LocalDateTime.parse(periodStart.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))));
             log.setViewCount(pp.periodViewCount);
             log.setCommentCount(pp.periodCommentCount);
             log.setPopularityScore(pp.popularityScore);
@@ -57,37 +59,40 @@ public class SchedulerController {
         }
     }
 
-    // DAILY: 매일 00:05에 실행 (전날 기준)
-    @Scheduled(cron = "0 5 0 * * *")
-    public void scheduleDailyPopularity() {
-        LocalDate yesterday = LocalDate.now().minusDays(1);
-        processPopularity("DAILY", yesterday.toString(), yesterday.toString());
-    }
-
-    // WEEKLY: 매주 월요일 00:05에 실행 (전 주 기준)
-    @Scheduled(cron = "0 5 0 * * MON")
-    public void scheduleWeeklyPopularity() {
-        LocalDate today = LocalDate.now();
-        LocalDate monday = today.with(java.time.DayOfWeek.MONDAY).minusWeeks(1);
-        LocalDate sunday = monday.plusDays(6);
-        processPopularity("WEEKLY", monday.toString(), sunday.toString());
-    }
-
-    // MONTHLY: 매월 1일 00:05에 실행 (전월 기준)
-    @Scheduled(cron = "0 5 0 1 * *")
-    public void scheduleMonthlyPopularity() {
-        LocalDate firstDayOfLastMonth = LocalDate.now().minusMonths(1).withDayOfMonth(1);
-        LocalDate lastDayOfLastMonth = firstDayOfLastMonth.withDayOfMonth(firstDayOfLastMonth.lengthOfMonth());
-        processPopularity("MONTHLY", firstDayOfLastMonth.toString(), lastDayOfLastMonth.toString());
-    }
-
     // HOURLY: 매 시간 정각에 실행 (지난 1시간 기준)
     @Scheduled(cron = "0 0 * * * *")
     public void scheduleHourlyPopularity() {
         LocalDateTime now = LocalDateTime.now();
         LocalDateTime lastHourStart = now.minusHours(1).withMinute(0).withSecond(0).withNano(0);
-        LocalDateTime lastHourEnd = lastHourStart.plusHours(1).minusNanos(1);
-        processPopularity("HOURLY", lastHourStart.toString(), lastHourEnd.toString());
+        LocalDateTime nextHourStart = lastHourStart.plusHours(1);
+        processPopularity("HOURLY", lastHourStart, nextHourStart);
+    }
+
+    // DAILY: 매일 00:05에 실행 (전날 기준)
+    @Scheduled(cron = "0 5 0 * * *")
+    public void scheduleDailyPopularity() {
+        LocalDate yesterday = LocalDate.now().minusDays(1);
+        LocalDateTime dayStart = yesterday.atStartOfDay();
+        LocalDateTime nextDayStart = dayStart.plusDays(1);
+        processPopularity("DAILY", dayStart, nextDayStart);
+    }
+
+    // WEEKLY: 매주 월요일 00:05에 실행 (전 주 기준)
+    @Scheduled(cron = "0 5 0 * * MON")
+    public void scheduleWeeklyPopularity() {
+        LocalDate lastMonday = LocalDate.now().with(TemporalAdjusters.previous(DayOfWeek.MONDAY));
+        LocalDateTime weekStart = lastMonday.atStartOfDay();
+        LocalDateTime nextWeekStart = weekStart.plusWeeks(1);
+        processPopularity("WEEKLY", weekStart, nextWeekStart);
+    }
+
+    // MONTHLY: 매월 1일 00:05에 실행 (전월 기준)
+    @Scheduled(cron = "0 5 0 1 * *")
+    public void scheduleMonthlyPopularity() {
+        LocalDate firstDayLastMonth = LocalDate.now().minusMonths(1).withDayOfMonth(1);
+        LocalDateTime monthStart = firstDayLastMonth.atStartOfDay();
+        LocalDateTime nextMonthStart = monthStart.plusMonths(1);
+        processPopularity("MONTHLY", monthStart, nextMonthStart);
     }
 
     // 유저마다 최근 본 게시글이 16개 이상인 경우 삭제

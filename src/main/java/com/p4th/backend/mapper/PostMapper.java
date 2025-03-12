@@ -41,11 +41,11 @@ public interface PostMapper {
 
     // 기간 내 게시글 조회수 집계 (post_view 테이블 기준)
     Integer getViewCountWithinPeriod(@Param("postId") String postId,
-                                     @Param("startDate") String startDate,
-                                     @Param("endDate") String endDate);
+                                     @Param("startDate") LocalDateTime startDate,
+                                     @Param("endDate") LocalDateTime endDate);
 
     // 기간 내 댓글 수 집계 (comment 테이블 기준)
     Integer getCommentCountWithinPeriod(@Param("postId") String postId,
-                                        @Param("startDate") String startDate,
-                                        @Param("endDate") String endDate);
+                                        @Param("startDate") LocalDateTime startDate,
+                                        @Param("endDate") LocalDateTime endDate);
 }

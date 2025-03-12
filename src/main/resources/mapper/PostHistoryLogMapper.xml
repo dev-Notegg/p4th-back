@@ -33,6 +33,7 @@
 
     <!-- 인기 게시글 조회: Map 파라미터를 받아 기간 조건 적용 -->
     <select id="getPopularPostsByPeriod" resultType="com.p4th.backend.dto.response.post.PopularPostResponse" parameterType="map">
+        <![CDATA[
         SELECT
             p.post_id AS postId,
             p.board_id AS boardId,
@@ -52,8 +53,9 @@
                  JOIN category c ON b.category_id = c.category_id
                  JOIN user_info u ON u.user_id = p.user_id
         WHERE h.period_type = #{period}
-          AND h.period_start_date = #{startDate}
-          AND h.period_end_date = #{endDate}
+        AND h.period_start_date >= #{startDate}
+        AND h.period_start_date < #{endDate}
+        ]]>
         <if test="userId != null">
             AND p.user_id NOT IN (
                 SELECT target_user_id

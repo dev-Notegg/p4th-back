@@ -13,10 +13,12 @@ import com.p4th.backend.util.RelativeTimeFormatter;
 import com.p4th.backend.util.HtmlContentUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAdjusters;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -58,37 +60,41 @@ public class MainService {
         }
     }
 
+    @Transactional(readOnly = true)
     public List<PopularPostResponse> getPopularPosts(String period, String userId) {
         try {
-            // 현재 날짜 기준으로 조회 기간 계산 (전날, 전주, 전달)
             LocalDate today = LocalDate.now();
             Map<String, Object> params = new HashMap<>();
             params.put("userId", userId);
             params.put("period", period);
+            DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
             if ("HOURLY".equalsIgnoreCase(period)) {
                 LocalDateTime now = LocalDateTime.now();
                 LocalDateTime lastHourStart = now.minusHours(1).withMinute(0).withSecond(0).withNano(0);
-                LocalDateTime lastHourEnd = lastHourStart.plusHours(1).minusNanos(1);
-                // ISO_LOCAL_DATE_TIME 형식으로 변환
-                params.put("startDate", lastHourStart.toString());
-                params.put("endDate", lastHourEnd.toString());
+                LocalDateTime nextHourStart = lastHourStart.plusHours(1);
+                params.put("startDate", lastHourStart.format(dtf));
+                params.put("endDate", nextHourStart.format(dtf));
             } else if ("DAILY".equalsIgnoreCase(period)) {
                 LocalDate yesterday = today.minusDays(1);
-                params.put("startDate", yesterday.toString());
-                params.put("endDate", yesterday.toString());
+                LocalDateTime dayStart = yesterday.atStartOfDay();
+                LocalDateTime nextDayStart = dayStart.plusDays(1);
+                params.put("startDate", dayStart.format(dtf));
+                params.put("endDate", nextDayStart.format(dtf));
             } else if ("WEEKLY".equalsIgnoreCase(period)) {
-                // 전주: 지난 주 월요일 ~ 일요일
+                // 전주: 지난 주 월요일 00:00:00 ~ 다음 월요일 00:00:00
                 LocalDate lastMonday = today.with(TemporalAdjusters.previous(DayOfWeek.MONDAY));
-                LocalDate lastSunday = lastMonday.plusDays(6);
-                params.put("startDate", lastMonday.toString());
-                params.put("endDate", lastSunday.toString());
+                LocalDateTime weekStart = lastMonday.atStartOfDay();
+                LocalDateTime nextWeekStart = weekStart.plusWeeks(1);
+                params.put("startDate", weekStart.format(dtf));
+                params.put("endDate", nextWeekStart.format(dtf));
             } else if ("MONTHLY".equalsIgnoreCase(period)) {
-                // 전달: 지난 달 1일 ~ 마지막 날
+                // 전달: 지난 달 1일 00:00:00 ~ 다음 달 1일 00:00:00
                 LocalDate firstDayLastMonth = today.minusMonths(1).withDayOfMonth(1);
-                LocalDate lastDayLastMonth = today.minusMonths(1).withDayOfMonth(today.minusMonths(1).lengthOfMonth());
-                params.put("startDate", firstDayLastMonth.toString());
-                params.put("endDate", lastDayLastMonth.toString());
+                LocalDateTime monthStart = firstDayLastMonth.atStartOfDay();
+                LocalDateTime nextMonthStart = monthStart.plusMonths(1);
+                params.put("startDate", monthStart.format(dtf));
+                params.put("endDate", nextMonthStart.format(dtf));
             } else {
                 throw new CustomException(ErrorCode.INVALID_INPUT, "유효하지 않은 조회 기간입니다.");
             }

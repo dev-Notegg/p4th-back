@@ -11,8 +11,7 @@ public class PostHistoryLog {
     private String historyId;
     private String postId;
     private String periodType; // DAILY, WEEKLY, MONTHLY
-    private String periodStartDate;
-    private String periodEndDate;
+    private LocalDateTime periodStartDate;
     private int viewCount;
     private int commentCount;
     private float popularityScore;
