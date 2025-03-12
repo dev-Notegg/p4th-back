@@ -38,4 +38,14 @@ public interface PostMapper {
     LocalDateTime get16thLatestViewedAt(@Param("userId") String userId);
 
     int deletePostViewsOlderThan(@Param("userId") String userId, @Param("cutoff") LocalDateTime cutoff);
+
+    // 기간 내 게시글 조회수 집계 (post_view 테이블 기준)
+    Integer getViewCountWithinPeriod(@Param("postId") String postId,
+                                     @Param("startDate") String startDate,
+                                     @Param("endDate") String endDate);
+
+    // 기간 내 댓글 수 집계 (comment 테이블 기준)
+    Integer getCommentCountWithinPeriod(@Param("postId") String postId,
+                                        @Param("startDate") String startDate,
+                                        @Param("endDate") String endDate);
 }

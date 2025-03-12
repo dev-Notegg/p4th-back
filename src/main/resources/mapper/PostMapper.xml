@@ -247,4 +247,19 @@
     ]]>
     </delete>
 
+    <!-- 기간 내 조회수 집계 -->
+    <select id="getViewCountWithinPeriod" resultType="int" parameterType="map">
+        SELECT COUNT(*)
+        FROM post_view
+        WHERE post_id = #{postId}
+          AND viewed_at BETWEEN #{startDate} AND #{endDate}
+    </select>
+
+    <!-- 기간 내 댓글 수 집계 -->
+    <select id="getCommentCountWithinPeriod" resultType="int" parameterType="map">
+        SELECT COUNT(*)
+        FROM comment
+        WHERE post_id = #{postId}
+          AND created_at BETWEEN #{startDate} AND #{endDate}
+    </select>
 </mapper>

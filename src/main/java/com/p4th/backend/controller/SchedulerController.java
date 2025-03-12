@@ -19,30 +19,40 @@ public class SchedulerController {
     private final PostMapper postMapper;
     private final PostHistoryLogMapper postHistoryLogMapper;
 
-    private float calculatePopularity(Post post) {
-        return post.getViewCount() * 0.4f + post.getCommentCount() * 0.2f;
+    // 기간 내 집계된 조회수와 댓글 수를 기준으로 인기 점수 계산
+    private float calculatePopularity(int viewCount, int commentCount) {
+        return viewCount * 0.4f + commentCount * 0.2f;
     }
 
     private void processPopularity(String periodType, String periodStart, String periodEnd) {
         List<Post> posts = postMapper.getAllPosts();
 
-        // 모든 게시글의 인기도 점수를 계산한 후, 내림차순으로 정렬하여 상위 20개 선택
-        List<Post> topPosts = posts.stream()
-                .sorted((p1, p2) -> Float.compare(calculatePopularity(p2), calculatePopularity(p1)))
+        // 모든 게시글에 대해 기간 내 집계된 수치를 가져와 인기 점수를 계산
+        List<PostPopularity> popularityList = posts.stream().map(post -> {
+            int periodViewCount = postMapper.getViewCountWithinPeriod(post.getPostId(), periodStart, periodEnd);
+            int periodCommentCount = postMapper.getCommentCountWithinPeriod(post.getPostId(), periodStart, periodEnd);
+            float popularityScore = calculatePopularity(periodViewCount, periodCommentCount);
+            return new PostPopularity(post, popularityScore, periodViewCount, periodCommentCount);
+        }).toList();
+
+        // 인기 점수 내림차순 정렬 후 상위 20개 선택
+        List<PostPopularity> topPosts = popularityList.stream()
+                .sorted((pp1, pp2) -> Float.compare(pp2.popularityScore, pp1.popularityScore))
                 .limit(20)
                 .toList();
 
-        for (Post post : topPosts) {
-            float popularityScore = calculatePopularity(post);
+        // 인기 게시글 로그 저장
+        for (PostPopularity pp : topPosts) {
             PostHistoryLog log = new PostHistoryLog();
             log.setHistoryId(ULIDUtil.getULID());
-            log.setPostId(post.getPostId());
+            log.setPostId(pp.post.getPostId());
             log.setPeriodType(periodType);
             log.setPeriodStartDate(periodStart);
             log.setPeriodEndDate(periodEnd);
-            log.setViewCount(post.getViewCount());
-            log.setCommentCount(post.getCommentCount());
-            log.setPopularityScore(popularityScore);
+            // 기간 내 집계된 수치를 로그에 기록
+            log.setViewCount(pp.periodViewCount);
+            log.setCommentCount(pp.periodCommentCount);
+            log.setPopularityScore(pp.popularityScore);
             postHistoryLogMapper.insertHistoryLog(log);
         }
     }
@@ -92,6 +102,21 @@ public class SchedulerController {
                 // cutoff보다 이전의 모든 post_view 레코드 삭제
                 postMapper.deletePostViewsOlderThan(userId, cutoff);
             }
+        }
+    }
+
+    // 내부 클래스: 게시글과 해당 기간의 집계 결과 보관
+    private static class PostPopularity {
+        Post post;
+        float popularityScore;
+        int periodViewCount;
+        int periodCommentCount;
+
+        public PostPopularity(Post post, float popularityScore, int periodViewCount, int periodCommentCount) {
+            this.post = post;
+            this.popularityScore = popularityScore;
+            this.periodViewCount = periodViewCount;
+            this.periodCommentCount = periodCommentCount;
         }
     }
 }
