@@ -11,7 +11,6 @@ import org.springframework.stereotype.Component;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAdjusters;
 import java.util.List;
 import com.p4th.backend.util.ULIDUtil;
@@ -51,7 +50,7 @@ public class SchedulerController {
             log.setHistoryId(ULIDUtil.getULID());
             log.setPostId(pp.post.getPostId());
             log.setPeriodType(periodType);
-            log.setPeriodStartDate(LocalDateTime.parse(periodStart.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))));
+            log.setPeriodStartDate(periodStart.withNano(0));
             log.setViewCount(pp.periodViewCount);
             log.setCommentCount(pp.periodCommentCount);
             log.setPopularityScore(pp.popularityScore);
