@@ -15,7 +15,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -51,7 +50,7 @@ public class ScrapController {
     public ResponseEntity<Page<ScrapPostListResponse>> getScrapPosts(
             @Parameter(name = "scrapFolderId", description = "스크랩 폴더 ID (옵션)")
             @RequestParam(value = "scrapFolderId", required = false) String scrapFolderId,
-            @ParameterObject @PageableDefault(sort = "scrappedAt", direction = Sort.Direction.DESC) Pageable pageable,
+            @Parameter(hidden = true) @PageableDefault(sort = "scrappedAt", direction = Sort.Direction.DESC) Pageable pageable,
             HttpServletRequest request) {
         String userId = jwtProvider.resolveUserId(request);
         if (userId == null) {

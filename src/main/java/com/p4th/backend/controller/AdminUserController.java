@@ -16,7 +16,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -47,7 +46,7 @@ public class AdminUserController {
             @Parameter(name = "nickname", description = "검색할 닉네임 (옵션)")
             @RequestParam(value = "nickname", required = false) String nickname,
             HttpServletRequest request,
-            @ParameterObject @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
+            @Parameter(hidden = true) @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
     ) {
         authorization.checkAdmin(request);
         Page<UserProfileResponse> users = adminUserService.getUserList(userId, nickname, pageable);

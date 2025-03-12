@@ -66,7 +66,14 @@ public class MainService {
             params.put("userId", userId);
             params.put("period", period);
 
-            if ("DAILY".equalsIgnoreCase(period)) {
+            if ("HOURLY".equalsIgnoreCase(period)) {
+                LocalDateTime now = LocalDateTime.now();
+                LocalDateTime lastHourStart = now.minusHours(1).withMinute(0).withSecond(0).withNano(0);
+                LocalDateTime lastHourEnd = lastHourStart.plusHours(1).minusNanos(1);
+                // ISO_LOCAL_DATE_TIME 형식으로 변환
+                params.put("startDate", lastHourStart.toString());
+                params.put("endDate", lastHourEnd.toString());
+            } else if ("DAILY".equalsIgnoreCase(period)) {
                 LocalDate yesterday = today.minusDays(1);
                 params.put("startDate", yesterday.toString());
                 params.put("endDate", yesterday.toString());

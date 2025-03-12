@@ -19,7 +19,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-import org.springdoc.api.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -50,7 +49,7 @@ public class AdminCategoryController {
             @Parameter(name = "categoryName", description = "검색할 카테고리명 (옵션)")
             @RequestParam(value = "categoryName", required = false) String categoryName,
             HttpServletRequest request,
-            @ParameterObject @PageableDefault(sort = "sortOrder", direction = Sort.Direction.ASC) Pageable pageable) {
+            @Parameter(hidden = true) @PageableDefault(sort = "sortOrder", direction = Sort.Direction.ASC) Pageable pageable) {
         authorization.checkAdmin(request);
         Page<CategoryResponse> response = adminCategoryService.getCategories(categoryId, categoryName, pageable);
         return ResponseEntity.ok(response);

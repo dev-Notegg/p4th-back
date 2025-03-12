@@ -13,7 +13,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -48,7 +47,7 @@ public class SearchController {
             @Parameter(name = "query", description = "검색어", required = true)
             @RequestParam("query") String query,
             HttpServletRequest request,
-            @ParameterObject @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+            @Parameter(hidden = true) @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
         String userId = jwtProvider.resolveUserId(request);
         Page<SearchResponse.SearchResult> response = searchService.search(boardId, userId, query, pageable);
         return ResponseEntity.ok(response);

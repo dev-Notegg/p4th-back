@@ -56,7 +56,7 @@ public class MainController {
     }
 
 
-    @Operation(summary = "인기 게시글 목록 조회", description = "인기 게시글 목록(최대 20개)을 반환한다. period 파라미터(DAILY, WEEKLY, MONTHLY)를 통해 조회 기간을 지정한다.")
+    @Operation(summary = "인기 게시글 목록 조회", description = "인기 게시글 목록(최대 20개)을 반환한다. period 파라미터(HOURLY, DAILY, WEEKLY, MONTHLY)를 통해 조회 기간을 지정한다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "인기 게시글 목록 조회 성공",
                     content = @Content(schema = @Schema(implementation = PopularPostResponse.class))),
@@ -65,7 +65,7 @@ public class MainController {
     })
     @GetMapping("/popular/posts")
     public ResponseEntity<List<?>> getPopularPosts(
-            @Parameter(name = "period", description = "조회 기간 (DAILY, WEEKLY, MONTHLY)", example = "DAILY")
+            @Parameter(name = "period", description = "조회 기간 (HOURLY, DAILY, WEEKLY, MONTHLY)", example = "DAILY")
             @RequestParam(value = "period", defaultValue = "DAILY") String period,
             HttpServletRequest httpRequest) {
         String userId = jwtProvider.resolveUserId(httpRequest);

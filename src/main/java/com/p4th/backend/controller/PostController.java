@@ -15,7 +15,6 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -44,8 +43,7 @@ public class PostController {
             @Parameter(name = "board_id", description = "게시판 ID", required = true)
             @RequestParam("board_id") String boardId,
             HttpServletRequest httpRequest,
-            @ParameterObject
-            @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+            @Parameter(hidden = true) @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
         String userId = jwtProvider.resolveUserId(httpRequest);
         Page<PostListResponse> posts = postService.getPostsByBoard(boardId, userId, pageable);
         return ResponseEntity.ok().body(posts);
