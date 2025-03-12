@@ -1,12 +1,18 @@
 package com.p4th.backend.domain;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 import java.time.LocalDateTime;
 
+@Entity
+@Table(name = "notification")
 @Getter
 @Setter
 public class Notification {
+    @Id
     private String notificationId;
     private String userId;
     private String postId;
