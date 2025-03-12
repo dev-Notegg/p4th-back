@@ -4,7 +4,7 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.p4th.backend.mapper.AdminBoardMapper">
 
-    <resultMap id="boardResultMap" type="com.p4th.backend.dto.response.admin.BoardResponse">
+    <resultMap id="boardResultMap" type="com.p4th.backend.domain.Board">
         <id property="boardId" column="board_id"/>
         <result property="boardName" column="board_name"/>
         <result property="sortOrder" column="sort_order"/>
