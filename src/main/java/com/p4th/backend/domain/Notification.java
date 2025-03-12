@@ -1,5 +1,6 @@
 package com.p4th.backend.domain;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
@@ -14,7 +15,9 @@ import java.time.LocalDateTime;
 public class Notification {
     @Id
     private String notificationId;
+    @Column(name = "user_id")
     private String userId;
+    @Column(name = "post_id")
     private String postId;
     private String commentId;
     private NotificationType type;      // COMMENT, RECOMMENT, NOTICE, ALERT 등

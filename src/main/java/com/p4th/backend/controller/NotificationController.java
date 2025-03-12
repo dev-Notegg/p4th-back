@@ -43,8 +43,8 @@ public class NotificationController {
     })
     @GetMapping
     public ResponseEntity<Page<NotificationResponse>> getNotifications(
-            HttpServletRequest request,
-            @ParameterObject @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+            @ParameterObject @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
+            HttpServletRequest request) {
         String userId = jwtProvider.resolveUserId(request);
         if (userId == null) {
             throw new CustomException(ErrorCode.LOGIN_REQUIRED);

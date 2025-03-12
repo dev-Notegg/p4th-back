@@ -12,6 +12,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Locale;
@@ -27,6 +28,9 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleCustomException(CustomException ex, Locale locale) {
         ErrorCode code = ex.getErrorCode();
         String message = messageSource.getMessage(code.getMessage(), null, locale);
+        StackTraceElement element = ex.getStackTrace()[0];
+        logger.error("CustomException occurred at {}.{}():{} - {}",
+                element.getClassName(), element.getMethodName(), element.getLineNumber(), ex.getMessage(), ex);
         ErrorResponse errorResponse = ErrorResponse.builder()
                 .errorCode(code.getCode())
                 .errorMessage(message)
@@ -47,6 +51,9 @@ public class GlobalExceptionHandler {
                     .append(fieldError.getDefaultMessage())
                     .append("; ");
         }
+        StackTraceElement element = ex.getStackTrace()[0];
+        logger.error("Validation error at {}.{}():{} - {}",
+                element.getClassName(), element.getMethodName(), element.getLineNumber(), errorMessage, ex);
         ErrorResponse errorResponse = ErrorResponse.builder()
                 .errorCode(400)
                 .errorMessage(errorMessage.toString())
@@ -58,7 +65,9 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(org.springframework.http.converter.HttpMessageNotReadableException.class)
     public ResponseEntity<ErrorResponse> handleHttpMessageNotReadable(org.springframework.http.converter.HttpMessageNotReadableException ex) {
-        logger.error("Unreadable HTTP message: {}", ex.getMessage());
+        StackTraceElement element = ex.getStackTrace()[0];
+        logger.error("Unreadable HTTP message at {}.{}():{} - {}",
+                element.getClassName(), element.getMethodName(), element.getLineNumber(), ex.getMessage(), ex);
         ErrorResponse errorResponse = ErrorResponse.builder()
                 .errorCode(400)
                 .errorMessage("Malformed JSON request: " + ex.getMostSpecificCause().getMessage())
@@ -70,7 +79,9 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(org.springframework.web.HttpRequestMethodNotSupportedException.class)
     public ResponseEntity<ErrorResponse> handleHttpRequestMethodNotSupported(org.springframework.web.HttpRequestMethodNotSupportedException ex) {
-        logger.error("Method not supported: {}", ex.getMessage());
+        StackTraceElement element = ex.getStackTrace()[0];
+        logger.error("HTTP method not supported at {}.{}():{} - {}",
+                element.getClassName(), element.getMethodName(), element.getLineNumber(), ex.getMessage(), ex);
         String message = "HTTP method " + ex.getMethod() + " is not supported. Supported";
         ErrorResponse errorResponse = ErrorResponse.builder()
                 .errorCode(405)
@@ -83,10 +94,12 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleAllUncaughtException(Exception ex) {
-        logger.error("Unhandled exception: ", ex);
+        StackTraceElement element = ex.getStackTrace()[0];
+        logger.error("Unhandled exception at {}.{}():{} - {}",
+                element.getClassName(), element.getMethodName(), element.getLineNumber(), ex.getMessage(), ex);
         ErrorResponse errorResponse = ErrorResponse.builder()
                 .errorCode(500)
-                .errorMessage("Internal server error")
+                .errorMessage("Internal server error: " + ex.getMessage())
                 .status(HttpStatus.INTERNAL_SERVER_ERROR.name())
                 .timestamp(LocalDateTime.now())
                 .build();
