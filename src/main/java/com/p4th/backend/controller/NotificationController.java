@@ -2,6 +2,7 @@ package com.p4th.backend.controller;
 
 import com.p4th.backend.common.exception.CustomException;
 import com.p4th.backend.common.exception.ErrorCode;
+import com.p4th.backend.common.exception.ErrorResponse;
 import com.p4th.backend.dto.response.NotificationResponse;
 import com.p4th.backend.dto.response.UnreadCountResponse;
 import com.p4th.backend.security.JwtProvider;
@@ -15,9 +16,13 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.api.annotations.ParameterObject;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import java.util.List;
 
 @Tag(name = "알림 API", description = "알림 관련 API")
 @RestController
@@ -29,21 +34,22 @@ public class NotificationController {
     private final JwtProvider jwtProvider;
 
     @Operation(summary = "알림 목록 조회",
-            description = "사용자의 알림 목록을 조회한다." +
-                    "\n 알림 타입:댓글(COMMENT)/대댓글(RECOMMENT)/공지(NOTICE)/안내(ALERT)")
+            description = "사용자의 알림 목록을 페이징 처리하여 조회한다. 알림 타입: 댓글(COMMENT)/대댓글(RECOMMENT)/공지(NOTICE)/안내(ALERT)")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "알림 목록 조회 성공",
                     content = @Content(schema = @Schema(implementation = NotificationResponse.class))),
             @ApiResponse(responseCode = "403", description = "로그인 후 이용가능한 메뉴",
-                    content = @Content(schema = @Schema(implementation = com.p4th.backend.dto.response.ErrorResponse.class)))
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @GetMapping
-    public ResponseEntity<List<NotificationResponse>> getNotifications(HttpServletRequest request) {
+    public ResponseEntity<Page<NotificationResponse>> getNotifications(
+            HttpServletRequest request,
+            @ParameterObject @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
         String userId = jwtProvider.resolveUserId(request);
         if (userId == null) {
             throw new CustomException(ErrorCode.LOGIN_REQUIRED);
         }
-        List<NotificationResponse> notifications = notificationService.getNotifications(userId);
+        Page<NotificationResponse> notifications = notificationService.getNotifications(userId, pageable);
         return ResponseEntity.ok(notifications);
     }
 

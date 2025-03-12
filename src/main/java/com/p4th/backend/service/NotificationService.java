@@ -8,6 +8,7 @@ import com.p4th.backend.dto.response.UnreadCountResponse;
 import com.p4th.backend.mapper.AuthMapper;
 import com.p4th.backend.mapper.NotificationMapper;
 import com.p4th.backend.mapper.PostMapper;
+import com.p4th.backend.repository.NotificationRepository;
 import com.p4th.backend.util.HtmlImageUtils;
 import com.p4th.backend.util.HtmlContentUtils;
 import com.p4th.backend.util.RelativeTimeFormatter;
@@ -15,11 +16,12 @@ import com.p4th.backend.util.ULIDUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Locale;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -30,34 +32,39 @@ public class NotificationService {
     private final AuthMapper authMapper;
     @Autowired
     private MessageSource messageSource;
+    private final NotificationRepository notificationRepository;
 
     Locale locale = Locale.getDefault();
 
     @Transactional(readOnly = true)
-    public List<NotificationResponse> getNotifications(String userId) {
-        List<Notification> notifications = notificationMapper.getNotificationsByUserId(userId);
-        return notifications.stream().map(notification -> {
-            NotificationResponse response = new NotificationResponse();
-            response.setNotificationId(notification.getNotificationId());
-            response.setUserId(notification.getUserId());
-            response.setPostId(notification.getPostId());
-            response.setCommentId(notification.getCommentId());
-            response.setType(notification.getType());
-            response.setTitle(notification.getTitle());
-            response.setContent(notification.getContent());
-            response.setReadYn(notification.getReadYn());
-            response.setReadAt(notification.getReadAt());
-            response.setCreatedAt(RelativeTimeFormatter.formatRelativeTime(notification.getCreatedAt()));
+    public Page<NotificationResponse> getNotifications(String userId, Pageable pageable) {
+        try {
+            Page<Notification> notificationPage = notificationRepository.findByUserIdOrderByCreatedAtDesc(userId, pageable);
+            return notificationPage.map(notification -> {
+                NotificationResponse response = new NotificationResponse();
+                response.setNotificationId(notification.getNotificationId());
+                response.setUserId(notification.getUserId());
+                response.setPostId(notification.getPostId());
+                response.setCommentId(notification.getCommentId());
+                response.setType(notification.getType());
+                response.setTitle(notification.getTitle());
+                response.setContent(notification.getContent());
+                response.setReadYn(notification.getReadYn());
+                response.setReadAt(notification.getReadAt());
+                response.setCreatedAt(RelativeTimeFormatter.formatRelativeTime(notification.getCreatedAt()));
 
-            // 게시글 ID가 있을 경우 이미지 URL 설정(삭제 안내는 제외)
-            if (!notification.getType().equals(NotificationType.ALERT) && notification.getPostId() != null) {
-                Post post = postMapper.getPostDetail(notification.getPostId(), null);
-                if (post != null) {
-                    response.setImageUrl(HtmlImageUtils.extractFirstImageUrl(post.getContent()));
+                // 게시글 ID가 있을 경우 이미지 URL 설정(삭제 안내는 제외)
+                if (!notification.getType().equals(NotificationType.ALERT) && notification.getPostId() != null) {
+                    Post post = postMapper.getPostDetail(notification.getPostId(), null);
+                    if (post != null) {
+                        response.setImageUrl(HtmlImageUtils.extractFirstImageUrl(post.getContent()));
+                    }
                 }
-            }
-            return response;
-        }).collect(Collectors.toList());
+                return response;
+            });
+        } catch (Exception e) {
+            throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR, "알림 목록 조회 중 오류: " + e.getMessage());
+        }
     }
 
     private String getPostTitle(String postId) {
