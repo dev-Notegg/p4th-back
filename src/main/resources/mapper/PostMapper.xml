@@ -240,11 +240,9 @@
         LIMIT 1 OFFSET 15
     </select>
 
-    <delete id="deletePostViewsOlderThan" parameterType="map">
-    <![CDATA[
+    <delete id="deletePostViewsOlderThan" parameterType="java.time.LocalDateTime">
         DELETE FROM post_view
-        WHERE user_id = #{userId} AND viewed_at < #{cutoff, jdbcType=TIMESTAMP}
-    ]]>
+        WHERE viewed_at <![CDATA[ < ]]> #{cutoff}
     </delete>
 
     <!-- 기간 내 조회수 집계 -->

@@ -94,28 +94,13 @@ public class SchedulerController {
         processPopularity("MONTHLY", monthStart, nextMonthStart);
     }
 
-    // HOURLY: 매 시간 정각에 실행 (지난 1시간 기준)
-    @Scheduled(cron = "0 15 17 * * *")
-    public void scheduleHourlyPopularityTest() {
-        LocalDateTime now = LocalDateTime.now();
-        LocalDateTime lastHourStart = now.minusHours(1).withMinute(0).withSecond(0).withNano(0);
-        LocalDateTime nextHourStart = lastHourStart.plusHours(1);
-        processPopularity("HOURLY", lastHourStart, nextHourStart);
-    }
-
-    // 유저마다 최근 본 게시글이 16개 이상인 경우 삭제
+    // 생성된 지 2달 이상된 post_view 데이터를 삭제
     @Scheduled(cron = "0 0 0 * * *")
     public void cleanupPostViews() {
-        // 모든 사용자 ID 조회
-        List<String> userIds = postMapper.getDistinctUserIdsFromPostView();
-        for (String userId : userIds) {
-            // 해당 사용자의 16번째 최신 조회일시를 구함
-            LocalDateTime cutoff = postMapper.get16thLatestViewedAt(userId);
-            if (cutoff != null) {
-                // cutoff보다 이전의 모든 post_view 레코드 삭제
-                postMapper.deletePostViewsOlderThan(userId, cutoff);
-            }
-        }
+        // 현재 시각에서 2달 이전의 시각 계산
+        LocalDateTime cutoff = LocalDateTime.now().minusMonths(2);
+        // 모든 post_view 레코드 중, cutoff보다 이전에 생성된 데이터 삭제
+        postMapper.deletePostViewsOlderThan(cutoff);
     }
 
     // 내부 클래스: 게시글과 해당 기간의 집계 결과 보관
