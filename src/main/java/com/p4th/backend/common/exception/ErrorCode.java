@@ -29,6 +29,9 @@ public enum ErrorCode {
     SCRAP_NOT_FOUND(HttpStatus.NOT_FOUND, 20301, "error.scrapNotFound"),
     SCRAP_ALREADY_EXISTS(HttpStatus.BAD_REQUEST, 20302, "error.scrapAlreadyExists"),
 
+    //카테고리 관련
+    CATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND, 20401, "error.categoryNotFound"),
+
     // 공통
     INVALID_INPUT(HttpStatus.BAD_REQUEST, 30100, "error.invalidInput"),
 

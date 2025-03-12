@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.p4th.backend.mapper.AdminCategoryMapper">
+
+    <resultMap id="categoryResultMap" type="com.p4th.backend.domain.Category">
+        <id property="categoryId" column="category_id"/>
+        <result property="categoryName" column="category_name"/>
+        <result property="sortOrder" column="sort_order"/>
+        <result property="mainExposure" column="main_exposure"/>
+        <result property="createdAt" column="created_at"/>
+    </resultMap>
+
+    <select id="findById" resultMap="categoryResultMap" parameterType="string">
+        SELECT category_id, category_name, sort_order, main_exposure
+        FROM category
+        WHERE category_id = #{categoryId}
+    </select>
+
+    <insert id="insertCategory" parameterType="com.p4th.backend.domain.Category">
+        INSERT INTO category (category_id, category_name, sort_order)
+        VALUES (#{categoryId}, #{categoryName}, #{sortOrder})
+    </insert>
+
+    <update id="updateCategory" parameterType="com.p4th.backend.domain.Category">
+        UPDATE category
+        SET category_name = #{categoryName},
+            sort_order = #{sortOrder},
+            main_exposure = #{mainExposure}
+        WHERE category_id = #{categoryId}
+    </update>
+
+    <update id="updateCategoryOrder" parameterType="map">
+        UPDATE category
+        SET sort_order = #{sortOrder}
+        WHERE category_id = #{categoryId}
+    </update>
+
+    <select id="findAllCategoryIds" resultType="String">
+        SELECT category_id FROM category
+    </select>
+
+    <select id="getMaxSortOrder" resultType="Integer">
+        SELECT COALESCE(MAX(sort_order), 0) FROM category
+    </select>
+</mapper>
