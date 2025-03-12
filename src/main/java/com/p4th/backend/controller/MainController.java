@@ -65,7 +65,7 @@ public class MainController {
     })
     @GetMapping("/popular/posts")
     public ResponseEntity<List<?>> getPopularPosts(
-            @Parameter(name = "period", description = "조회 기간 (HOURLY, DAILY, WEEKLY, MONTHLY)", example = "DAILY")
+            @Parameter(name = "period", description = "조회 기간 (HOURLY, DAILY, WEEKLY, MONTHLY)", example = "HOURLY")
             @RequestParam(value = "period", defaultValue = "DAILY") String period,
             HttpServletRequest httpRequest) {
         String userId = jwtProvider.resolveUserId(httpRequest);

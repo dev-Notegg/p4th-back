@@ -94,6 +94,15 @@ public class SchedulerController {
         processPopularity("MONTHLY", monthStart, nextMonthStart);
     }
 
+    // HOURLY: 매 시간 정각에 실행 (지난 1시간 기준)
+    @Scheduled(cron = "0 15 17 * * *")
+    public void scheduleHourlyPopularityTest() {
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime lastHourStart = now.minusHours(1).withMinute(0).withSecond(0).withNano(0);
+        LocalDateTime nextHourStart = lastHourStart.plusHours(1);
+        processPopularity("HOURLY", lastHourStart, nextHourStart);
+    }
+
     // 유저마다 최근 본 게시글이 16개 이상인 경우 삭제
     @Scheduled(cron = "0 0 0 * * *")
     public void cleanupPostViews() {
