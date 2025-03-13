@@ -68,12 +68,12 @@ public class CommentService {
         if (request.getParentCommentId() != null && !request.getParentCommentId().trim().isEmpty()) {
             Comment parentComment = commentMapper.getCommentById(request.getParentCommentId());
             if (parentComment != null && !userId.equals(parentComment.getUserId())) {
-                notificationService.notifyComment(NotificationType.RECOMMENT, post, user, commentId, request.getContent());
+                notificationService.notifyComment(NotificationType.RECOMMENT, postId, parentComment.getUserId(), commentId, user.getNickname(), request.getContent());
             }
         } else {
             // 2. 일반 댓글인 경우: 게시글 작성자에게 알림 생성 (자신이 작성한 댓글은 제외)
             if (!userId.equals(post.getUserId())) {
-                notificationService.notifyComment(NotificationType.COMMENT, post, user, commentId, request.getContent());
+                notificationService.notifyComment(NotificationType.COMMENT, postId, post.getUserId(), commentId, user.getNickname(), request.getContent());
             }
         }
 

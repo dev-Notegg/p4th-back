@@ -93,17 +93,17 @@ public class NotificationService {
      * 내 게시글에 댓글 혹은 대댓글이 달렸을 때 알림 생성
      */
     @Transactional
-    public void notifyComment(NotificationType type, Post post, User user, String commentId, String commentContent) {
+    public void notifyComment(NotificationType type, String postId, String userId, String commentId, String Nickname, String commentContent) {
         Notification notification = new Notification();
         notification.setNotificationId(ULIDUtil.getULID());
-        notification.setUserId(post.getUserId());
-        notification.setPostId(post.getPostId());
+        notification.setUserId(userId);
+        notification.setPostId(postId);
         notification.setCommentId(commentId);
         notification.setType(type);
         if(type.equals(NotificationType.COMMENT)) {
-            notification.setTitle(messageSource.getMessage("notification.comment", new Object[]{user.getNickname()}, locale));
+            notification.setTitle(messageSource.getMessage("notification.comment", new Object[]{Nickname}, locale));
         }else{
-            notification.setTitle(messageSource.getMessage("notification.recomment", new Object[]{user.getNickname()}, locale));
+            notification.setTitle(messageSource.getMessage("notification.recomment", new Object[]{Nickname}, locale));
         }
         notification.setContent(commentContent);
         notification.setReadYn(0);
