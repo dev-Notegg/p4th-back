@@ -44,4 +44,9 @@
     <select id="getMaxSortOrder" resultType="Integer">
         SELECT COALESCE(MAX(sort_order), 0) FROM category
     </select>
+
+    <delete id="deleteCategory" parameterType="string">
+        DELETE FROM category
+        WHERE category_id = #{categoryId}
+    </delete>
 </mapper>

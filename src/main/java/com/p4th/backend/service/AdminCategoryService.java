@@ -107,4 +107,38 @@ public class AdminCategoryService {
             }
         }
     }
+
+    /**
+     * 카테고리명 수정
+     * @param categoryId 수정할 카테고리의 ID
+     * @param newCategoryName 새로 적용할 카테고리명
+     */
+    @Transactional
+    public void updateCategoryName(String categoryId, String newCategoryName) {
+        Category category = adminCategoryMapper.findById(categoryId);
+        if (category == null) {
+            throw new CustomException(ErrorCode.CATEGORY_NOT_FOUND, "해당 카테고리를 찾을 수 없습니다.");
+        }
+        category.setCategoryName(newCategoryName);
+        int updated = adminCategoryMapper.updateCategory(category);
+        if (updated != 1) {
+            throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR, "카테고리명 수정에 실패하였습니다.");
+        }
+    }
+
+    /**
+     * 카테고리 삭제
+     * @param categoryId 삭제할 카테고리의 ID
+     */
+    @Transactional
+    public void deleteCategory(String categoryId) {
+        Category category = adminCategoryMapper.findById(categoryId);
+        if (category == null) {
+            throw new CustomException(ErrorCode.CATEGORY_NOT_FOUND, "해당 카테고리를 찾을 수 없습니다.");
+        }
+        int deleted = adminCategoryMapper.deleteCategory(categoryId);
+        if (deleted != 1) {
+            throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR, "카테고리 삭제에 실패하였습니다.");
+        }
+    }
 }

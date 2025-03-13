@@ -1,10 +1,7 @@
 package com.p4th.backend.controller;
 
 import com.p4th.backend.common.exception.ErrorResponse;
-import com.p4th.backend.dto.request.BoardOrderUpdateRequest;
-import com.p4th.backend.dto.request.CategoryCreationRequest;
-import com.p4th.backend.dto.request.MainExposureUpdateRequest;
-import com.p4th.backend.dto.request.CategoryOrderUpdateRequest;
+import com.p4th.backend.dto.request.*;
 import com.p4th.backend.dto.response.admin.BoardListResponse;
 import com.p4th.backend.dto.response.admin.CategoryCreationResponse;
 import com.p4th.backend.dto.response.admin.CategoryResponse;
@@ -63,7 +60,7 @@ public class AdminCategoryController {
         @ApiResponse(responseCode = "500", description = "내부 서버 오류",
                 content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
-    @PatchMapping("/{categoryId}/main-exposure")
+    @PutMapping("/{categoryId}/main-exposure")
     public ResponseEntity<?> updateMainExposure(
             @Parameter(name = "categoryId", description = "카테고리 ID", required = true)
             @PathVariable("categoryId") String categoryId,
@@ -98,7 +95,7 @@ public class AdminCategoryController {
         @ApiResponse(responseCode = "500", description = "내부 서버 오류",
                 content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
-    @PatchMapping("/order")
+    @PutMapping("/order")
     public ResponseEntity<?> updateCategoryOrder(
             @RequestBody CategoryOrderUpdateRequest requestDto,
             HttpServletRequest request) {
@@ -133,7 +130,7 @@ public class AdminCategoryController {
             @ApiResponse(responseCode = "500", description = "내부 서버 오류",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
-    @PatchMapping("/{categoryId}/boards/order")
+    @PutMapping("/{categoryId}/boards/order")
     public ResponseEntity<?> updateBoardOrder(
             @Parameter(name = "categoryId", description = "카테고리 ID", required = true)
             @PathVariable("categoryId") String categoryId,
@@ -141,6 +138,43 @@ public class AdminCategoryController {
             HttpServletRequest request) {
         authorization.checkAdmin(request);
         adminCategoryService.updateBoardOrder(categoryId, requestDto);
+        return ResponseEntity.ok().build();
+    }
+
+    @Operation(summary = "카테고리명 수정", description = "특정 카테고리의 이름을 수정한다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "카테고리명 수정 성공"),
+            @ApiResponse(responseCode = "400", description = "입력값 오류",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "403", description = "관리자 권한 필요",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    @PutMapping("/{categoryId}/category-name")
+    public ResponseEntity<?> updateCategoryName(
+            @Parameter(name = "categoryId", description = "수정할 카테고리 ID", required = true)
+            @PathVariable("categoryId") String categoryId,
+            @RequestBody CategoryNameUpdateRequest requestDto,
+            HttpServletRequest request) {
+        authorization.checkAdmin(request);
+        adminCategoryService.updateCategoryName(categoryId, requestDto.getCategoryName());
+        return ResponseEntity.ok().build();
+    }
+
+    @Operation(summary = "카테고리 삭제", description = "특정 카테고리를 삭제한다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "카테고리 삭제 성공"),
+            @ApiResponse(responseCode = "403", description = "관리자 권한 필요",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "500", description = "내부 서버 오류",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    })
+    @DeleteMapping("/{categoryId}")
+    public ResponseEntity<?> deleteCategory(
+            @Parameter(name = "categoryId", description = "삭제할 카테고리 ID", required = true)
+            @PathVariable("categoryId") String categoryId,
+            HttpServletRequest request) {
+        authorization.checkAdmin(request);
+        adminCategoryService.deleteCategory(categoryId);
         return ResponseEntity.ok().build();
     }
 }

@@ -27,4 +27,7 @@ public interface AdminCategoryMapper {
 
     // 현재 최대 정렬 순서를 조회
     Integer getMaxSortOrder();
+
+    // 카테고리 삭제
+    int deleteCategory(@Param("categoryId") String categoryId);
 }
