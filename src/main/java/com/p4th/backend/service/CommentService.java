@@ -67,16 +67,35 @@ public class CommentService {
         // 1. 대댓글인 경우: 부모 댓글 작성자, 게시글 작성자에게 알림 생성 (자신이 작성한 댓글은 제외)
         if (request.getParentCommentId() != null && !request.getParentCommentId().trim().isEmpty()) {
             Comment parentComment = commentMapper.getCommentById(request.getParentCommentId());
-            if (parentComment != null && !userId.equals(parentComment.getUserId())) {
-                notificationService.notifyComment(NotificationType.RECOMMENT, postId, parentComment.getUserId(), commentId, user.getNickname(), request.getContent());
-            }
-            if (!userId.equals(post.getUserId())) {
-                notificationService.notifyComment(NotificationType.COMMENT, postId, post.getUserId(), commentId, user.getNickname(), request.getContent());
+            if (parentComment != null) {
+                // 부모 댓글 작성자와 게시글 작성자가 동일한 경우: 한 번만 알림 (대댓글 알림)
+                if (parentComment.getUserId().equals(post.getUserId())) {
+                    if (!userId.equals(parentComment.getUserId())) {
+                        notificationService.notifyComment(NotificationType.RECOMMENT,
+                                postId, parentComment.getUserId(), commentId,
+                                user.getNickname(), request.getContent());
+                    }
+                } else {
+                    // 부모 댓글 작성자에게 대댓글 알림
+                    if (!userId.equals(parentComment.getUserId())) {
+                        notificationService.notifyComment(NotificationType.RECOMMENT,
+                                postId, parentComment.getUserId(), commentId,
+                                user.getNickname(), request.getContent());
+                    }
+                    // 게시글 작성자에게 일반 댓글 알림
+                    if (!userId.equals(post.getUserId())) {
+                        notificationService.notifyComment(NotificationType.COMMENT,
+                                postId, post.getUserId(), commentId,
+                                user.getNickname(), request.getContent());
+                    }
+                }
             }
         } else {
             // 2. 일반 댓글인 경우: 게시글 작성자에게만 알림 생성 (자신이 작성한 댓글은 제외)
             if (!userId.equals(post.getUserId())) {
-                notificationService.notifyComment(NotificationType.COMMENT, postId, post.getUserId(), commentId, user.getNickname(), request.getContent());
+                notificationService.notifyComment(NotificationType.COMMENT,
+                        postId, post.getUserId(), commentId,
+                        user.getNickname(), request.getContent());
             }
         }
 
