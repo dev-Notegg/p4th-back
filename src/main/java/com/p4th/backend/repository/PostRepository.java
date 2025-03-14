@@ -4,6 +4,7 @@ import com.p4th.backend.domain.Post;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -21,7 +22,8 @@ public interface PostRepository extends JpaRepository<Post, String> {
                                              @Param("userId") String userId,
                                              Pageable pageable);
 
-    // 내가 작성한 댓글이 포함된 게시글을 조회 (중복 게시글 제거를 위해 DISTINCT 사용)
-    @Query("SELECT DISTINCT p FROM Post p JOIN p.comments c WHERE c.userId = :userId ORDER BY p.createdAt DESC")
+    // 내가 작성한 댓글이 포함된 게시글을 조회
+    @EntityGraph(attributePaths = {"comments"})
+    @Query("SELECT DISTINCT p FROM Post p WHERE EXISTS (SELECT 1 FROM Comment c WHERE c.post = p AND c.userId = :userId)")
     Page<Post> findPostsWithUserComments(@Param("userId") String userId, Pageable pageable);
 }

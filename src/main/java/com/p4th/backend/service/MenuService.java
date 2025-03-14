@@ -2,7 +2,6 @@ package com.p4th.backend.service;
 
 import com.p4th.backend.domain.Board;
 import com.p4th.backend.domain.Category;
-import com.p4th.backend.domain.Comment;
 import com.p4th.backend.domain.Post;
 import com.p4th.backend.dto.response.board.BoardResponse;
 import com.p4th.backend.dto.response.post.PostListResponse;
@@ -64,24 +63,20 @@ public class MenuService {
     @Transactional(readOnly = true)
     public Page<UserCommentPostResponse> getUserComments(String userId, Pageable pageable) {
         try {
-            // PostRepository를 통해 내가 쓴 댓글이 포함된 게시글을 페이징 조회
             Page<Post> postPage = postRepository.findPostsWithUserComments(userId, pageable);
-
-            List<UserCommentPostResponse> dtos = postPage.stream().map(post -> {
+            return postPage.map(post -> {
                 UserCommentPostResponse dto = UserCommentPostResponse.from(post);
-                List<Comment> myComments = post.getComments().stream()
+                List<UserCommentResponse> myComments = post.getComments().stream()
                         .filter(comment -> userId.equals(comment.getUserId()))
-                        .toList();
-                dto.setComments(myComments.stream()
                         .map(UserCommentResponse::from)
-                        .collect(Collectors.toList()));
+                        .toList();
+                dto.setComments(myComments);
                 return dto;
-            }).collect(Collectors.toList());
-            return new PageImpl<>(dtos, pageable, postPage.getTotalElements());
+            });
         } catch (CustomException ce) {
             throw ce;
         } catch (Exception e) {
-            throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR, "내가 쓴 댓글 조회 중 오류: " + Arrays.toString(e.getStackTrace()));
+            throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR, "내가 쓴 댓글 조회 중 오류: " + e.getMessage());
         }
     }
 
