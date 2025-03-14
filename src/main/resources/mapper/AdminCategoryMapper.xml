@@ -49,4 +49,11 @@
         DELETE FROM category
         WHERE category_id = #{categoryId}
     </delete>
+
+    <select id="findByCategoryName" parameterType="String" resultType="com.p4th.backend.domain.Category">
+        SELECT *
+        FROM category
+        WHERE category_name = #{categoryName}
+        LIMIT 1
+    </select>
 </mapper>

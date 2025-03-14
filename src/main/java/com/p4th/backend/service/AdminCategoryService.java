@@ -47,7 +47,7 @@ public class AdminCategoryService {
     public void updateMainExposure(String categoryId, int mainExposure) {
         Category category = adminCategoryMapper.findById(categoryId);
         if(category == null){
-            throw new CustomException(ErrorCode.CATEGORY_NOT_FOUND, "해당 카테고리를 찾을 수 없습니다.");
+            throw new CustomException(ErrorCode.CATEGORY_NOT_FOUND);
         }
         category.setMainExposure(mainExposure);
         adminCategoryMapper.updateCategory(category);
@@ -55,6 +55,11 @@ public class AdminCategoryService {
 
     @Transactional
     public String createCategory(String categoryName) {
+        Category existingCategory = adminCategoryMapper.findByCategoryName(categoryName);
+        if (existingCategory != null) {
+            throw new CustomException(ErrorCode.DUPLICATE_CATEGORY_NAME);
+        }
+
         Category category = new Category();
         category.setCategoryId(ULIDUtil.getULID());
         category.setCategoryName(categoryName);
@@ -117,7 +122,12 @@ public class AdminCategoryService {
     public void updateCategoryName(String categoryId, String newCategoryName) {
         Category category = adminCategoryMapper.findById(categoryId);
         if (category == null) {
-            throw new CustomException(ErrorCode.CATEGORY_NOT_FOUND, "해당 카테고리를 찾을 수 없습니다.");
+            throw new CustomException(ErrorCode.CATEGORY_NOT_FOUND);
+
+        }
+        Category existingCategory = adminCategoryMapper.findByCategoryName(newCategoryName);
+        if (existingCategory != null) {
+            throw new CustomException(ErrorCode.DUPLICATE_CATEGORY_NAME);
         }
         category.setCategoryName(newCategoryName);
         int updated = adminCategoryMapper.updateCategory(category);
@@ -134,7 +144,7 @@ public class AdminCategoryService {
     public void deleteCategory(String categoryId) {
         Category category = adminCategoryMapper.findById(categoryId);
         if (category == null) {
-            throw new CustomException(ErrorCode.CATEGORY_NOT_FOUND, "해당 카테고리를 찾을 수 없습니다.");
+            throw new CustomException(ErrorCode.CATEGORY_NOT_FOUND);
         }
         int deleted = adminCategoryMapper.deleteCategory(categoryId);
         if (deleted != 1) {

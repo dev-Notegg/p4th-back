@@ -31,6 +31,7 @@ public enum ErrorCode {
 
     //카테고리 관련
     CATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND, 20401, "error.categoryNotFound"),
+    DUPLICATE_CATEGORY_NAME(HttpStatus.BAD_REQUEST, 20402, "error.duplicateCategoryName"),
 
     // 공통
     INVALID_INPUT(HttpStatus.BAD_REQUEST, 30100, "error.invalidInput"),

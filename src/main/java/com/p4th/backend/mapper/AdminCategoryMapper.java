@@ -30,4 +30,6 @@ public interface AdminCategoryMapper {
 
     // 카테고리 삭제
     int deleteCategory(@Param("categoryId") String categoryId);
+
+    Category findByCategoryName(@Param("categoryName") String categoryName);
 }
