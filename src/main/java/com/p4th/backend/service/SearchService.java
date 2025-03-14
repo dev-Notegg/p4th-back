@@ -37,10 +37,13 @@ public class SearchService {
             // userId 존재하면, 차단된 작성자의 게시글을 필터링
             if (userId != null && !userId.trim().isEmpty()) {
                 List<String> blockedUserIds = blockMapper.findBlockedByUserId(userId);
-                List<Post> filteredPosts = posts.getContent().stream()
-                        .filter(post -> post.getUserId().equals(userId) || !blockedUserIds.contains(post.getUserId()))
-                        .collect(Collectors.toList());
-                posts = new PageImpl<>(filteredPosts, pageable, filteredPosts.size());
+                // 차단한 유저가 없으면 필터링하지 않음
+                if (blockedUserIds != null && !blockedUserIds.isEmpty()) {
+                    List<Post> filteredPosts = posts.getContent().stream()
+                            .filter(post -> !blockedUserIds.contains(post.getUserId()))
+                            .collect(Collectors.toList());
+                    posts = new PageImpl<>(filteredPosts, pageable, filteredPosts.size());
+                }
             }
 
             return posts.map(post -> {
