@@ -38,7 +38,7 @@ public class SearchService {
             if (userId != null && !userId.trim().isEmpty()) {
                 List<String> blockedUserIds = blockMapper.findBlockedByUserId(userId);
                 List<Post> filteredPosts = posts.getContent().stream()
-                        .filter(post -> !blockedUserIds.contains(post.getUserId()))
+                        .filter(post -> post.getUserId().equals(userId) || !blockedUserIds.contains(post.getUserId()))
                         .collect(Collectors.toList());
                 posts = new PageImpl<>(filteredPosts, pageable, filteredPosts.size());
             }
