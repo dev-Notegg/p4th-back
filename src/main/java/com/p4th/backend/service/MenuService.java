@@ -2,10 +2,12 @@ package com.p4th.backend.service;
 
 import com.p4th.backend.domain.Board;
 import com.p4th.backend.domain.Category;
+import com.p4th.backend.domain.Comment;
 import com.p4th.backend.domain.Post;
 import com.p4th.backend.dto.response.board.BoardResponse;
 import com.p4th.backend.dto.response.post.PostListResponse;
 import com.p4th.backend.dto.response.user.UserCommentPostResponse;
+import com.p4th.backend.dto.response.user.UserCommentResponse;
 import com.p4th.backend.mapper.PostMapper;
 import com.p4th.backend.mapper.MenuMapper;
 import com.p4th.backend.repository.PostRepository;
@@ -20,8 +22,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -64,31 +64,20 @@ public class MenuService {
     @Transactional(readOnly = true)
     public Page<UserCommentPostResponse> getUserComments(String userId, Pageable pageable) {
         try {
-            List<com.p4th.backend.domain.Comment> comments = menuMapper.getCommentsByUser(userId);
-            Map<String, List<com.p4th.backend.domain.Comment>> grouped = comments.stream()
-                    .collect(Collectors.groupingBy(com.p4th.backend.domain.Comment::getPostId));
+            // PostRepository를 통해 내가 쓴 댓글이 포함된 게시글을 페이징 조회
+            Page<Post> postPage = postRepository.findPostsWithUserComments(userId, pageable);
 
-            List<UserCommentPostResponse> responses = grouped.entrySet().stream()
-                    .map(entry -> {
-                        String postId = entry.getKey();
-                        Post post = postMapper.getPostDetail(postId, userId);
-                        if (post == null) {
-                            return null;
-                        }
-                        UserCommentPostResponse dto = UserCommentPostResponse.from(post);
-                        List<com.p4th.backend.domain.Comment> myComments = entry.getValue().stream()
-                                .filter(c -> c.getUserId().equals(userId))
-                                .toList();
-                        dto.setComments(myComments.stream()
-                                .map(com.p4th.backend.dto.response.user.UserCommentResponse::from)
-                                .collect(Collectors.toList()));
-                        return dto;
-                    })
-                    .filter(Objects::nonNull)
-                    // 최종적으로 게시글 생성일시(createdAt) 내림차순으로 정렬
-                    .sorted((d1, d2) -> d2.getCreatedAt().compareTo(d1.getCreatedAt()))
-                    .collect(Collectors.toList());
-            return new PageImpl<>(responses, pageable, responses.size());
+            List<UserCommentPostResponse> dtos = postPage.stream().map(post -> {
+                UserCommentPostResponse dto = UserCommentPostResponse.from(post);
+                List<Comment> myComments = post.getComments().stream()
+                        .filter(comment -> userId.equals(comment.getUserId()))
+                        .toList();
+                dto.setComments(myComments.stream()
+                        .map(UserCommentResponse::from)
+                        .collect(Collectors.toList()));
+                return dto;
+            }).collect(Collectors.toList());
+            return new PageImpl<>(dtos, pageable, postPage.getTotalElements());
         } catch (CustomException ce) {
             throw ce;
         } catch (Exception e) {

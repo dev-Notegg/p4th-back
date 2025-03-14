@@ -20,4 +20,8 @@ public interface PostRepository extends JpaRepository<Post, String> {
     Page<Post> findByBoardIdExcludingBlocked(@Param("boardId") String boardId,
                                              @Param("userId") String userId,
                                              Pageable pageable);
+
+    // 내가 작성한 댓글이 포함된 게시글을 조회 (중복 게시글 제거를 위해 DISTINCT 사용)
+    @Query("SELECT DISTINCT p FROM Post p JOIN p.comments c WHERE c.userId = :userId ORDER BY p.createdAt DESC")
+    Page<Post> findPostsWithUserComments(@Param("userId") String userId, Pageable pageable);
 }
