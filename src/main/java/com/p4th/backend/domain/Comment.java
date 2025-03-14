@@ -20,7 +20,7 @@ public class Comment {
     @Transient
     private String nickname;
     private String content;
-    // 상태를 ENUM으로 관리
+    @Enumerated(EnumType.STRING)
     private CommentStatus status;  // NORMAL, REPORTED
     private LocalDateTime statusChangedAt;
     private String createdBy;

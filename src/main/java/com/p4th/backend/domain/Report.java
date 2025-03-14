@@ -1,8 +1,6 @@
 package com.p4th.backend.domain;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -19,7 +17,9 @@ public class Report {
     private String targetUserId;
     private String targetBoardId;
     private String targetCommentId;
+    @Enumerated(EnumType.STRING)
     private ReportType type;         // POST 또는 COMMENT
+    @Enumerated(EnumType.STRING)
     private ReportStatus status;     // WAIT, DONE, REJECT, CANCEL
     private String reason;
     private LocalDateTime processedAt;
