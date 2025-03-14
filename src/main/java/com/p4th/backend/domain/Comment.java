@@ -17,6 +17,7 @@ public class Comment {
     private String postId;
     private String parentCommentId;
     private String userId;
+    @Transient
     private String nickname;
     private String content;
     // 상태를 ENUM으로 관리
