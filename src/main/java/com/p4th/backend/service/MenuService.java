@@ -68,8 +68,9 @@ public class MenuService {
                 UserCommentPostResponse dto = UserCommentPostResponse.from(post);
                 List<UserCommentResponse> myComments = post.getComments().stream()
                         .filter(comment -> userId.equals(comment.getUserId()))
+                        .sorted((c1, c2) -> c2.getCreatedAt().compareTo(c1.getCreatedAt()))
                         .map(UserCommentResponse::from)
-                        .toList();
+                        .collect(Collectors.toList());
                 dto.setComments(myComments);
                 return dto;
             });

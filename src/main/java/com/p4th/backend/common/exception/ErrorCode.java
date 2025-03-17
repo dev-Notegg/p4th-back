@@ -33,6 +33,10 @@ public enum ErrorCode {
     CATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND, 20401, "error.categoryNotFound"),
     DUPLICATE_CATEGORY_NAME(HttpStatus.BAD_REQUEST, 20402, "error.duplicateCategoryName"),
 
+    //게시판 관련
+    BOARD_NOT_FOUND(HttpStatus.NOT_FOUND, 20501, "error.boardNotFound"),
+    DUPLICATE_BOARD_NAME(HttpStatus.BAD_REQUEST, 20502, "error.duplicateBoardName"),
+
     // 공통
     INVALID_INPUT(HttpStatus.BAD_REQUEST, 30100, "error.invalidInput"),
 
