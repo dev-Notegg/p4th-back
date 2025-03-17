@@ -24,6 +24,10 @@ public interface PostRepository extends JpaRepository<Post, String> {
 
     // 내가 작성한 댓글이 포함된 게시글을 조회
     @EntityGraph(attributePaths = {"comments"})
-    @Query("SELECT DISTINCT p FROM Post p WHERE EXISTS (SELECT 1 FROM Comment c WHERE c.post = p AND c.userId = :userId)")
+    @Query("SELECT p FROM Post p " +
+            "JOIN p.comments c " +
+            "WHERE c.userId = :userId " +
+            "GROUP BY p.postId " +
+            "ORDER BY MAX(c.createdAt) DESC")
     Page<Post> findPostsWithUserComments(@Param("userId") String userId, Pageable pageable);
 }
