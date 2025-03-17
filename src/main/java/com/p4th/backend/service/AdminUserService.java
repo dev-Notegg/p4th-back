@@ -26,19 +26,19 @@ public class AdminUserService {
     }
 
     @Transactional
-    public void updateMembershipLevel(String userId, int membershipLevel) {
+    public void updateMembershipLevel(String currentUserId, String userId, int membershipLevel) {
         if (isUserNotExists(userId)) {
             throw new CustomException(ErrorCode.USER_NOT_FOUND, "해당 사용자를 찾을 수 없습니다.");
         }
-        adminUserMapper.updateMembershipLevel(userId, membershipLevel);
+        adminUserMapper.updateMembershipLevel(currentUserId, userId, membershipLevel);
     }
 
     @Transactional
-    public void updateAdminRole(String userId, int adminRole) {
+    public void updateAdminRole(String currentUserId, String userId, int adminRole) {
         if (isUserNotExists(userId)) {
             throw new CustomException(ErrorCode.USER_NOT_FOUND, "해당 사용자를 찾을 수 없습니다.");
         }
-        adminUserMapper.updateAdminRole(userId, adminRole);
+        adminUserMapper.updateAdminRole(currentUserId, userId, adminRole);
     }
 
     private boolean isUserNotExists(String userId) {

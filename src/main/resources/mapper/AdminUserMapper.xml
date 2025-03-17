@@ -6,13 +6,15 @@
 
     <update id="updateMembershipLevel">
         UPDATE user_info
-        SET membership_level = #{membershipLevel}
+        SET membership_level = #{membershipLevel},
+            updated_by = #{currentUserId}
         WHERE user_id = #{userId}
     </update>
 
     <update id="updateAdminRole">
         UPDATE user_info
-        SET admin_role = #{adminRole}
+        SET admin_role = #{adminRole},
+            updated_by = #{currentUserId}
         WHERE user_id = #{userId}
     </update>
 

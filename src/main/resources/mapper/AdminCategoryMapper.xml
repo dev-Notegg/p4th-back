@@ -19,21 +19,23 @@
     </select>
 
     <insert id="insertCategory" parameterType="com.p4th.backend.domain.Category">
-        INSERT INTO category (category_id, category_name, sort_order)
-        VALUES (#{categoryId}, #{categoryName}, #{sortOrder})
+        INSERT INTO category (category_id, category_name, sort_order, created_by)
+        VALUES (#{categoryId}, #{categoryName}, #{sortOrder}, #{createdBy})
     </insert>
 
     <update id="updateCategory" parameterType="com.p4th.backend.domain.Category">
         UPDATE category
         SET category_name = #{categoryName},
             sort_order = #{sortOrder},
-            main_exposure = #{mainExposure}
+            main_exposure = #{mainExposure},
+            updated_by = #{updatedBy}
         WHERE category_id = #{categoryId}
     </update>
 
     <update id="updateCategoryOrder" parameterType="map">
         UPDATE category
-        SET sort_order = #{sortOrder}
+        SET sort_order = #{sortOrder},
+            updated_by = #{userId}
         WHERE category_id = #{categoryId}
     </update>
 

@@ -46,7 +46,7 @@ public class AdminBoardService {
     }
 
     @Transactional
-    public String createBoard(String boardName, String categoryId, int boardLevel) {
+    public String createBoard(String userId, String boardName, String categoryId, int boardLevel) {
         Board existing = boardRepository.findByBoardNameAndCategoryId(boardName, categoryId);
         if (existing != null) {
             throw new CustomException(ErrorCode.DUPLICATE_BOARD_NAME);
@@ -58,12 +58,13 @@ public class AdminBoardService {
         board.setCategoryId(categoryId);
         board.setBoardLevel(boardLevel);
         board.setSortOrder(boardRepository.findMaxSortOrderByCategory(categoryId) + 1);
+        board.setCreatedBy(userId);
         boardRepository.save(board);
         return boardId;
     }
 
     @Transactional
-    public void updateBoard(String boardId, String boardName, String categoryId, int boardLevel) {
+    public void updateBoard(String userId, String boardId, String boardName, String categoryId, int boardLevel) {
         Board board = boardRepository.findById(boardId)
                 .orElseThrow(() -> new CustomException(ErrorCode.BOARD_NOT_FOUND));
         Board duplicate = boardRepository.findByBoardNameAndCategoryId(boardName, categoryId);
@@ -73,6 +74,7 @@ public class AdminBoardService {
         board.setBoardName(boardName);
         board.setCategoryId(categoryId);
         board.setBoardLevel(boardLevel);
+        board.setUpdatedBy(userId);
         boardRepository.save(board);
     }
 

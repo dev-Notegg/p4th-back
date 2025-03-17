@@ -19,7 +19,8 @@ public interface AdminCategoryMapper {
     int updateCategory(Category category);
     
     // 카테고리 순서 변경 (단건 업데이트)
-    int updateCategoryOrder(@Param("categoryId") String categoryId,
+    int updateCategoryOrder(@Param("userId") String userId,
+                            @Param("categoryId") String categoryId,
                             @Param("sortOrder") int sortOrder);
     
     // 전체 카테고리 ID 목록 조회

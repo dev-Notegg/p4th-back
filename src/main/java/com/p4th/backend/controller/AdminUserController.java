@@ -5,6 +5,7 @@ import com.p4th.backend.dto.request.MembershipLevelUpdateRequest;
 import com.p4th.backend.dto.response.ErrorResponse;
 import com.p4th.backend.dto.response.admin.UserListResponse;
 import com.p4th.backend.dto.response.user.UserProfileResponse;
+import com.p4th.backend.security.JwtProvider;
 import com.p4th.backend.service.AdminUserService;
 import com.p4th.backend.security.Authorization;
 import io.swagger.v3.oas.annotations.Operation;
@@ -31,6 +32,7 @@ public class AdminUserController {
 
     private final AdminUserService adminUserService;
     private final Authorization authorization;
+    private final JwtProvider jwtProvider;
 
     @Operation(summary = "회원 목록 조회", description = "회원목록을 조회하며, 회원ID 또는 닉네임으로 검색 가능.")
     @ApiResponses(value = {
@@ -66,7 +68,8 @@ public class AdminUserController {
             HttpServletRequest httpRequest
     ) {
         authorization.checkAdmin(httpRequest);
-        adminUserService.updateMembershipLevel(userId, request.getMembershipLevel());
+        String currentUserId = jwtProvider.resolveUserId(httpRequest);
+        adminUserService.updateMembershipLevel(currentUserId, userId, request.getMembershipLevel());
     }
 
     @Operation(summary = "관리자 권한 변경", description = "특정 회원의 관리자 권한을 변경한다. (0=해제, 1=설정)")
@@ -82,6 +85,7 @@ public class AdminUserController {
             HttpServletRequest httpRequest
     ) {
         authorization.checkAdmin(httpRequest);
-        adminUserService.updateAdminRole(userId, request.getAdminRole());
+        String currentUserId = jwtProvider.resolveUserId(httpRequest);
+        adminUserService.updateAdminRole(currentUserId, userId, request.getAdminRole());
     }
 }

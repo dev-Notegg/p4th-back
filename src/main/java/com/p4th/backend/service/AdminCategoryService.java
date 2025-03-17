@@ -44,17 +44,18 @@ public class AdminCategoryService {
     }
 
     @Transactional
-    public void updateMainExposure(String categoryId, int mainExposure) {
+    public void updateMainExposure(String userId, String categoryId, int mainExposure) {
         Category category = adminCategoryMapper.findById(categoryId);
         if(category == null){
             throw new CustomException(ErrorCode.CATEGORY_NOT_FOUND);
         }
         category.setMainExposure(mainExposure);
+        category.setUpdatedBy(userId);
         adminCategoryMapper.updateCategory(category);
     }
 
     @Transactional
-    public String createCategory(String categoryName) {
+    public String createCategory(String userId, String categoryName) {
         Category existingCategory = adminCategoryMapper.findByCategoryName(categoryName);
         if (existingCategory != null) {
             throw new CustomException(ErrorCode.DUPLICATE_CATEGORY_NAME);
@@ -63,6 +64,7 @@ public class AdminCategoryService {
         Category category = new Category();
         category.setCategoryId(ULIDUtil.getULID());
         category.setCategoryName(categoryName);
+        category.setCreatedBy(userId);
         // 현재 최대 sortOrder를 조회 (없으면 0)
         Integer maxSortOrder = adminCategoryMapper.getMaxSortOrder();
         if(maxSortOrder == null) {
@@ -74,7 +76,7 @@ public class AdminCategoryService {
     }
 
     @Transactional
-    public void updateCategoryOrder(List<String> order) {
+    public void updateCategoryOrder(String userId, List<String> order) {
         List<String> allCategoryIds = adminCategoryMapper.findAllCategoryIds();
         if (order.size() != allCategoryIds.size()) {
             throw new CustomException(ErrorCode.INVALID_INPUT, "모든 카테고리의 순서를 지정해주세요.");
@@ -84,7 +86,7 @@ public class AdminCategoryService {
         }
         for (int i = 0; i < order.size(); i++) {
             String categoryId = order.get(i);
-            adminCategoryMapper.updateCategoryOrder(categoryId, i);
+            adminCategoryMapper.updateCategoryOrder(userId, categoryId, i);
         }
     }
 
@@ -98,17 +100,17 @@ public class AdminCategoryService {
     }
 
     @Transactional
-    public void updateBoardOrder(String categoryId, BoardOrderUpdateRequest requestDto) {
+    public void updateBoardOrder(String userId, String categoryId, BoardOrderUpdateRequest requestDto) {
         // 만약 sortType이 postCount이면 게시글 수 기준 자동 정렬
         if ("postCount".equalsIgnoreCase(requestDto.getSortType())) {
             List<String> sortedBoardIds = adminBoardMapper.findBoardIdsByCategorySortedByPostCount(categoryId);
             for (int i = 0; i < sortedBoardIds.size(); i++) {
-                adminBoardMapper.updateBoardOrder(categoryId, sortedBoardIds.get(i), i);
+                adminBoardMapper.updateBoardOrder(userId, categoryId, sortedBoardIds.get(i), i);
             }
         } else { // 수동 정렬
             List<String> order = requestDto.getOrder();
             for (int i = 0; i < order.size(); i++) {
-                adminBoardMapper.updateBoardOrder(categoryId, order.get(i), i);
+                adminBoardMapper.updateBoardOrder(userId, categoryId, order.get(i), i);
             }
         }
     }
@@ -119,7 +121,7 @@ public class AdminCategoryService {
      * @param newCategoryName 새로 적용할 카테고리명
      */
     @Transactional
-    public void updateCategoryName(String categoryId, String newCategoryName) {
+    public void updateCategoryName(String userId, String categoryId, String newCategoryName) {
         Category category = adminCategoryMapper.findById(categoryId);
         if (category == null) {
             throw new CustomException(ErrorCode.CATEGORY_NOT_FOUND);
@@ -130,6 +132,7 @@ public class AdminCategoryService {
             throw new CustomException(ErrorCode.DUPLICATE_CATEGORY_NAME);
         }
         category.setCategoryName(newCategoryName);
+        category.setUpdatedBy(userId);
         int updated = adminCategoryMapper.updateCategory(category);
         if (updated != 1) {
             throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR, "카테고리명 수정에 실패하였습니다.");

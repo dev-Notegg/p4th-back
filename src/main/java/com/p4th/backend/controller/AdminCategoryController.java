@@ -6,6 +6,7 @@ import com.p4th.backend.dto.response.admin.BoardListResponse;
 import com.p4th.backend.dto.response.admin.CategoryCreationResponse;
 import com.p4th.backend.dto.response.admin.CategoryResponse;
 import com.p4th.backend.security.Authorization;
+import com.p4th.backend.security.JwtProvider;
 import com.p4th.backend.service.AdminCategoryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -31,6 +32,7 @@ public class AdminCategoryController {
 
     private final AdminCategoryService adminCategoryService;
     private final Authorization authorization;
+    private final JwtProvider jwtProvider;
 
     @Operation(summary = "카테고리 목록 조회", description = "카테고리 목록을 조회하며, 카테고리 ID 또는 카테고리명으로 검색한다.")
     @ApiResponses(value = {
@@ -69,7 +71,8 @@ public class AdminCategoryController {
             @RequestBody MainExposureUpdateRequest requestDto,
             HttpServletRequest request) {
         authorization.checkAdmin(request);
-        adminCategoryService.updateMainExposure(categoryId, requestDto.getMainExposure());
+        String userId = jwtProvider.resolveUserId(request);
+        adminCategoryService.updateMainExposure(userId, categoryId, requestDto.getMainExposure());
         return ResponseEntity.ok().build();
     }
 
@@ -89,7 +92,8 @@ public class AdminCategoryController {
             @RequestBody CategoryCreationRequest requestDto,
             HttpServletRequest request) {
         authorization.checkAdmin(request);
-        String categoryId = adminCategoryService.createCategory(requestDto.getCategoryName());
+        String userId = jwtProvider.resolveUserId(request);
+        String categoryId = adminCategoryService.createCategory(userId, requestDto.getCategoryName());
         return ResponseEntity.ok(new CategoryCreationResponse(categoryId));
     }
 
@@ -108,7 +112,8 @@ public class AdminCategoryController {
             @RequestBody CategoryOrderUpdateRequest requestDto,
             HttpServletRequest request) {
         authorization.checkAdmin(request);
-        adminCategoryService.updateCategoryOrder(requestDto.getOrder());
+        String userId = jwtProvider.resolveUserId(request);
+        adminCategoryService.updateCategoryOrder(userId, requestDto.getOrder());
         return ResponseEntity.ok().build();
     }
 
@@ -149,7 +154,8 @@ public class AdminCategoryController {
             @RequestBody BoardOrderUpdateRequest requestDto,
             HttpServletRequest request) {
         authorization.checkAdmin(request);
-        adminCategoryService.updateBoardOrder(categoryId, requestDto);
+        String userId = jwtProvider.resolveUserId(request);
+        adminCategoryService.updateBoardOrder(userId, categoryId, requestDto);
         return ResponseEntity.ok().build();
     }
 
@@ -172,7 +178,8 @@ public class AdminCategoryController {
             @RequestBody CategoryNameUpdateRequest requestDto,
             HttpServletRequest request) {
         authorization.checkAdmin(request);
-        adminCategoryService.updateCategoryName(categoryId, requestDto.getCategoryName());
+        String userId = jwtProvider.resolveUserId(request);
+        adminCategoryService.updateCategoryName(userId, categoryId, requestDto.getCategoryName());
         return ResponseEntity.ok().build();
     }
 

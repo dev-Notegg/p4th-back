@@ -13,7 +13,8 @@ public interface AdminBoardMapper {
     List<Board> findByCategoryIdOrderBySortOrder(@Param("categoryId") String categoryId);
     
     // 게시판 순서 변경 (단건 업데이트)
-    int updateBoardOrder(@Param("categoryId") String categoryId,
+    int updateBoardOrder(@Param("userId") String userId,
+                         @Param("categoryId") String categoryId,
                          @Param("boardId") String boardId,
                          @Param("sortOrder") int sortOrder);
 

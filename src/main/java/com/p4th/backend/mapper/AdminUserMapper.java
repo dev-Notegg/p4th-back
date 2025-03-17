@@ -5,10 +5,12 @@ import org.apache.ibatis.annotations.Param;
 
 @Mapper
 public interface AdminUserMapper {
-    void updateMembershipLevel(@Param("userId") String userId,
+    void updateMembershipLevel(@Param("currentUserId") String currentUserId,
+                               @Param("userId") String userId,
                                @Param("membershipLevel") int membershipLevel);
 
-    void updateAdminRole(@Param("userId") String userId,
+    void updateAdminRole(@Param("currentUserId") String currentUserId,
+                         @Param("userId") String userId,
                          @Param("adminRole") int adminRole);
 
     Integer findAdminRoleByUserId(@Param("userId") String userId);

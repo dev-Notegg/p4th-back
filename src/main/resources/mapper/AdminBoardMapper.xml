@@ -21,7 +21,8 @@
 
     <update id="updateBoardOrder" parameterType="map">
         UPDATE board
-        SET sort_order = #{sortOrder}
+        SET sort_order = #{sortOrder},
+            updated_by = #{userId}
         WHERE category_id = #{categoryId}
           AND board_id = #{boardId}
     </update>
