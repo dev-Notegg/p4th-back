@@ -83,7 +83,7 @@ public class MenuController {
     })
     @GetMapping(value = "/{userId}/comments")
     public ResponseEntity<Page<UserCommentPostResponse>> getUserComments(
-            @Parameter(hidden = true) @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
+            @Parameter(hidden = true) Pageable pageable,
             HttpServletRequest httpRequest) {
         String userId = jwtProvider.resolveUserId(httpRequest);
         if (userId == null) {
