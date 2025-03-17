@@ -10,7 +10,7 @@ import com.p4th.backend.dto.response.admin.BoardResponse;
 import com.p4th.backend.dto.response.admin.CategoryResponse;
 import com.p4th.backend.mapper.AdminCategoryMapper;
 import com.p4th.backend.mapper.AdminBoardMapper;
-import com.p4th.backend.repository.CategoryRepository;
+import com.p4th.backend.repository.AdminCategoryRepository;
 import com.p4th.backend.util.ULIDUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -29,16 +29,16 @@ public class AdminCategoryService {
     private final AdminCategoryMapper adminCategoryMapper;
     private final AdminBoardMapper adminBoardMapper;
 
-    private final CategoryRepository categoryRepository;
+    private final AdminCategoryRepository adminCategoryRepository;
 
     @Transactional(readOnly = true)
     public Page<CategoryResponse> getCategories(String categoryId, String categoryName, Pageable pageable) {
         Page<Category> categoryPage;
         if ((categoryId != null && !categoryId.trim().isEmpty()) ||
                 (categoryName != null && !categoryName.trim().isEmpty())) {
-            categoryPage = categoryRepository.searchCategories(categoryId, categoryName, pageable);
+            categoryPage = adminCategoryRepository.searchCategories(categoryId, categoryName, pageable);
         } else {
-            categoryPage = categoryRepository.findAll(pageable);
+            categoryPage = adminCategoryRepository.findAll(pageable);
         }
         return categoryPage.map(CategoryResponse::from);
     }

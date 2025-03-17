@@ -21,8 +21,7 @@ public class AdminBoardService {
 
     @Transactional(readOnly = true)
     public Page<BoardResponse> getBoards(String boardId, String boardName, String categoryName, Pageable pageable) {
-        Page<Board> boardPage = boardRepository.searchBoards(boardId, boardName, categoryName, pageable);
-        return boardPage.map(BoardResponse::from);
+        return boardRepository.searchBoards(boardId, boardName, categoryName, pageable);
     }
 
     @Transactional

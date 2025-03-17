@@ -50,7 +50,7 @@ public class AdminBoardController {
             @Parameter(name = "categoryName", description = "검색할 카테고리명 (옵션)")
             @RequestParam(value = "categoryName", required = false) String categoryName,
             HttpServletRequest request,
-            @ParameterObject @PageableDefault(sort = "sortOrder", direction = Sort.Direction.ASC) Pageable pageable) {
+            @ParameterObject @PageableDefault(sort = "b.createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
         authorization.checkAdmin(request);
         Page<BoardResponse> boards = adminBoardService.getBoards(boardId, boardName, categoryName, pageable);
         return ResponseEntity.ok(boards);

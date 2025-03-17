@@ -7,12 +7,11 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-public interface CategoryRepository extends JpaRepository<Category, String> {
+public interface AdminCategoryRepository extends JpaRepository<Category, String> {
 
     @Query("SELECT c FROM Category c " +
             "WHERE (:categoryId IS NULL OR LOWER(c.categoryId) LIKE LOWER(CONCAT('%', :categoryId, '%'))) " +
-            "AND (:categoryName IS NULL OR LOWER(c.categoryName) LIKE LOWER(CONCAT('%', :categoryName, '%'))) " +
-            "ORDER BY c.sortOrder")
+            "AND (:categoryName IS NULL OR LOWER(c.categoryName) LIKE LOWER(CONCAT('%', :categoryName, '%')))")
     Page<Category> searchCategories(@Param("categoryId") String categoryId,
                                     @Param("categoryName") String categoryName,
                                     Pageable pageable);

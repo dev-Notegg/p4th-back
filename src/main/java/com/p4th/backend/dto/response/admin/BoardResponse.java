@@ -17,6 +17,9 @@ public class BoardResponse {
     private String boardName;
     @Schema(description = "카테고리 ID")
     private String categoryId;
+    @Schema(description = "카테고리명")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private String categoryName;
     @Schema(description = "게시판 레벨")
     private int boardLevel;
     @Schema(description = "추천 여부")
@@ -27,19 +30,38 @@ public class BoardResponse {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private String recentlyModified;
 
+    public BoardResponse(String boardId, String boardName, String categoryId, String categoryName,
+                         int boardLevel, int recommendYn, int sortOrder,
+                         LocalDateTime createdAt, LocalDateTime updatedAt) {
+        this.boardId = boardId;
+        this.boardName = boardName;
+        this.categoryId = categoryId;
+        this.categoryName = categoryName;
+        this.boardLevel = boardLevel;
+        this.recommendYn = recommendYn;
+        this.sortOrder = sortOrder;
+        // 최근 수정일이 있으면 수정일, 없으면 생성일을 'yyyy-MM-dd' 형식으로 설정
+        LocalDateTime dateToShow = updatedAt != null ? updatedAt : createdAt;
+        if(dateToShow != null) {
+            this.recentlyModified = dateToShow.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+        }
+    }
+
+    public BoardResponse() {
+    }
+
     public static BoardResponse from(Board board) {
+        LocalDateTime dateToShow = board.getUpdatedAt() != null ? board.getUpdatedAt() : board.getCreatedAt();
+        String recentlyModified = (dateToShow != null) ? dateToShow.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")) : null;
         BoardResponse dto = new BoardResponse();
         dto.setBoardId(board.getBoardId());
         dto.setBoardName(board.getBoardName());
         dto.setCategoryId(board.getCategoryId());
+        dto.setCategoryName(board.getCategory() != null ? board.getCategory().getCategoryName() : null);
         dto.setBoardLevel(board.getBoardLevel());
         dto.setRecommendYn(board.getRecommendYn());
         dto.setSortOrder(board.getSortOrder());
-        // 최근 수정일이 있으면 수정일, 없으면 생성일을 'yyyy-MM-dd' 형식으로 설정
-        LocalDateTime dateToShow = board.getUpdatedAt() != null ? board.getUpdatedAt() : board.getCreatedAt();
-        if(dateToShow != null) {
-            dto.setRecentlyModified(dateToShow.format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
-        }
+        dto.setRecentlyModified(recentlyModified);
         return dto;
     }
 }
