@@ -19,4 +19,21 @@ public interface AdminBoardMapper {
                          @Param("sortOrder") int sortOrder);
 
     List<String> findBoardIdsByCategorySortedByPostCount(@Param("categoryId") String categoryId);
+
+    int insertBoard(Board board);
+
+    int updateBoard(Board board);
+
+    Board selectBoardById(@Param("boardId") String boardId);
+
+    int deleteBoard(@Param("boardId") String boardId);
+
+    int findMaxSortOrderByCategory(@Param("categoryId") String categoryId);
+
+    int countPostsByBoardId(@Param("boardId") String boardId);
+
+    int countCommentsByBoardId(@Param("boardId") String boardId);
+
+    Board findByBoardNameAndCategoryId(@Param("boardName") String boardName,
+                                       @Param("categoryId") String categoryId);
 }

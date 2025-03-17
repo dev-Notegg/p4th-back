@@ -6,6 +6,7 @@ import com.p4th.backend.domain.Board;
 import com.p4th.backend.domain.Category;
 import com.p4th.backend.dto.response.admin.BoardDeletionInfoResponse;
 import com.p4th.backend.dto.response.admin.BoardResponse;
+import com.p4th.backend.mapper.AdminBoardMapper;
 import com.p4th.backend.repository.AdminBoardRepository;
 import com.p4th.backend.util.ULIDUtil;
 import jakarta.persistence.criteria.Join;
@@ -23,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class AdminBoardService {
 
     private final AdminBoardRepository boardRepository;
+    private final AdminBoardMapper adminBoardMapper;
 
     @Transactional(readOnly = true)
     public Page<BoardResponse> getBoards(String boardId, String boardName, String categoryName, Pageable pageable) {
@@ -47,7 +49,7 @@ public class AdminBoardService {
 
     @Transactional
     public String createBoard(String userId, String boardName, String categoryId, int boardLevel) {
-        Board existing = boardRepository.findByBoardNameAndCategoryId(boardName, categoryId);
+        Board existing = adminBoardMapper.findByBoardNameAndCategoryId(boardName, categoryId);
         if (existing != null) {
             throw new CustomException(ErrorCode.DUPLICATE_BOARD_NAME);
         }
@@ -57,17 +59,20 @@ public class AdminBoardService {
         board.setBoardName(boardName);
         board.setCategoryId(categoryId);
         board.setBoardLevel(boardLevel);
-        board.setSortOrder(boardRepository.findMaxSortOrderByCategory(categoryId) + 1);
+        board.setSortOrder(adminBoardMapper.findMaxSortOrderByCategory(categoryId) + 1);
         board.setCreatedBy(userId);
-        boardRepository.save(board);
+        board.setRecommendYn(0);
+        adminBoardMapper.insertBoard(board);
         return boardId;
     }
 
     @Transactional
     public void updateBoard(String userId, String boardId, String boardName, String categoryId, int boardLevel) {
-        Board board = boardRepository.findById(boardId)
-                .orElseThrow(() -> new CustomException(ErrorCode.BOARD_NOT_FOUND));
-        Board duplicate = boardRepository.findByBoardNameAndCategoryId(boardName, categoryId);
+        Board board = adminBoardMapper.selectBoardById(boardId);
+        if (board == null) {
+            throw new CustomException(ErrorCode.BOARD_NOT_FOUND);
+        }
+        Board duplicate = adminBoardMapper.findByBoardNameAndCategoryId(boardName, categoryId);
         if (duplicate != null && !duplicate.getBoardId().equals(boardId)) {
             throw new CustomException(ErrorCode.DUPLICATE_BOARD_NAME);
         }
@@ -75,22 +80,26 @@ public class AdminBoardService {
         board.setCategoryId(categoryId);
         board.setBoardLevel(boardLevel);
         board.setUpdatedBy(userId);
-        boardRepository.save(board);
+        adminBoardMapper.updateBoard(board);
     }
 
     @Transactional(readOnly = true)
     public BoardDeletionInfoResponse getBoardDeletionInfo(String boardId) {
-        Board board = boardRepository.findById(boardId)
-                .orElseThrow(() -> new CustomException(ErrorCode.BOARD_NOT_FOUND));
-        int postCount = boardRepository.countByBoardId(boardId);
-        int commentCount = boardRepository.countCommentsByBoardId(boardId);
+        Board board = adminBoardMapper.selectBoardById(boardId);
+        if (board == null) {
+            throw new CustomException(ErrorCode.BOARD_NOT_FOUND);
+        }
+        int postCount = adminBoardMapper.countPostsByBoardId(boardId);
+        int commentCount = adminBoardMapper.countCommentsByBoardId(boardId);
         return new BoardDeletionInfoResponse(board.getBoardName(), postCount, commentCount);
     }
 
     @Transactional
     public void deleteBoard(String boardId) {
-        Board board = boardRepository.findById(boardId)
-                .orElseThrow(() -> new CustomException(ErrorCode.BOARD_NOT_FOUND));
-        boardRepository.delete(board);
+        Board board = adminBoardMapper.selectBoardById(boardId);
+        if (board == null) {
+            throw new CustomException(ErrorCode.BOARD_NOT_FOUND);
+        }
+        adminBoardMapper.deleteBoard(boardId);
     }
 }
