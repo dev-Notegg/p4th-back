@@ -3,13 +3,18 @@ package com.p4th.backend.service;
 import com.p4th.backend.common.exception.CustomException;
 import com.p4th.backend.common.exception.ErrorCode;
 import com.p4th.backend.domain.Board;
+import com.p4th.backend.domain.Category;
 import com.p4th.backend.dto.response.admin.BoardDeletionInfoResponse;
 import com.p4th.backend.dto.response.admin.BoardResponse;
 import com.p4th.backend.repository.AdminBoardRepository;
 import com.p4th.backend.util.ULIDUtil;
+import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.JoinType;
+import jakarta.persistence.criteria.Predicate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,7 +26,23 @@ public class AdminBoardService {
 
     @Transactional(readOnly = true)
     public Page<BoardResponse> getBoards(String boardId, String boardName, String categoryName, Pageable pageable) {
-        return boardRepository.searchBoards(boardId, boardName, categoryName, pageable);
+        Specification<Board> spec = (root, query, cb) -> {
+            Join<Board, Category> categoryJoin = root.join("category", JoinType.INNER);
+            Predicate predicate = cb.conjunction();
+            if (boardId != null && !boardId.trim().isEmpty()) {
+                predicate = cb.and(predicate, cb.like(root.get("boardId"), "%" + boardId + "%"));
+            }
+            if (boardName != null && !boardName.trim().isEmpty()) {
+                predicate = cb.and(predicate, cb.like(cb.lower(root.get("boardName")), "%" + boardName.toLowerCase() + "%"));
+            }
+            if (categoryName != null && !categoryName.trim().isEmpty()) {
+                predicate = cb.and(predicate, cb.like(cb.lower(categoryJoin.get("categoryName")), "%" + categoryName.toLowerCase() + "%"));
+            }
+            return predicate;
+        };
+
+        Page<Board> boardPage = boardRepository.findAll(spec, pageable);
+        return boardPage.map(BoardResponse::from);
     }
 
     @Transactional
