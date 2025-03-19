@@ -67,10 +67,23 @@ public class BannerController {
     })
     @PostMapping(value = "", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<BannerCreationResponse> createBanner(
+            @Parameter(name = "bannerName", description = "광고 식별명(배너 이름)", required = true)
             @RequestParam("bannerName") String bannerName,
+            @Parameter(name = "linkUrl", description = "클릭 시 이동 링크 (옵션)")
             @RequestParam(value = "linkUrl", required = false) String linkUrl,
+            @Parameter(name = "startDate", description = "광고 시작일 (yyyy-MM-dd)", required = true)
             @RequestParam("startDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
+            @Parameter(name = "endDate", description = "광고 종료일 (yyyy-MM-dd)", required = true)
             @RequestParam("endDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate,
+            @Parameter(
+                    name = "imageFile",
+                    description = "배너 이미지 파일 (multipart/form-data)",
+                    required = true,
+                    content = @Content(
+                            mediaType = MediaType.APPLICATION_OCTET_STREAM_VALUE,
+                            schema = @Schema(type = "string", format = "binary")
+                    )
+            )
             @RequestParam("imageFile") MultipartFile imageFile,
             HttpServletRequest request
     ) {
