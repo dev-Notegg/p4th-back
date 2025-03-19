@@ -1,7 +1,6 @@
 package com.p4th.backend.controller;
 
 import com.p4th.backend.common.exception.ErrorResponse;
-import com.p4th.backend.dto.request.BannerCreationRequest;
 import com.p4th.backend.dto.request.BannerOrderUpdateRequest;
 import com.p4th.backend.dto.response.admin.BannerCreationResponse;
 import com.p4th.backend.dto.response.admin.BannerResponse;
@@ -22,10 +21,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.time.LocalDate;
 
 @Tag(name = "배너 관리 API", description = "배너 관리 관련 API")
 @RestController
@@ -54,7 +56,7 @@ public class BannerController {
         return ResponseEntity.ok(banners);
     }
 
-    @Operation(summary = "배너 등록", description = "새 배너를 등록한다. 이미지 파일은 멀티파트로 전송된다.")
+    @Operation(summary = "배너 등록", description = "새 배너를 등록한다. (각 필드는 @RequestParam으로 받음, 파일은 MultipartFile)")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "배너 등록 성공",
                     content = @Content(schema = @Schema(implementation = BannerCreationResponse.class))),
@@ -63,18 +65,18 @@ public class BannerController {
             @ApiResponse(responseCode = "500", description = "내부 서버 오류",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
-    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<BannerCreationResponse> createBanner(
-            @Parameter(name = "data", description = "배너 등록 정보", required = true)
-            @RequestPart("data") BannerCreationRequest requestDto,
-            @Parameter(name = "imageFile", description = "배너 이미지 파일", required = true,
-                    content = @Content(mediaType = "multipart/form-data",
-                            schema = @Schema(type = "string", format = "binary")))
-            @RequestPart("imageFile") MultipartFile imageFile,
-            HttpServletRequest request) {
+            @RequestParam("bannerName") String bannerName,
+            @RequestParam(value = "linkUrl", required = false) String linkUrl,
+            @RequestParam("startDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
+            @RequestParam("endDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate,
+            @RequestParam("imageFile") MultipartFile imageFile,
+            HttpServletRequest request
+    ) {
         authorization.checkAdmin(request);
         String userId = jwtProvider.resolveUserId(request);
-        String bannerId = bannerService.createBanner(userId, requestDto, imageFile);
+        String bannerId = bannerService.createBanner(userId, bannerName, linkUrl, startDate, endDate, imageFile);
         return ResponseEntity.ok(new BannerCreationResponse(bannerId));
     }
 

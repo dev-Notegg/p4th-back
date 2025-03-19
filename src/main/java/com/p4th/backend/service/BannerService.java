@@ -3,7 +3,6 @@ package com.p4th.backend.service;
 import com.p4th.backend.common.exception.CustomException;
 import com.p4th.backend.common.exception.ErrorCode;
 import com.p4th.backend.domain.Banner;
-import com.p4th.backend.dto.request.BannerCreationRequest;
 import com.p4th.backend.dto.response.admin.BannerResponse;
 import com.p4th.backend.mapper.BannerMapper;
 import com.p4th.backend.repository.BannerRepository;
@@ -17,7 +16,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -43,35 +41,37 @@ public class BannerService {
     }
 
     @Transactional
-    public String createBanner(String userId, BannerCreationRequest request, MultipartFile imageFile) {
+    public String createBanner(String userId, String bannerName, String linkUrl,
+            LocalDate startDate, LocalDate endDate, MultipartFile imageFile) {
+        // 1) ULID 생성
         String bannerId = ULIDUtil.getULID();
-        // 이미지 업로드 처리
+        // 2) 이미지 업로드 (S3)
         String fileName = ULIDUtil.getULID() + "_" + imageFile.getOriginalFilename();
         String imageUrl = s3Service.upload(imageFile, "banners", fileName);
-
-        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        LocalDate startDate = LocalDate.parse(request.getStartDate(), dtf);
-        LocalDate endDate = LocalDate.parse(request.getEndDate(), dtf);
+        // 3) 광고 종료일이 현재보다 과거라면 예외 처리
         if(endDate.isBefore(LocalDate.now())){
             throw new CustomException(ErrorCode.INVALID_INPUT, "광고 종료일이 현재일 이전입니다.");
         }
-
+        // 4) 배너 엔티티 생성
         Banner banner = new Banner();
-        // 현재 날짜가 광고기간 내에 포함되면 seq 값 부여, 아니면 null로 설정
-        LocalDate today = LocalDate.now();
-        if (!today.isBefore(startDate) && !today.isAfter(endDate)) {
-            int maxSeq = bannerMapper.findMaxSeqForActiveBanners();
-            banner.setSeq(maxSeq + 1);
-        } else {
-            banner.setSeq(null);
-        }
         banner.setBannerId(bannerId);
-        banner.setBannerName(request.getBannerName());
+        banner.setBannerName(bannerName);
         banner.setImageUrl(imageUrl);
-        banner.setLinkUrl(request.getLinkUrl());
+        banner.setLinkUrl(linkUrl);
         banner.setStartDate(startDate);
         banner.setEndDate(endDate);
         banner.setCreatedBy(userId);
+        // 5) 현재 날짜가 광고 기간 내에 포함되면 seq 값 부여, 아니면 null
+        LocalDate today = LocalDate.now();
+        if (!today.isBefore(startDate) && !today.isAfter(endDate)) {
+            // 현재 활성화되는 배너 → seq 설정
+            int maxSeq = bannerMapper.findMaxSeqForActiveBanners();
+            banner.setSeq(maxSeq + 1);
+        } else {
+            // 미래(또는 과거) 배너 → seq를 null 처리
+            banner.setSeq(null);
+        }
+        // 6) DB Insert
         bannerMapper.insertBanner(banner);
         return bannerId;
     }
