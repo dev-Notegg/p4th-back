@@ -22,7 +22,7 @@ public class BannerResponse {
     private String linkUrl;
     
     @Schema(description = "배너 노출 순서", example = "1")
-    private int seq;
+    private Integer seq;
     
     @Schema(description = "광고 시작일", example = "2025-02-01 00:00:00")
     private String startDate;
