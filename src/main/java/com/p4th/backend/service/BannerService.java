@@ -9,7 +9,6 @@ import com.p4th.backend.repository.BannerRepository;
 import com.p4th.backend.util.ULIDUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -88,13 +87,11 @@ public class BannerService {
     }
 
     @Transactional(readOnly = true)
-    public Page<BannerResponse> getActiveBanners(Pageable pageable) {
+    public List<BannerResponse> getActiveBanners() {
         List<Banner> activeBanners = bannerMapper.selectActiveBanners();
-        List<BannerResponse> responses = activeBanners.stream()
+        return activeBanners.stream()
                 .map(BannerResponse::from)
                 .collect(Collectors.toList());
-        int total = responses.size();
-        return new PageImpl<>(responses, pageable, total);
     }
 
     @Transactional

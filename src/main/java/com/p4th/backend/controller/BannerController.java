@@ -28,6 +28,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Tag(name = "배너 관리 API", description = "배너 관리 관련 API")
 @RestController
@@ -112,11 +113,9 @@ public class BannerController {
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @GetMapping("/active")
-    public ResponseEntity<Page<BannerResponse>> getActiveBanners(
-            HttpServletRequest request,
-            @ParameterObject @PageableDefault(sort = "seq", direction = Sort.Direction.ASC) Pageable pageable) {
+    public ResponseEntity<List<BannerResponse>> getActiveBanners(HttpServletRequest request) {
         authorization.checkAdmin(request);
-        Page<BannerResponse> banners = bannerService.getActiveBanners(pageable);
+        List<BannerResponse> banners = bannerService.getActiveBanners();
         return ResponseEntity.ok(banners);
     }
 
