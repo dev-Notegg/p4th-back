@@ -19,7 +19,5 @@ public interface BannerMapper {
 
     void updateBannerSeq(Map<String, Object> params);
 
-    List<Banner> selectBannersByStartDate();
-
     int findMaxSeqForActiveBanners();
 }

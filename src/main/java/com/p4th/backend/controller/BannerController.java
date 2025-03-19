@@ -104,8 +104,8 @@ public class BannerController {
         return ResponseEntity.ok().build();
     }
 
-    @Operation(summary = "활성 배너 순서 목록 조회",
-            description = "현재 광고기간 내 활성 배너 목록을 조회한다. 배너 노출순서 변경 목록을 조회할때 이용한다.")
+    @Operation(summary = "배너 순서 목록 조회",
+            description = "광고기간 종료일이 지나지 않은 배너 순서 목록을 조회한다. 배너 노출순서 변경 목록을 조회할때 이용한다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "활성 배너 목록 조회 성공",
                     content = @Content(schema = @Schema(implementation = BannerResponse.class))),
@@ -119,8 +119,8 @@ public class BannerController {
         return ResponseEntity.ok(banners);
     }
 
-    @Operation(summary = "활성 배너 순서 변경",
-            description = "현재 광고기간 내 활성 배너의 노출 순서를 변경한다. (배너 ID 목록을 순서대로 전달)")
+    @Operation(summary = "배너 순서 변경",
+            description = "광고기간 종료일이 지나지 않은 배너의 노출 순서를 변경한다. (배너 ID 목록을 순서대로 전달)")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "배너 순서 변경 성공"),
             @ApiResponse(responseCode = "403", description = "관리자 권한 필요",

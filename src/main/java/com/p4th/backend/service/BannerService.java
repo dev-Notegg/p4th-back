@@ -60,16 +60,9 @@ public class BannerService {
         banner.setStartDate(startDate);
         banner.setEndDate(endDate);
         banner.setCreatedBy(userId);
-        // 5) 현재 날짜가 광고 기간 내에 포함되면 seq 값 부여, 아니면 null
-        LocalDate today = LocalDate.now();
-        if (!today.isBefore(startDate) && !today.isAfter(endDate)) {
-            // 현재 활성화되는 배너 → seq 설정
-            int maxSeq = bannerMapper.findMaxSeqForActiveBanners();
-            banner.setSeq(maxSeq + 1);
-        } else {
-            // 미래(또는 과거) 배너 → seq를 null 처리
-            banner.setSeq(null);
-        }
+        // 5) 마지막 seq 값 부여
+        int maxSeq = bannerMapper.findMaxSeqForActiveBanners();
+        banner.setSeq(maxSeq + 1);
         // 6) DB Insert
         bannerMapper.insertBanner(banner);
         return bannerId;

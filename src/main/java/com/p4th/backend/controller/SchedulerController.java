@@ -1,9 +1,7 @@
 package com.p4th.backend.controller;
 
-import com.p4th.backend.domain.Banner;
 import com.p4th.backend.domain.Post;
 import com.p4th.backend.domain.PostHistoryLog;
-import com.p4th.backend.mapper.BannerMapper;
 import com.p4th.backend.mapper.PostHistoryLogMapper;
 import com.p4th.backend.mapper.PostMapper;
 import lombok.RequiredArgsConstructor;
@@ -14,10 +12,7 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.TemporalAdjusters;
-import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import com.p4th.backend.util.ULIDUtil;
 
@@ -27,7 +22,6 @@ public class SchedulerController {
 
     private final PostMapper postMapper;
     private final PostHistoryLogMapper postHistoryLogMapper;
-    private final BannerMapper bannerMapper;
 
     // 기간 내 집계된 조회수와 댓글 수를 기준으로 인기 점수 계산
     private float calculatePopularity(int viewCount, int commentCount) {
@@ -122,26 +116,6 @@ public class SchedulerController {
             this.popularityScore = popularityScore;
             this.periodViewCount = periodViewCount;
             this.periodCommentCount = periodCommentCount;
-        }
-    }
-
-    // 매일 00:00에 실행하여, 오늘부터 활성화되는 배너 중 아직 seq가 null인 배너에 대해 seq 업데이트
-    @Scheduled(cron = "0 0 0 * * *")
-    public void updateBannerSeqForToday() {
-        List<Banner> bannersToActivate = bannerMapper.selectBannersByStartDate();
-        if (bannersToActivate == null || bannersToActivate.isEmpty()) {
-            return;
-        }
-        // 기존 활성 배너의 최대 seq를 구함
-        int maxSeq = bannerMapper.findMaxSeqForActiveBanners();
-        // 오늘 활성화될 배너들을 정렬 후, 순차적으로 seq를 부여
-        bannersToActivate.sort(Comparator.comparing(Banner::getCreatedAt));
-        for (Banner banner : bannersToActivate) {
-            maxSeq++;
-            Map<String, Object> params = new HashMap<>();
-            params.put("bannerId", banner.getBannerId());
-            params.put("seq", maxSeq);
-            bannerMapper.updateBannerSeq(params);
         }
     }
 }
