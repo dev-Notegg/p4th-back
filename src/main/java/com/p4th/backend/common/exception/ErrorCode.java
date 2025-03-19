@@ -37,6 +37,9 @@ public enum ErrorCode {
     BOARD_NOT_FOUND(HttpStatus.NOT_FOUND, 20501, "error.boardNotFound"),
     DUPLICATE_BOARD_NAME(HttpStatus.BAD_REQUEST, 20502, "error.duplicateBoardName"),
 
+    //배너 관련
+    BANNER_NOT_FOUND(HttpStatus.NOT_FOUND, 20503, "error.bannerNotFound"),
+
     // 공통
     INVALID_INPUT(HttpStatus.BAD_REQUEST, 30100, "error.invalidInput"),
 

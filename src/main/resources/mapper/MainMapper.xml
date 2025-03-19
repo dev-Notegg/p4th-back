@@ -22,7 +22,6 @@
             banner_name,
             image_url,
             link_url,
-            display_yn,
             seq,
             start_date,
             end_date,
@@ -31,8 +30,7 @@
             updated_by,
             updated_at
         FROM banner
-        WHERE display_yn = 1
-          AND NOW() BETWEEN start_date AND end_date
+        WHERE CURDATE() BETWEEN start_date AND end_date
         ORDER BY seq
     </select>
 </mapper>

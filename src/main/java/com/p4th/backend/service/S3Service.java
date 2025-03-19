@@ -117,4 +117,15 @@ public class S3Service {
             throw new RuntimeException("바이트 배열 업로드 중 오류 발생: " + e.getMessage(), e);
         }
     }
+
+    /**
+     * S3 버킷에서 주어진 파일 경로(파일 key)를 삭제한다.
+     * @param filePath S3 내 파일 경로 (key)
+     */
+    public void delete(String filePath) {
+        if (filePath == null || filePath.isEmpty()) {
+            return;
+        }
+        amazonS3.deleteObject(s3Config.getBucketName(), filePath);
+    }
 }

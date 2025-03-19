@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.p4th.backend.mapper.BannerMapper">
+
+    <resultMap id="bannerResultMap" type="com.p4th.backend.domain.Banner">
+        <id property="bannerId" column="banner_id"/>
+        <result property="bannerName" column="banner_name"/>
+        <result property="imageUrl" column="image_url"/>
+        <result property="linkUrl" column="link_url"/>
+        <result property="seq" column="seq"/>
+        <result property="startDate" column="start_date"/>
+        <result property="endDate" column="end_date"/>
+    </resultMap>
+
+    <!-- 배너 ID로 배너 조회 -->
+    <select id="findById" parameterType="string" resultMap="bannerResultMap">
+        SELECT banner_id, banner_name, image_url, link_url, seq, start_date, end_date, created_at, created_by, updated_at, updated_by
+        FROM banner
+        WHERE banner_id = #{bannerId}
+    </select>
+
+    <!-- 배너 등록 -->
+    <insert id="insertBanner" parameterType="com.p4th.backend.domain.Banner">
+        INSERT INTO banner (banner_id, banner_name, image_url, link_url, seq, start_date, end_date, created_at, created_by)
+        VALUES (#{bannerId}, #{bannerName}, #{imageUrl}, #{linkUrl}, #{seq}, #{startDate}, #{endDate}, NOW(), #{createdBy})
+    </insert>
+
+    <delete id="deleteBanner" parameterType="string">
+        DELETE FROM banner WHERE banner_id = #{bannerId}
+    </delete>
+
+    <!-- 활성 배너 목록 조회 -->
+    <select id="selectActiveBanners" resultMap="bannerResultMap">
+        SELECT banner_id, banner_name, image_url, link_url, seq, start_date, end_date
+        FROM banner
+        WHERE CURDATE() BETWEEN start_date AND end_date
+        ORDER BY seq
+    </select>
+
+    <update id="updateBannerSeq" parameterType="map">
+        UPDATE banner
+        SET seq = #{seq}
+        WHERE banner_id = #{bannerId}
+    </update>
+
+    <!-- 광고시작일이 오늘인 배너 조회 -->
+    <select id="selectBannersByStartDate" resultMap="bannerResultMap" parameterType="java.time.LocalDate">
+        SELECT banner_id, banner_name, image_url, link_url, display_yn, seq, start_date, end_date, created_at, created_by, updated_at, updated_by
+        FROM banner
+        WHERE start_date = CURDATE()
+    </select>
+
+    <!-- 현재 활성 배너의 최대 seq 구하기 (현재 날짜 기준) -->
+    <select id="findMaxSeqForActiveBanners" resultType="int">
+        SELECT COALESCE(MAX(seq), 0) FROM banner
+        WHERE CURDATE() BETWEEN start_date AND end_date
+    </select>
+</mapper>
