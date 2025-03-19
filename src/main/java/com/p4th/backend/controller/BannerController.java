@@ -56,7 +56,7 @@ public class BannerController {
         return ResponseEntity.ok(banners);
     }
 
-    @Operation(summary = "배너 등록", description = "새 배너를 등록한다. (각 필드는 @RequestParam으로 받음, 파일은 MultipartFile)")
+    @Operation(summary = "배너 등록", description = "새 배너를 등록한다. (각 필드는 @RequestParam으로 받고, 이미지 파일은 MultipartFile로 받음)")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "배너 등록 성공",
                     content = @Content(schema = @Schema(implementation = BannerCreationResponse.class))),
@@ -75,18 +75,11 @@ public class BannerController {
             @RequestParam("startDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
             @Parameter(name = "endDate", description = "광고 종료일 (yyyy-MM-dd)", required = true)
             @RequestParam("endDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate,
-            @Parameter(
-                    name = "imageFile",
-                    description = "배너 이미지 파일 (multipart/form-data)",
-                    required = true,
-                    content = @Content(
-                            mediaType = MediaType.APPLICATION_OCTET_STREAM_VALUE,
-                            schema = @Schema(type = "string", format = "binary")
-                    )
-            )
-            @RequestParam("imageFile") MultipartFile imageFile,
-            HttpServletRequest request
-    ) {
+            @Parameter(name = "imageFile", description = "배너 이미지 파일", required = true,
+                    content = @Content(mediaType = "multipart/form-data",
+                            schema = @Schema(type = "string", format = "binary")))
+            @RequestPart("imageFile") MultipartFile imageFile,
+            HttpServletRequest request) {
         authorization.checkAdmin(request);
         String userId = jwtProvider.resolveUserId(request);
         String bannerId = bannerService.createBanner(userId, bannerName, linkUrl, startDate, endDate, imageFile);
