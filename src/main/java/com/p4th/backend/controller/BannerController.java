@@ -65,7 +65,11 @@ public class BannerController {
     })
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<BannerCreationResponse> createBanner(
+            @Parameter(name = "data", description = "배너 등록 정보", required = true)
             @RequestPart("data") BannerCreationRequest requestDto,
+            @Parameter(name = "imageFile", description = "배너 이미지 파일", required = true,
+                    content = @Content(mediaType = "multipart/form-data",
+                            schema = @Schema(type = "string", format = "binary")))
             @RequestPart("imageFile") MultipartFile imageFile,
             HttpServletRequest request) {
         authorization.checkAdmin(request);

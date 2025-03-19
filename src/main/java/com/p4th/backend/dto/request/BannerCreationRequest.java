@@ -9,9 +9,6 @@ public class BannerCreationRequest {
     @Schema(description = "광고식별명", example = "메인배너")
     private String bannerName;
     
-    @Schema(description = "배너 이미지 URL", example = "https://example.com/new-banner.jpg")
-    private String imageUrl;
-    
     @Schema(description = "클릭 시 이동 링크", example = "https://example.com/landing")
     private String linkUrl;
     
