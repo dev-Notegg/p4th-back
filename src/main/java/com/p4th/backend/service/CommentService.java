@@ -12,6 +12,7 @@ import com.p4th.backend.dto.response.comment.CommentResponse;
 import com.p4th.backend.mapper.AuthMapper;
 import com.p4th.backend.mapper.CommentMapper;
 import com.p4th.backend.mapper.PostMapper;
+import com.p4th.backend.repository.PostRepository;
 import com.p4th.backend.util.ULIDUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -28,11 +29,17 @@ public class CommentService {
     private final AuthMapper authMapper;
     private final PostMapper postMapper;
     private final NotificationService notificationService;
+    private final PostRepository postRepository;
 
     @Transactional(readOnly = true)
-    public List<CommentResponse> getCommentsByPost(String postId, String userId) {
-        return commentMapper.getCommentsByPost(postId, userId).stream()
-                .map(CommentResponse::from)
+    public List<CommentResponse> getCommentsByPost(String postId, String currentUserId) {
+        // 게시글 정보를 조회하여 작성자 ID를 가져온다
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new CustomException(ErrorCode.POST_NOT_FOUND));
+        String postAuthorId = post.getUserId();
+
+        return commentMapper.getCommentsByPost(postId, currentUserId).stream()
+                .map(comment -> CommentResponse.from(comment, currentUserId, postAuthorId))
                 .collect(Collectors.toList());
     }
 

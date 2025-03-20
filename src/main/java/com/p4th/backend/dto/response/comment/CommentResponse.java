@@ -27,6 +27,9 @@ public class CommentResponse {
     
     @Schema(description = "비밀 댓글 여부", example = "true")
     private boolean secretYn;
+
+    @Schema(description = "현재 사용자에게 댓글 내용 공개 여부", example = "true")
+    private boolean canViewContent;
     
     @Schema(description = "댓글 작성일 (0분 전, X분 전, X시간 전, 또는 날짜 형식)", example = "0분 전")
     private String createdAt;
@@ -34,7 +37,7 @@ public class CommentResponse {
     @Schema(description = "댓글 상태", example = "NORMAL")
     private CommentStatus status;
 
-    public static CommentResponse from(Comment comment) {
+    public static CommentResponse from(Comment comment, String currentUserId, String postAuthorId) {
         CommentResponse response = new CommentResponse();
         response.setCommentId(comment.getCommentId());
         response.setParentCommentId(comment.getParentCommentId());
@@ -42,6 +45,12 @@ public class CommentResponse {
         response.setNickname(comment.getNickname() != null ? comment.getNickname() : null);
         response.setContent(comment.getContent());
         response.setSecretYn(comment.getSecretYn());
+        // 만약 댓글이 비밀 댓글이라면, 댓글 작성자 또는 게시글 작성자일 때만 공개, 아니면 false 설정
+        if (comment.getSecretYn() != null && comment.getSecretYn()) {
+            response.setCanViewContent(comment.getUserId().equals(currentUserId) || postAuthorId.equals(currentUserId));
+        } else {
+            response.setCanViewContent(true);
+        }
         response.setCreatedAt(RelativeTimeFormatter.formatRelativeTime(comment.getCreatedAt()));
         response.setStatus(comment.getStatus());
         return response;
