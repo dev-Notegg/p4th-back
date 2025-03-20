@@ -6,7 +6,7 @@ import com.p4th.backend.dto.response.admin.BannerCreationResponse;
 import com.p4th.backend.dto.response.admin.BannerResponse;
 import com.p4th.backend.security.Authorization;
 import com.p4th.backend.security.JwtProvider;
-import com.p4th.backend.service.BannerService;
+import com.p4th.backend.service.AdminBannerService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -34,9 +34,9 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/admin/banners")
 @RequiredArgsConstructor
-public class BannerController {
+public class AdminBannerController {
 
-    private final BannerService bannerService;
+    private final AdminBannerService adminBannerService;
     private final Authorization authorization;
     private final JwtProvider jwtProvider;
 
@@ -53,7 +53,7 @@ public class BannerController {
             @ParameterObject @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
             HttpServletRequest request) {
         authorization.checkAdmin(request);
-        Page<BannerResponse> banners = bannerService.getBanners(search, pageable);
+        Page<BannerResponse> banners = adminBannerService.getBanners(search, pageable);
         return ResponseEntity.ok(banners);
     }
 
@@ -83,7 +83,7 @@ public class BannerController {
             HttpServletRequest request) {
         authorization.checkAdmin(request);
         String userId = jwtProvider.resolveUserId(request);
-        String bannerId = bannerService.createBanner(userId, bannerName, linkUrl, startDate, endDate, imageFile);
+        String bannerId = adminBannerService.createBanner(userId, bannerName, linkUrl, startDate, endDate, imageFile);
         return ResponseEntity.ok(new BannerCreationResponse(bannerId));
     }
 
@@ -100,7 +100,7 @@ public class BannerController {
             @PathVariable("bannerId") String bannerId,
             HttpServletRequest request) {
         authorization.checkAdmin(request);
-        bannerService.deleteBanner(bannerId);
+        adminBannerService.deleteBanner(bannerId);
         return ResponseEntity.ok().build();
     }
 
@@ -115,7 +115,7 @@ public class BannerController {
     @GetMapping("/active")
     public ResponseEntity<List<BannerResponse>> getActiveBanners(HttpServletRequest request) {
         authorization.checkAdmin(request);
-        List<BannerResponse> banners = bannerService.getActiveBanners();
+        List<BannerResponse> banners = adminBannerService.getActiveBanners();
         return ResponseEntity.ok(banners);
     }
 
@@ -133,7 +133,7 @@ public class BannerController {
             @RequestBody BannerOrderUpdateRequest requestDto,
             HttpServletRequest request) {
         authorization.checkAdmin(request);
-        bannerService.updateActiveBannerOrder(requestDto.getOrder());
+        adminBannerService.updateActiveBannerOrder(requestDto.getOrder());
         return ResponseEntity.ok().build();
     }
 }

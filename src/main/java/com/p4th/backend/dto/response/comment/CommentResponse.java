@@ -24,7 +24,10 @@ public class CommentResponse {
     
     @Schema(description = "댓글 내용", example = "첫 번째 댓글입니다.")
     private String content;
-
+    
+    @Schema(description = "비밀 댓글 여부", example = "true")
+    private boolean secretYn;
+    
     @Schema(description = "댓글 작성일 (0분 전, X분 전, X시간 전, 또는 날짜 형식)", example = "0분 전")
     private String createdAt;
 
@@ -37,7 +40,7 @@ public class CommentResponse {
         response.setParentCommentId(comment.getParentCommentId());
         response.setUserId(comment.getUserId());
         response.setNickname(comment.getNickname() != null ? comment.getNickname() : null);
-        response.setContent(comment.getContent());
+        response.setSecretYn(comment.getSecretYn());
         response.setCreatedAt(RelativeTimeFormatter.formatRelativeTime(comment.getCreatedAt()));
         response.setStatus(comment.getStatus());
         return response;

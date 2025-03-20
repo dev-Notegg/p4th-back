@@ -15,6 +15,7 @@
             c.content,
             c.status,
             c.status_changed_at,
+            c.secret_yn,
             c.created_by,
             c.created_at,
             c.updated_by,
@@ -40,6 +41,7 @@
             parent_comment_id,
             user_id,
             content,
+            secret_yn,
             created_by
         ) VALUES (
                      #{commentId},
@@ -47,6 +49,7 @@
                      #{parentCommentId},
                      #{userId},
                      #{content},
+                     #{secretYn},
                      #{createdBy}
                  )
     </insert>
@@ -55,6 +58,7 @@
     <update id="updateComment">
         UPDATE comment
         SET content = #{content},
+            secret_yn = #{secretYn},
             updated_by = #{userId}
         WHERE comment_id = #{commentId}
     </update>

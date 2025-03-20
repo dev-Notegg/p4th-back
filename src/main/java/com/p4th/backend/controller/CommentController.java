@@ -78,7 +78,7 @@ public class CommentController {
             @Valid @RequestBody CommentUpdateRequest request,
             HttpServletRequest httpRequest) {
         String userId = jwtProvider.resolveUserId(httpRequest);
-        boolean updated = commentService.updateComment(commentId, request.getContent(), userId);
+        boolean updated = commentService.updateComment(commentId, request, userId);
         CommentUpdateResponse response = new CommentUpdateResponse(updated);
         return ResponseEntity.ok().body(response);
     }

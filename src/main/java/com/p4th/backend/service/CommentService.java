@@ -7,6 +7,7 @@ import com.p4th.backend.domain.NotificationType;
 import com.p4th.backend.domain.Post;
 import com.p4th.backend.domain.User;
 import com.p4th.backend.dto.request.CommentCreateRequest;
+import com.p4th.backend.dto.request.CommentUpdateRequest;
 import com.p4th.backend.dto.response.comment.CommentResponse;
 import com.p4th.backend.mapper.AuthMapper;
 import com.p4th.backend.mapper.CommentMapper;
@@ -55,6 +56,7 @@ public class CommentService {
         comment.setNickname(user.getNickname());
         comment.setContent(request.getContent());
         comment.setParentCommentId(request.getParentCommentId());
+        comment.setSecretYn(request.getSecretYn() != null ? request.getSecretYn() : false);
         comment.setCreatedBy(userId);
         int inserted = commentMapper.insertComment(comment);
         if (inserted != 1) {
@@ -103,7 +105,7 @@ public class CommentService {
     }
 
     @Transactional
-    public boolean updateComment(String commentId, String content, String userId) {
+    public boolean updateComment(String commentId, CommentUpdateRequest request, String userId) {
         // 댓글 조회 및 권한 체크
         Comment comment = commentMapper.getCommentById(commentId);
         if (comment == null) {
@@ -112,7 +114,7 @@ public class CommentService {
         if (!comment.getUserId().equals(userId)) {
             throw new CustomException(ErrorCode.UNAUTHORIZED_ACCESS, "본인이 작성한 댓글만 수정할 수 있습니다.");
         }
-        int updated = commentMapper.updateComment(commentId, content, userId);
+        int updated = commentMapper.updateComment(commentId, request.getSecretYn(), request.getContent(), userId);
         return updated == 1;
     }
 

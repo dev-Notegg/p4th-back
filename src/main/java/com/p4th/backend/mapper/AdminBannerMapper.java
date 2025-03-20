@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 @Mapper
-public interface BannerMapper {
+public interface AdminBannerMapper {
     Banner findById(@Param("bannerId") String bannerId);
 
     int insertBanner(Banner banner);

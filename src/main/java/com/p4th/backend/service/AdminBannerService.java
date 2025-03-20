@@ -4,8 +4,8 @@ import com.p4th.backend.common.exception.CustomException;
 import com.p4th.backend.common.exception.ErrorCode;
 import com.p4th.backend.domain.Banner;
 import com.p4th.backend.dto.response.admin.BannerResponse;
-import com.p4th.backend.mapper.BannerMapper;
-import com.p4th.backend.repository.BannerRepository;
+import com.p4th.backend.mapper.AdminBannerMapper;
+import com.p4th.backend.repository.AdminBannerRepository;
 import com.p4th.backend.util.ULIDUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -22,19 +22,19 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class BannerService {
+public class AdminBannerService {
 
-    private final BannerRepository bannerRepository;
-    private final BannerMapper bannerMapper;
+    private final AdminBannerRepository adminBannerRepository;
+    private final AdminBannerMapper adminBannerMapper;
     private final S3Service s3Service;
 
     @Transactional(readOnly = true)
     public Page<BannerResponse> getBanners(String search, Pageable pageable) {
         Page<Banner> page;
         if (search == null || search.trim().isEmpty()) {
-            page = bannerRepository.findAll(pageable);
+            page = adminBannerRepository.findAll(pageable);
         } else {
-            page = bannerRepository.findByBannerNameContainingIgnoreCase(search, pageable);
+            page = adminBannerRepository.findByBannerNameContainingIgnoreCase(search, pageable);
         }
         return page.map(BannerResponse::from);
     }
@@ -61,27 +61,27 @@ public class BannerService {
         banner.setEndDate(endDate);
         banner.setCreatedBy(userId);
         // 5) 마지막 seq 값 부여
-        int maxSeq = bannerMapper.findMaxSeqForActiveBanners();
+        int maxSeq = adminBannerMapper.findMaxSeqForActiveBanners();
         banner.setSeq(maxSeq + 1);
         // 6) DB Insert
-        bannerMapper.insertBanner(banner);
+        adminBannerMapper.insertBanner(banner);
         return bannerId;
     }
 
     @Transactional
     public void deleteBanner(String bannerId) {
-        Banner banner = bannerMapper.findById(bannerId);
+        Banner banner = adminBannerMapper.findById(bannerId);
         if (banner == null) {
             throw new CustomException(ErrorCode.BANNER_NOT_FOUND);
         }
-        bannerMapper.deleteBanner(bannerId);
+        adminBannerMapper.deleteBanner(bannerId);
         s3Service.deleteByFileUrl(banner.getImageUrl());
-        bannerMapper.deleteBanner(bannerId);
+        adminBannerMapper.deleteBanner(bannerId);
     }
 
     @Transactional(readOnly = true)
     public List<BannerResponse> getActiveBanners() {
-        List<Banner> activeBanners = bannerMapper.selectActiveBanners();
+        List<Banner> activeBanners = adminBannerMapper.selectActiveBanners();
         return activeBanners.stream()
                 .map(BannerResponse::from)
                 .collect(Collectors.toList());
@@ -93,7 +93,7 @@ public class BannerService {
             Map<String, Object> params = new HashMap<>();
             params.put("bannerId", order.get(i));
             params.put("seq", i + 1);
-            bannerMapper.updateBannerSeq(params);
+            adminBannerMapper.updateBannerSeq(params);
         }
     }
 }

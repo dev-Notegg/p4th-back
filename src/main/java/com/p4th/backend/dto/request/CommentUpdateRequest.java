@@ -8,4 +8,6 @@ import lombok.Data;
 public class CommentUpdateRequest {
     @Schema(description = "수정된 댓글 내용", example = "수정된 댓글 내용")
     private String content;
+    @Schema(description = "비밀 댓글 여부", example = "true")
+    private Boolean secretYn;
 }

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.p4th.backend.mapper.BannerMapper">
+<mapper namespace="com.p4th.backend.mapper.AdminBannerMapper">
 
     <resultMap id="bannerResultMap" type="com.p4th.backend.domain.Banner">
         <id property="bannerId" column="banner_id"/>
@@ -45,7 +45,7 @@
 
     <!-- 광고시작일이 오늘인 배너 조회 -->
     <select id="selectBannersByStartDate" resultMap="bannerResultMap" parameterType="java.time.LocalDate">
-        SELECT banner_id, banner_name, image_url, link_url, display_yn, seq, start_date, end_date, created_at, created_by, updated_at, updated_by
+        SELECT banner_id, banner_name, image_url, link_url, seq, start_date, end_date, created_at, created_by, updated_at, updated_by
         FROM banner
         WHERE start_date = CURDATE()
     </select>

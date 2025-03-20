@@ -23,6 +23,7 @@ public class Comment {
     @Enumerated(EnumType.STRING)
     private CommentStatus status;  // NORMAL, REPORTED
     private LocalDateTime statusChangedAt;
+    private Boolean secretYn;
     private String createdBy;
     private LocalDateTime createdAt;
     private String updatedBy;
