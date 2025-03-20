@@ -11,7 +11,7 @@
             c.is_notice AS isNotice,
             b.board_name AS boardName
         FROM board b
-                 JOIN category c ON b.category_id = c.category_id
+                 JOIN category c ON b.category_id = c.category_id AND c.main_exposure = 1
         ORDER BY (SELECT COUNT(*) FROM post p WHERE p.board_id = b.board_id) DESC
         LIMIT 7
     </select>
