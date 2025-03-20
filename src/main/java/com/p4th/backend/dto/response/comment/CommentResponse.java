@@ -40,6 +40,7 @@ public class CommentResponse {
         response.setParentCommentId(comment.getParentCommentId());
         response.setUserId(comment.getUserId());
         response.setNickname(comment.getNickname() != null ? comment.getNickname() : null);
+        response.setContent(comment.getContent());
         response.setSecretYn(comment.getSecretYn());
         response.setCreatedAt(RelativeTimeFormatter.formatRelativeTime(comment.getCreatedAt()));
         response.setStatus(comment.getStatus());
