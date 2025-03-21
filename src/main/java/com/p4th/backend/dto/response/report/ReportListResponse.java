@@ -31,7 +31,7 @@ public class ReportListResponse {
     private int readYn;
 
     @Schema(description = "신고 생성일 (yyyy-MM-dd)")
-    private String createdDate;
+    private String createdAt;
 
     public static ReportListResponse from(Report report) {
         ReportListResponse dto = new ReportListResponse();
@@ -42,7 +42,7 @@ public class ReportListResponse {
         dto.setReason(HtmlContentUtils.extractPlainText(report.getReason(),30));
         dto.setReadYn(report.getReadYn());
         if (report.getCreatedAt() != null) {
-            dto.setCreatedDate(report.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
+            dto.setCreatedAt(report.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
         }
         return dto;
     }
