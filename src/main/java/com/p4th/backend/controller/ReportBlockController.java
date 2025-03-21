@@ -53,7 +53,7 @@ public class ReportBlockController {
         if (reporterId == null) {
             throw new CustomException(ErrorCode.LOGIN_REQUIRED);
         }
-        String reportId = reportService.report(reportRequest.getTargetType(), reportRequest.getTargetId(), reporterId, reportRequest.getReason());
+        String reportId = reportService.report(reporterId, reportRequest);
         ReportResponse response = new ReportResponse(reportId);
         return ResponseEntity.ok(response);
     }

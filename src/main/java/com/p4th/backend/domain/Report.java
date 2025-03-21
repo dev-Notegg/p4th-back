@@ -15,15 +15,13 @@ public class Report {
     private String reportId;
     private String reporterId;
     private String targetUserId;
-    private String targetBoardId;
+    private String targetPostId;
     private String targetCommentId;
     @Enumerated(EnumType.STRING)
-    private ReportType type;         // POST 또는 COMMENT
-    @Enumerated(EnumType.STRING)
-    private ReportStatus status;     // WAIT, DONE, REJECT, CANCEL
+    private ReportType type; // POST, COMMENT
+    private int readYn; // 0: 미확인, 1: 확인
+    private LocalDateTime readAt;
     private String reason;
-    private LocalDateTime processedAt;
-    private String processedBy;
     private LocalDateTime createdAt;
     private String createdBy;
     private LocalDateTime updatedAt;

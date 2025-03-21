@@ -38,7 +38,10 @@ public enum ErrorCode {
     DUPLICATE_BOARD_NAME(HttpStatus.BAD_REQUEST, 20502, "error.duplicateBoardName"),
 
     //배너 관련
-    BANNER_NOT_FOUND(HttpStatus.NOT_FOUND, 20503, "error.bannerNotFound"),
+    BANNER_NOT_FOUND(HttpStatus.NOT_FOUND, 20601, "error.bannerNotFound"),
+
+    //신고 관련
+    REPORT_NOT_FOUND(HttpStatus.NOT_FOUND, 20701, "error.reportNotFound"),
 
     // 공통
     INVALID_INPUT(HttpStatus.BAD_REQUEST, 30100, "error.invalidInput"),
