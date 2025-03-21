@@ -22,14 +22,9 @@ public class ReportService {
         report.setReportId(ULIDUtil.getULID());
         report.setReporterId(reporterId);
 
-        if ("POST".equalsIgnoreCase(reportRequest.getTargetType())) {
-            report.setTargetPostId(reportRequest.getTargetId());
-            report.setType(ReportType.POST);
-            report.setTargetCommentId(null);
-        } else if ("COMMENT".equalsIgnoreCase(reportRequest.getTargetType())) {
-            report.setTargetCommentId(reportRequest.getTargetId());
-            report.setType(ReportType.COMMENT);
-            report.setTargetPostId(null);
+        if (ReportType.POST.equals(reportRequest.getTargetType()) || ReportType.COMMENT.equals(reportRequest.getTargetType())) {
+            report.setTargetId(reportRequest.getTargetId());
+            report.setType(reportRequest.getTargetType());
         } else {
             throw new CustomException(ErrorCode.INVALID_INPUT, "유효하지 않은 신고 대상 타입입니다.");
         }
