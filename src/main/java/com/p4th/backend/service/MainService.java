@@ -118,14 +118,14 @@ public class MainService {
         int imgCount = HtmlImageUtils.countInlineImages(response.getContent());
         response.setImageUrl(imgUrl);
         response.setImageCount(imgCount);
-        // HTML 태그 제거 후 순수 텍스트 추출 (최대 50자)
+        // HTML 태그 제거 후 순수 텍스트 추출 (최대 100자)
         if (response.getContent() != null && !response.getContent().isEmpty()) {
-            String plainText = HtmlContentUtils.extractPlainText(response.getContent(), 50);
+            String plainText = HtmlContentUtils.extractPlainText(response.getContent(), 100);
             response.setContent(plainText);
         }
-        // 제목 최대 23자 처리
+        // 제목 최대 30자 처리
         if (response.getTitle() != null) {
-            response.setTitle(HtmlContentUtils.extractText(response.getTitle(), 23));
+            response.setTitle(HtmlContentUtils.extractText(response.getTitle(), 30));
         }
         // 생성일시를 상대 시간 형식으로 변환
         if (response.getCreatedAt() != null && !response.getCreatedAt().isEmpty()) {

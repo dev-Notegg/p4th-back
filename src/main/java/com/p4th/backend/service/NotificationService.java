@@ -129,7 +129,7 @@ public class NotificationService {
             notification.setCommentId(null);
             notification.setType(NotificationType.NOTICE);
             notification.setTitle(messageSource.getMessage("notification.notice", new Object[]{getPostTitle(notification.getPostId())}, locale));
-            notification.setContent(HtmlContentUtils.extractPlainText(content, 30));
+            notification.setContent(HtmlContentUtils.extractPlainText(content, 100));
             notification.setReadYn(0);
             notification.setCreatedBy("SYSTEM");
             notificationMapper.insertNotification(notification);

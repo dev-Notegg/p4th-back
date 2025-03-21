@@ -76,7 +76,6 @@ public class AdminBannerService {
         }
         adminBannerMapper.deleteBanner(bannerId);
         s3Service.deleteByFileUrl(banner.getImageUrl());
-        adminBannerMapper.deleteBanner(bannerId);
     }
 
     @Transactional(readOnly = true)

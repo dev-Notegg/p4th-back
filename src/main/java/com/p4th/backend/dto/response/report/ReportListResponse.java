@@ -39,7 +39,7 @@ public class ReportListResponse {
         dto.setReporterId(report.getReporterId());
         dto.setTargetUserId(report.getTargetUserId());
         dto.setType(report.getType());
-        dto.setReason(HtmlContentUtils.extractPlainText(report.getReason(),30));
+        dto.setReason(HtmlContentUtils.extractPlainText(report.getReason(),100));
         dto.setReadYn(report.getReadYn());
         if (report.getCreatedAt() != null) {
             dto.setCreatedAt(report.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));

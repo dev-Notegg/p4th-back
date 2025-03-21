@@ -39,7 +39,7 @@ public class PostListResponse {
         }else{
             dto.nickname = post.getNickname() != null ? post.getNickname() : null;
         }
-        dto.title = HtmlContentUtils.extractText(post.getTitle(), 23);
+        dto.title = HtmlContentUtils.extractText(post.getTitle(), 30);
         if (post.getBoard() != null) {
             dto.boardName = post.getBoard().getBoardName();
             if (post.getBoard().getCategory() != null) {
@@ -53,7 +53,7 @@ public class PostListResponse {
         dto.commentCount = post.getCommentCount();
 
         // HTML 태그 제거 후 순수 텍스트 추출 (최대 50자)
-        dto.setContent(HtmlContentUtils.extractPlainText(post.getContent(), 50));
+        dto.setContent(HtmlContentUtils.extractPlainText(post.getContent(), 100));
 
         // HTML 내 이미지 태그 처리
         dto.imageCount = HtmlImageUtils.countInlineImages(post.getContent());
