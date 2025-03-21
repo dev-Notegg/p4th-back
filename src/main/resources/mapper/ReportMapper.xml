@@ -4,13 +4,13 @@
 <mapper namespace="com.p4th.backend.mapper.ReportMapper">
     <insert id="insertReport" parameterType="com.p4th.backend.domain.Report">
         INSERT INTO report
-        (report_id, reporter_id, target_user_id, target_board_id, target_comment_id, type, reason, created_by)
+        (report_id, reporter_id, target_user_id, target_post_id, target_comment_id, type, reason, created_by)
         VALUES
-            (#{reportId}, #{reporterId}, #{targetUserId}, #{targetBoardId}, #{targetCommentId}, #{type}, #{reason}, #{reporterId})
+            (#{reportId}, #{reporterId}, #{targetUserId}, #{targetPostId}, #{targetCommentId}, #{type}, #{reason}, #{reporterId})
     </insert>
 
     <select id="getReportById" resultType="com.p4th.backend.domain.Report">
-        SELECT report_id, reporter_id, target_user_id, target_board_id, target_comment_id, type, status_changed_at, reason, created_at, created_by
+        SELECT report_id, reporter_id, target_user_id, target_post_id, target_comment_id, type, read_yn, read_at, reason, created_at, created_by
         FROM report
         WHERE report_id = #{reportId}
     </select>

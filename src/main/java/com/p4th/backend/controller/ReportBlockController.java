@@ -33,7 +33,7 @@ public class ReportBlockController {
 
     @Operation(
             summary = "신고",
-            description = "게시글 또는 댓글을 신고한다. 요청 본문에 신고 대상 타입, 신고 대상 ID, 신고 사유를 입력한다."
+            description = "게시글 또는 댓글을 신고한다. 요청 본문에 신고 대상 타입(POST 또는 COMMENT), 신고 대상 회원ID, 신고 대상 ID, 신고 사유를 입력한다."
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "신고 성공",
