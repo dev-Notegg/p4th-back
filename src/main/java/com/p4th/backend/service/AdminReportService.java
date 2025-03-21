@@ -41,22 +41,21 @@ public class AdminReportService {
                 p = cb.and(p, cb.equal(root.get("type"), type));
             }
             if (reportId != null && !reportId.trim().isEmpty()) {
-                p = cb.and(p, cb.equal(root.get("reportId"), reportId));
+                p = cb.and(p, cb.like(root.get("reportId"), "%" + reportId + "%"));
             }
             if (reporterId != null && !reporterId.trim().isEmpty()) {
-                p = cb.and(p, cb.equal(root.get("reporterId"), reporterId));
+                p = cb.and(p, cb.like(cb.lower(root.get("reporterId")), "%" + reporterId.toLowerCase() + "%"));
             }
             if (targetUserId != null && !targetUserId.trim().isEmpty()) {
-                p = cb.and(p, cb.equal(root.get("targetUserId"), targetUserId));
+                p = cb.and(p, cb.like(cb.lower(root.get("targetUserId")), "%" + targetUserId.toLowerCase() + "%"));
             }
             if (reason != null && !reason.trim().isEmpty()) {
-                p = cb.and(p, cb.equal(root.get("reason"), reason));
+                p = cb.and(p, cb.like(cb.lower(root.get("reason")), "%" + reason.toLowerCase() + "%"));
             }
             return p;
         };
 
         Page<Report> reportPage = reportRepository.findAll(spec, pageable);
-
         return reportPage.map(ReportListResponse::from);
     }
 
