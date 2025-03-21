@@ -29,20 +29,28 @@ public class AdminReportService {
      * - reporterId(신고자ID), targetUserId(신고대상ID), type(POST/COMMENT)로 검색 가능
      */
     @Transactional(readOnly = true)
-    public Page<ReportListResponse> getReports(String reporterId,
+    public Page<ReportListResponse> getReports(ReportType type,
+                                               String reportId,
+                                               String reporterId,
                                                String targetUserId,
-                                               ReportType type,
+                                               String reason,
                                                Pageable pageable) {
         Specification<Report> spec = (root, query, cb) -> {
             Predicate p = cb.conjunction();
             if (type != null) {
                 p = cb.and(p, cb.equal(root.get("type"), type));
             }
+            if (reportId != null && !reportId.trim().isEmpty()) {
+                p = cb.and(p, cb.equal(root.get("reportId"), reportId));
+            }
             if (reporterId != null && !reporterId.trim().isEmpty()) {
                 p = cb.and(p, cb.equal(root.get("reporterId"), reporterId));
             }
             if (targetUserId != null && !targetUserId.trim().isEmpty()) {
                 p = cb.and(p, cb.equal(root.get("targetUserId"), targetUserId));
+            }
+            if (reason != null && !reason.trim().isEmpty()) {
+                p = cb.and(p, cb.equal(root.get("reason"), reason));
             }
             return p;
         };

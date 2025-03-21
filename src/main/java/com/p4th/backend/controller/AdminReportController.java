@@ -41,15 +41,19 @@ public class AdminReportController {
     public Page<ReportListResponse> getReports(
             @Parameter(description = "신고 타입(POST, COMMENT)")
             @RequestParam(value = "type", required = false) ReportType type,
+            @Parameter(description = "신고글 ID 검색")
+            @RequestParam(value = "reportId", required = false) String reportId,
             @Parameter(description = "신고자 ID 검색")
             @RequestParam(value = "reporterId", required = false) String reporterId,
-            @Parameter(description = "신고 대상 사용자 ID 검색")
+            @Parameter(description = "신고 대상 회원 ID 검색")
             @RequestParam(value = "targetUserId", required = false) String targetUserId,
+            @Parameter(description = "신고 내용 검색")
+            @RequestParam(value = "reason", required = false) String reason,
             @ParameterObject @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
             HttpServletRequest request
     ) {
         authorization.checkAdmin(request);
-        return adminReportService.getReports(reporterId, targetUserId, type, pageable);
+        return adminReportService.getReports(type, reportId, reporterId, targetUserId, reason, pageable);
     }
 
     @Operation(summary = "신고 상세 조회", description = "신고 상세 정보를 조회한다. 처음 조회 시 readYn=0이면 1로 변경 처리.")
