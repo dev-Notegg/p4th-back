@@ -17,6 +17,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 
 @Tag(name = "신고 관리 API", description = "게시글/댓글 신고 관리 관련 API")
@@ -43,7 +45,7 @@ public class AdminReportController {
             @RequestParam(value = "reporterId", required = false) String reporterId,
             @Parameter(description = "신고 대상 사용자 ID 검색")
             @RequestParam(value = "targetUserId", required = false) String targetUserId,
-            @ParameterObject Pageable pageable,
+            @ParameterObject @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
             HttpServletRequest request
     ) {
         authorization.checkAdmin(request);
