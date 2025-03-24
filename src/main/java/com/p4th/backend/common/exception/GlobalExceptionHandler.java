@@ -29,7 +29,7 @@ public class GlobalExceptionHandler {
         ErrorCode code = ex.getErrorCode();
         String message = messageSource.getMessage(code.getMessage(), null, locale);
         // CustomException의 경우, 간단한 메시지만 로그에 남김.
-        logger.error("CustomException occurred: {}", ex.getMessage());
+        logger.error("CustomException : " + message, ex.getMessage());
         ErrorResponse errorResponse = ErrorResponse.builder()
                 .errorCode(code.getCode())
                 .errorMessage(message)
