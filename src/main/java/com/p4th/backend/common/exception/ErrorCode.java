@@ -47,6 +47,7 @@ public enum ErrorCode {
 
     // 공통
     INVALID_INPUT(HttpStatus.BAD_REQUEST, 30100, "error.invalidInput"),
+    ALREADY_PROCESSED(HttpStatus.BAD_REQUEST, 30101, "error.alreadyProcessed"),
 
     // 내부 서버 오류
     INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, 40100, "error.internalServerError");

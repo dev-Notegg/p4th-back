@@ -52,6 +52,9 @@ public class AdminBlockService {
     public void blockUser(String userId, String currentUserId) {
         User user = adminUserRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+        if (user.getAccountStatus() == AccountStatus.BLOCKED) {
+            throw new CustomException(ErrorCode.ALREADY_PROCESSED, "해당 회원은 이미 차단된 상태입니다.");
+        }
         user.setAccountStatus(AccountStatus.BLOCKED);
         user.setAccountStatusChangedAt(LocalDateTime.now());
         adminUserRepository.save(user);
@@ -62,8 +65,7 @@ public class AdminBlockService {
             IpBlacklist existing = ipBlacklistMapper.findByIpAddress(ip);
             if (existing != null) {
                 existing.setStatus("BLOCKED");
-                existing.setUpdatedAt(LocalDateTime.now());
-                existing.setUpdatedBy(currentUserId); // 필요시 현재 관리자로 변경
+                existing.setUpdatedBy(currentUserId);
                 ipBlacklistMapper.updateIpBlacklist(existing);
             } else {
                 IpBlacklist newRecord = new IpBlacklist();
@@ -80,6 +82,10 @@ public class AdminBlockService {
     public void unblockUser(String userId, String currentUserId) {
         User user = adminUserRepository.findById(userId)
                 .orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+        // 이미 활성 상태이면 예외 발생
+        if (user.getAccountStatus() == AccountStatus.ACTIVE) {
+            throw new CustomException(ErrorCode.ALREADY_PROCESSED, "해당 회원은 이미 활성 상태입니다.");
+        }
         user.setAccountStatus(AccountStatus.ACTIVE);
         user.setAccountStatusChangedAt(LocalDateTime.now());
         user.setUpdatedBy(currentUserId);
@@ -92,7 +98,7 @@ public class AdminBlockService {
     }
 
     public boolean isIpBlocked(String ip) {
-        // ipBlacklistMapper를 통해 해당 IP의 차단 상태를 조회
+        // 해당 IP의 차단 상태를 조회
         return ipBlacklistMapper.findByIpAddress(ip) != null &&
                 "BLOCKED".equals(ipBlacklistMapper.findByIpAddress(ip).getStatus());
     }
