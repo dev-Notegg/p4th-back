@@ -22,13 +22,13 @@ public class ReportService {
         report.setReportId(ULIDUtil.getULID());
         report.setReporterId(reporterId);
 
-        if (ReportType.POST.equals(reportRequest.getTargetType()) || ReportType.COMMENT.equals(reportRequest.getTargetType())) {
-            report.setTargetId(reportRequest.getTargetId());
-            report.setType(reportRequest.getTargetType());
-        } else {
+        if (!ReportType.POST.equals(reportRequest.getTargetType()) && !ReportType.COMMENT.equals(reportRequest.getTargetType())) {
             throw new CustomException(ErrorCode.INVALID_INPUT, "유효하지 않은 신고 대상 타입입니다.");
         }
         report.setTargetUserId(reportRequest.getTargetUserId());
+        report.setTargetPostId(reportRequest.getTargetPostId());
+        report.setTargetCommentId(reportRequest.getTargetCommentId());
+        report.setType(reportRequest.getTargetType());
         report.setReason(reportRequest.getReason());
         int inserted = reportMapper.insertReport(report);
         if (inserted != 1) {

@@ -15,7 +15,8 @@ public class Report {
     private String reportId;
     private String reporterId;
     private String targetUserId;
-    private String targetId;
+    private String targetPostId;
+    private String targetCommentId;
     @Enumerated(EnumType.STRING)
     private ReportType type; // POST, COMMENT
     private int readYn; // 0: 미확인, 1: 확인

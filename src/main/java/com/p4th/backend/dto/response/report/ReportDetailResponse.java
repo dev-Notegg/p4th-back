@@ -20,8 +20,11 @@ public class ReportDetailResponse {
     @Schema(description = "신고 대상 사용자 ID")
     private String targetUserId;
 
-    @Schema(description = "신고 대상 ID(게시글/댓글)", nullable = true)
-    private String targetId;
+    @Schema(description = "신고 대상 게시글 ID", nullable = true)
+    private String targetPostId;
+
+    @Schema(description = "신고 대상 댓글 ID", nullable = true)
+    private String targetCommentId;
 
     @Schema(description = "신고 대상 타입 (POST/COMMENT)")
     private ReportType type;
@@ -43,7 +46,8 @@ public class ReportDetailResponse {
         dto.setReportId(report.getReportId());
         dto.setReporterId(report.getReporterId());
         dto.setTargetUserId(report.getTargetUserId());
-        dto.setTargetId(report.getTargetId());
+        dto.setTargetPostId(report.getTargetPostId());
+        dto.setTargetCommentId(report.getTargetCommentId());
         dto.setType(report.getType());
         dto.setReadYn(report.getReadYn());
         if (report.getReadAt() != null) {

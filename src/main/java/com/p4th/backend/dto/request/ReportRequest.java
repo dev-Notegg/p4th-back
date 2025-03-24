@@ -13,8 +13,11 @@ public class ReportRequest {
     @Schema(description = "신고 대상 회원ID", example = "yr0408")
     private String targetUserId;
 
-    @Schema(description = "신고 대상 ID (게시글 또는 댓글 ID)", example = "01JKWBMY3A47MEPETRT8MJN0MZ")
-    private String targetId;
+    @Schema(description = "신고 대상 게시글 ID", example = "01JKWBMY3A47MEPETRT8MJN0MZ")
+    private String targetPostId;
+
+    @Schema(description = "신고 대상 댓글 ID", example = "01JKWBMY3A47MEPETRT8MJN0MZ")
+    private String targetCommentId;
 
     @Schema(description = "신고 사유", example = "부적절한 내용")
     private String reason;
