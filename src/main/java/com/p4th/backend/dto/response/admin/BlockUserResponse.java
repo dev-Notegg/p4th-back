@@ -41,7 +41,7 @@ public class BlockUserResponse {
         if (user.getCreatedAt() != null) {
             dto.setJoinDate(user.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
         }
-        if (user.getAccountStatusChangedAt() != null) {
+        if (user.getAccountStatus().equals(AccountStatus.BLOCKED) && user.getAccountStatusChangedAt() != null) {
             dto.setBlockedDate(user.getAccountStatusChangedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")));
         }
         dto.setAccountStatus(user.getAccountStatus());

@@ -13,9 +13,10 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -40,7 +41,7 @@ public class AdminBlockController {
             @RequestParam(value="nickname", required=false) String nickname,
             @Parameter(description = "차단된 회원만 조회할 경우 true")
             @RequestParam(value="blockedOnly", defaultValue="false") boolean blockedOnly,
-            @ParameterObject Pageable pageable) {
+            @Parameter(hidden = true) @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
         Page<BlockUserResponse> page = adminBlockService.getBlockList(ip, userId, nickname, blockedOnly, pageable);
         return ResponseEntity.ok(page);
     }
