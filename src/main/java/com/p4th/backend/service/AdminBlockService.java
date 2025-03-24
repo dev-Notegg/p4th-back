@@ -31,7 +31,7 @@ public class AdminBlockService {
         Specification<User> spec = (root, query, cb) -> {
             Predicate p = cb.conjunction();
             if (ip != null && !ip.trim().isEmpty()) {
-                p = cb.and(p, cb.equal(root.get("lastLoginIp"), ip));
+                p = cb.and(p, cb.like(root.get("lastLoginIp"), "%" + ip + "%"));
             }
             if (userId != null && !userId.trim().isEmpty()) {
                 p = cb.and(p, cb.like(root.get("userId"), "%" + userId + "%"));
@@ -40,7 +40,7 @@ public class AdminBlockService {
                 p = cb.and(p, cb.like(cb.lower(root.get("nickname")), "%" + nickname.toLowerCase() + "%"));
             }
             if (blockedOnly) {
-                p = cb.and(p, cb.equal(root.get("accountStatus"), "BLOCKED"));
+                p = cb.and(p, cb.equal(root.get("accountStatus"), AccountStatus.BLOCKED));
             }
             return p;
         };
