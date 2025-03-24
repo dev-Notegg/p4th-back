@@ -41,7 +41,7 @@ public class AdminBlockController {
     }
 
     @Operation(summary = "회원 차단", 
-               description = "특정 회원을 차단한다. 해당 회원의 상태를 BLOCKED로 변경하고, IP 차단 테이블을 업데이트한다.")
+               description = "특정 회원을 차단한다. 해당 회원의 상태를 BLOCKED로 변경하고, 두번째 이상 동일 IP 차단인 경우 IP도 차단한다.")
     @PutMapping("/{userId}/block")
     public ResponseEntity<Void> blockUser(
             @PathVariable("userId") String userId,
@@ -52,7 +52,7 @@ public class AdminBlockController {
     }
 
     @Operation(summary = "회원 차단 해제", 
-               description = "특정 회원의 차단을 해제한다. 해당 회원의 상태를 ACTIVE로 변경하고, IP 차단 테이블을 업데이트한다.")
+               description = "특정 회원의 차단을 해제한다. 해당 회원의 상태를 ACTIVE로 변경하고, IP 차단도 삭제한다.")
     @PutMapping("/{userId}/unblock")
     public ResponseEntity<Void> unblockUser(
             @PathVariable("userId") String userId,
