@@ -138,6 +138,7 @@ public class AuthController {
             @ApiResponse(responseCode = "401", description = "리프레쉬 토큰이 유효하지 않은 경우",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
+    @RequireLogin
     @PostMapping("/token/refresh")
     public ResponseEntity<LoginResponse> updateToken(
             @Parameter(name = "RefreshTokenRequest", description = "토큰 갱신 요청 DTO (refreshToken)", required = true)

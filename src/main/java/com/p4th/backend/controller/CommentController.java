@@ -1,5 +1,6 @@
 package com.p4th.backend.controller;
 
+import com.p4th.backend.annotation.RequireLogin;
 import com.p4th.backend.common.exception.ErrorResponse;
 import com.p4th.backend.dto.request.CommentCreateRequest;
 import com.p4th.backend.dto.request.CommentUpdateRequest;
@@ -52,6 +53,7 @@ public class CommentController {
             @ApiResponse(responseCode = "400", description = "사용자를 찾을 수 없음", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "404", description = "게시글을 찾을 수 없음", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
     })
+    @RequireLogin
     @PostMapping(value = "/posts/{postId}/comments")
     public ResponseEntity<CommentCreateResponse> createComment(
             @Parameter(name = "postId", description = "게시글 ID", required = true)

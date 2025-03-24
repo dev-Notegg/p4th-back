@@ -1,5 +1,6 @@
 package com.p4th.backend.controller;
 
+import com.p4th.backend.annotation.RequireLogin;
 import com.p4th.backend.common.exception.ErrorResponse;
 import com.p4th.backend.domain.Post;
 import com.p4th.backend.dto.request.RegisterPostRequest;
@@ -76,6 +77,7 @@ public class PostController {
             @ApiResponse(responseCode = "500", description = "내부 서버 오류",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
+    @RequireLogin
     @PostMapping
     public ResponseEntity<CreatePostResponse> registerPost(
             @Parameter(name = "RegisterPostRequest", description = "게시글 등록 요청 DTO", required = true)
@@ -99,6 +101,7 @@ public class PostController {
             @ApiResponse(responseCode = "500", description = "내부 서버 오류",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
+    @RequireLogin
     @PutMapping(value = "/{postId}")
     public ResponseEntity<UpdatePostResponse> updatePost(
             @Parameter(name = "postId", description = "게시글 ID", required = true)
@@ -113,6 +116,7 @@ public class PostController {
     }
 
     @Operation(summary = "게시글 삭제", description = "게시글 삭제 API. 토큰의 회원ID와 게시글 작성자가 일치해야 삭제 가능하다.")
+    @RequireLogin
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "게시글 삭제 성공"),
             @ApiResponse(responseCode = "403", description = "권한 없음",
