@@ -17,7 +17,10 @@ public class AdminAuthorizationInterceptor implements HandlerInterceptor {
     private final AdminUserMapper adminUserMapper;
 
     @Override
-    public boolean preHandle(@NonNull HttpServletRequest request,@NonNull  HttpServletResponse response,@NonNull  Object handler){
+    public boolean preHandle(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull Object handler) {
+        if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
+            return true;
+        }
         String currentUserId = jwtProvider.resolveUserId(request);
         if (currentUserId == null) {
             throw new CustomException(ErrorCode.LOGIN_REQUIRED);

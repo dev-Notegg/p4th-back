@@ -1,10 +1,15 @@
 package com.p4th.backend.controller;
 
+import com.p4th.backend.common.exception.ErrorResponse;
 import com.p4th.backend.dto.response.admin.BlockUserResponse;
 import com.p4th.backend.security.JwtProvider;
 import com.p4th.backend.service.AdminBlockService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -42,6 +47,10 @@ public class AdminBlockController {
 
     @Operation(summary = "회원 차단", 
                description = "특정 회원을 차단한다. 해당 회원의 상태를 BLOCKED로 변경하고, 두번째 이상 동일 IP 차단인 경우 IP도 차단한다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "400", description = "이미 차단 회원인 경우",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    })
     @PutMapping("/{userId}/block")
     public ResponseEntity<Void> blockUser(
             @PathVariable("userId") String userId,
@@ -53,6 +62,10 @@ public class AdminBlockController {
 
     @Operation(summary = "회원 차단 해제", 
                description = "특정 회원의 차단을 해제한다. 해당 회원의 상태를 ACTIVE로 변경하고, IP 차단도 삭제한다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "400", description = "이미 활성 상태 회원인 경우",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
+    })
     @PutMapping("/{userId}/unblock")
     public ResponseEntity<Void> unblockUser(
             @PathVariable("userId") String userId,
