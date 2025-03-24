@@ -88,7 +88,22 @@
     <select id="selectByNickname" resultType="com.p4th.backend.domain.User">
         SELECT
             user_id AS userId,
-            nickname
+            password,
+            password_changed_at AS passwordChangedAt,
+            pass_code AS passCode,
+            nickname,
+            nickname_changed_at AS nicknameChangedAt,
+            membership_level AS membershipLevel,
+            admin_role AS adminRole,
+            warning_count AS warningCount,
+            account_status AS accountStatus,
+            account_status_changed_at AS accountStatusChangedAt,
+            last_login_ip AS lastLoginIp,
+            refresh_token AS refreshToken,
+            created_by AS createdBy,
+            created_at AS createdAt,
+            updated_by AS updatedBy,
+            updated_at AS updatedAt
         FROM user_info
         WHERE nickname = #{nickname}
     </select>

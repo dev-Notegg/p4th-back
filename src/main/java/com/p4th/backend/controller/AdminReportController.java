@@ -4,7 +4,6 @@ import com.p4th.backend.common.exception.ErrorResponse;
 import com.p4th.backend.domain.ReportType;
 import com.p4th.backend.dto.response.report.ReportDetailResponse;
 import com.p4th.backend.dto.response.report.ReportListResponse;
-import com.p4th.backend.security.Authorization;
 import com.p4th.backend.service.AdminReportService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -13,7 +12,6 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.*;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -28,7 +26,6 @@ import org.springframework.web.bind.annotation.*;
 public class AdminReportController {
 
     private final AdminReportService adminReportService;
-    private final Authorization authorization;
 
     @Operation(summary = "신고 목록 조회", description = "신고 목록을 조회하며, 신고자ID, 신고대상ID, 신고타입(POST/COMMENT)으로 검색 가능.")
     @ApiResponses(value = {
@@ -49,10 +46,8 @@ public class AdminReportController {
             @RequestParam(value = "targetUserId", required = false) String targetUserId,
             @Parameter(description = "신고 내용 검색")
             @RequestParam(value = "reason", required = false) String reason,
-            @ParameterObject @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
-            HttpServletRequest request
+            @ParameterObject @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
     ) {
-        authorization.checkAdmin(request);
         return adminReportService.getReports(type, reportId, reporterId, targetUserId, reason, pageable);
     }
 
@@ -67,10 +62,8 @@ public class AdminReportController {
     })
     @GetMapping("/{reportId}")
     public ReportDetailResponse getReportDetail(
-            @Parameter(description = "신고 ID") @PathVariable String reportId,
-            HttpServletRequest request
+            @Parameter(description = "신고 ID") @PathVariable String reportId
     ) {
-        authorization.checkAdmin(request);
         return adminReportService.getReportDetail(reportId);
     }
 }

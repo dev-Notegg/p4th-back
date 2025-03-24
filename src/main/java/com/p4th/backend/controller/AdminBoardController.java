@@ -6,7 +6,6 @@ import com.p4th.backend.dto.request.BoardUpdateRequest;
 import com.p4th.backend.dto.response.admin.BoardCreationResponse;
 import com.p4th.backend.dto.response.admin.BoardDeletionInfoResponse;
 import com.p4th.backend.dto.response.admin.BoardResponse;
-import com.p4th.backend.security.Authorization;
 import com.p4th.backend.security.JwtProvider;
 import com.p4th.backend.service.AdminBoardService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -33,7 +32,6 @@ import org.springframework.web.bind.annotation.*;
 public class AdminBoardController {
 
     private final AdminBoardService adminBoardService;
-    private final Authorization authorization;
     private final JwtProvider jwtProvider;
 
     @Operation(summary = "게시판 목록 조회", description = "게시판 목록을 조회하며, 게시판 ID, 게시판명, 카테고리명으로 검색 가능하다.")
@@ -51,9 +49,7 @@ public class AdminBoardController {
             @RequestParam(value = "boardName", required = false) String boardName,
             @Parameter(name = "categoryName", description = "검색할 카테고리명 (옵션)")
             @RequestParam(value = "categoryName", required = false) String categoryName,
-            HttpServletRequest request,
             @ParameterObject @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
-        authorization.checkAdmin(request);
         Page<BoardResponse> boards = adminBoardService.getBoards(boardId, boardName, categoryName, pageable);
         return ResponseEntity.ok(boards);
     }
@@ -69,7 +65,6 @@ public class AdminBoardController {
     public ResponseEntity<BoardCreationResponse> createBoard(
             @RequestBody BoardCreationRequest requestDto,
             HttpServletRequest request) {
-        authorization.checkAdmin(request);
         String userId = jwtProvider.resolveUserId(request);
         String boardId = adminBoardService.createBoard(userId, requestDto.getBoardName(), requestDto.getCategoryId(), requestDto.getBoardLevel());
         return ResponseEntity.ok(new BoardCreationResponse(boardId));
@@ -90,7 +85,6 @@ public class AdminBoardController {
             @PathVariable("boardId") String boardId,
             @RequestBody BoardUpdateRequest requestDto,
             HttpServletRequest request) {
-        authorization.checkAdmin(request);
         String userId = jwtProvider.resolveUserId(request);
         adminBoardService.updateBoard(userId, boardId, requestDto.getBoardName(), requestDto.getCategoryId(), requestDto.getBoardLevel());
         return ResponseEntity.ok().build();
@@ -106,9 +100,7 @@ public class AdminBoardController {
     @GetMapping("/{boardId}/deletion-info")
     public ResponseEntity<BoardDeletionInfoResponse> getBoardDeletionInfo(
             @Parameter(name = "boardId", description = "게시판 ID", required = true)
-            @PathVariable("boardId") String boardId,
-            HttpServletRequest request) {
-        authorization.checkAdmin(request);
+            @PathVariable("boardId") String boardId) {
         BoardDeletionInfoResponse info = adminBoardService.getBoardDeletionInfo(boardId);
         return ResponseEntity.ok(info);
     }
@@ -123,9 +115,7 @@ public class AdminBoardController {
     @DeleteMapping("/{boardId}")
     public ResponseEntity<?> deleteBoard(
             @Parameter(name = "boardId", description = "삭제할 게시판 ID", required = true)
-            @PathVariable("boardId") String boardId,
-            HttpServletRequest request) {
-        authorization.checkAdmin(request);
+            @PathVariable("boardId") String boardId) {
         adminBoardService.deleteBoard(boardId);
         return ResponseEntity.ok().build();
     }

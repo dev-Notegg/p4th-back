@@ -5,7 +5,6 @@ import com.p4th.backend.dto.request.*;
 import com.p4th.backend.dto.response.admin.BoardListResponse;
 import com.p4th.backend.dto.response.admin.CategoryCreationResponse;
 import com.p4th.backend.dto.response.admin.CategoryResponse;
-import com.p4th.backend.security.Authorization;
 import com.p4th.backend.security.JwtProvider;
 import com.p4th.backend.service.AdminCategoryService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -31,7 +30,6 @@ import org.springframework.web.bind.annotation.*;
 public class AdminCategoryController {
 
     private final AdminCategoryService adminCategoryService;
-    private final Authorization authorization;
     private final JwtProvider jwtProvider;
 
     @Operation(summary = "카테고리 목록 조회", description = "카테고리 목록을 조회하며, 카테고리 ID 또는 카테고리명으로 검색한다.")
@@ -47,9 +45,7 @@ public class AdminCategoryController {
             @RequestParam(value = "categoryId", required = false) String categoryId,
             @Parameter(name = "categoryName", description = "검색할 카테고리명 (옵션)")
             @RequestParam(value = "categoryName", required = false) String categoryName,
-            HttpServletRequest request,
             @Parameter(hidden = true) @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
-        authorization.checkAdmin(request);
         Page<CategoryResponse> response = adminCategoryService.getCategories(categoryId, categoryName, pageable);
         return ResponseEntity.ok(response);
     }
@@ -70,7 +66,6 @@ public class AdminCategoryController {
             @PathVariable("categoryId") String categoryId,
             @RequestBody MainExposureUpdateRequest requestDto,
             HttpServletRequest request) {
-        authorization.checkAdmin(request);
         String userId = jwtProvider.resolveUserId(request);
         adminCategoryService.updateMainExposure(userId, categoryId, requestDto.getMainExposure());
         return ResponseEntity.ok().build();
@@ -91,7 +86,6 @@ public class AdminCategoryController {
     public ResponseEntity<CategoryCreationResponse> createCategory(
             @RequestBody CategoryCreationRequest requestDto,
             HttpServletRequest request) {
-        authorization.checkAdmin(request);
         String userId = jwtProvider.resolveUserId(request);
         String categoryId = adminCategoryService.createCategory(userId, requestDto.getCategoryName());
         return ResponseEntity.ok(new CategoryCreationResponse(categoryId));
@@ -111,7 +105,6 @@ public class AdminCategoryController {
     public ResponseEntity<?> updateCategoryOrder(
             @RequestBody CategoryOrderUpdateRequest requestDto,
             HttpServletRequest request) {
-        authorization.checkAdmin(request);
         String userId = jwtProvider.resolveUserId(request);
         adminCategoryService.updateCategoryOrder(userId, requestDto.getOrder());
         return ResponseEntity.ok().build();
@@ -129,9 +122,7 @@ public class AdminCategoryController {
     @GetMapping("/{categoryId}/boards")
     public ResponseEntity<BoardListResponse> getBoardsByCategory(
             @Parameter(name = "categoryId", description = "카테고리 ID", required = true)
-            @PathVariable("categoryId") String categoryId,
-            HttpServletRequest request) {
-        authorization.checkAdmin(request);
+            @PathVariable("categoryId") String categoryId) {
         BoardListResponse response = adminCategoryService.getBoardsByCategory(categoryId);
         return ResponseEntity.ok(response);
     }
@@ -153,7 +144,6 @@ public class AdminCategoryController {
             @PathVariable("categoryId") String categoryId,
             @RequestBody BoardOrderUpdateRequest requestDto,
             HttpServletRequest request) {
-        authorization.checkAdmin(request);
         String userId = jwtProvider.resolveUserId(request);
         adminCategoryService.updateBoardOrder(userId, categoryId, requestDto);
         return ResponseEntity.ok().build();
@@ -177,7 +167,6 @@ public class AdminCategoryController {
             @PathVariable("categoryId") String categoryId,
             @RequestBody CategoryNameUpdateRequest requestDto,
             HttpServletRequest request) {
-        authorization.checkAdmin(request);
         String userId = jwtProvider.resolveUserId(request);
         adminCategoryService.updateCategoryName(userId, categoryId, requestDto.getCategoryName());
         return ResponseEntity.ok().build();
@@ -196,9 +185,7 @@ public class AdminCategoryController {
     @DeleteMapping("/{categoryId}")
     public ResponseEntity<?> deleteCategory(
             @Parameter(name = "categoryId", description = "삭제할 카테고리 ID", required = true)
-            @PathVariable("categoryId") String categoryId,
-            HttpServletRequest request) {
-        authorization.checkAdmin(request);
+            @PathVariable("categoryId") String categoryId) {
         adminCategoryService.deleteCategory(categoryId);
         return ResponseEntity.ok().build();
     }

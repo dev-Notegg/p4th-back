@@ -4,7 +4,6 @@ import com.p4th.backend.common.exception.ErrorResponse;
 import com.p4th.backend.dto.request.BannerOrderUpdateRequest;
 import com.p4th.backend.dto.response.admin.BannerCreationResponse;
 import com.p4th.backend.dto.response.admin.BannerResponse;
-import com.p4th.backend.security.Authorization;
 import com.p4th.backend.security.JwtProvider;
 import com.p4th.backend.service.AdminBannerService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -37,7 +36,6 @@ import java.util.List;
 public class AdminBannerController {
 
     private final AdminBannerService adminBannerService;
-    private final Authorization authorization;
     private final JwtProvider jwtProvider;
 
     @Operation(summary = "배너 목록 조회", description = "배너 목록을 조회하며, 광고식별명으로 검색한다.")
@@ -50,9 +48,7 @@ public class AdminBannerController {
     @GetMapping
     public ResponseEntity<Page<BannerResponse>> getBanners(
             @RequestParam(value = "search", required = false) String search,
-            @ParameterObject @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
-            HttpServletRequest request) {
-        authorization.checkAdmin(request);
+            @ParameterObject @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
         Page<BannerResponse> banners = adminBannerService.getBanners(search, pageable);
         return ResponseEntity.ok(banners);
     }
@@ -81,7 +77,6 @@ public class AdminBannerController {
                             schema = @Schema(type = "string", format = "binary")))
             @RequestPart("imageFile") MultipartFile imageFile,
             HttpServletRequest request) {
-        authorization.checkAdmin(request);
         String userId = jwtProvider.resolveUserId(request);
         String bannerId = adminBannerService.createBanner(userId, bannerName, linkUrl, startDate, endDate, imageFile);
         return ResponseEntity.ok(new BannerCreationResponse(bannerId));
@@ -97,9 +92,7 @@ public class AdminBannerController {
     @DeleteMapping("/{bannerId}")
     public ResponseEntity<?> deleteBanner(
             @Parameter(name = "bannerId", description = "삭제할 배너 ID", required = true)
-            @PathVariable("bannerId") String bannerId,
-            HttpServletRequest request) {
-        authorization.checkAdmin(request);
+            @PathVariable("bannerId") String bannerId) {
         adminBannerService.deleteBanner(bannerId);
         return ResponseEntity.ok().build();
     }
@@ -113,8 +106,7 @@ public class AdminBannerController {
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @GetMapping("/active")
-    public ResponseEntity<List<BannerResponse>> getActiveBanners(HttpServletRequest request) {
-        authorization.checkAdmin(request);
+    public ResponseEntity<List<BannerResponse>> getActiveBanners() {
         List<BannerResponse> banners = adminBannerService.getActiveBanners();
         return ResponseEntity.ok(banners);
     }
@@ -132,8 +124,8 @@ public class AdminBannerController {
     public ResponseEntity<?> updateActiveBannerOrder(
             @RequestBody BannerOrderUpdateRequest requestDto,
             HttpServletRequest request) {
-        authorization.checkAdmin(request);
-        adminBannerService.updateActiveBannerOrder(requestDto.getOrder());
+        String userId = jwtProvider.resolveUserId(request);
+        adminBannerService.updateActiveBannerOrder(requestDto.getOrder(), userId);
         return ResponseEntity.ok().build();
     }
 }

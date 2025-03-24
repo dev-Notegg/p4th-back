@@ -2,12 +2,14 @@ package com.p4th.backend.service;
 
 import com.p4th.backend.common.exception.CustomException;
 import com.p4th.backend.common.exception.ErrorCode;
+import com.p4th.backend.domain.AccountStatus;
 import com.p4th.backend.domain.User;
 import com.p4th.backend.dto.response.user.UserProfileResponse;
 import com.p4th.backend.dto.response.auth.LoginResponse;
 import com.p4th.backend.dto.response.auth.SignUpResponse;
 import com.p4th.backend.mapper.AuthMapper;
 import com.p4th.backend.security.JwtProvider;
+import com.p4th.backend.util.IpUtil;
 import com.p4th.backend.util.PassCodeUtil;
 import com.p4th.backend.util.PasswordUtil;
 import jakarta.servlet.http.HttpServletRequest;
@@ -58,12 +60,23 @@ public class AuthService {
             throw new CustomException(ErrorCode.INVALID_INPUT, "닉네임은 빈값일 수 없습니다.");
         }
         User user = authMapper.selectByNickname(nickname);
+        if(user != null) {
+            // BLOCKED 상태이고, 차단날짜가 3일 이상 경과한 경우 닉네임 재사용 가능
+            if (user.getAccountStatus() == AccountStatus.BLOCKED &&
+                    user.getAccountStatusChangedAt() != null &&
+                    user.getAccountStatusChangedAt().plusDays(3).isBefore(LocalDateTime.now())) {
+                user.setNickname("차단_" + user.getUserId());
+                user.setUpdatedBy("SYSTEM");
+                authMapper.updateUserNickname(user);
+                return true;
+            }
+        }
         return user == null;
     }
 
     // 로그인: 회원ID와 비밀번호 확인 후 바로 LoginResponse 반환
     public LoginResponse login(String userId, String rawPassword, HttpServletRequest request) {
-        String clientIp = extractClientIp(request);
+        String clientIp = IpUtil.extractClientIp(request);
         User user = authMapper.selectByUserId(userId);
         if (user == null) {
             throw new CustomException(ErrorCode.USER_NOT_FOUND);
@@ -137,9 +150,16 @@ public class AuthService {
         //닉네임 중복 체크
         User checkNickname = authMapper.selectByNickname(newNickname);
         if(checkNickname != null){
+            // BLOCKED 상태이고, 차단날짜가 3일 이상 경과한 경우 닉네임 재사용 가능
+            if (checkNickname.getAccountStatus() == AccountStatus.BLOCKED &&
+                    checkNickname.getAccountStatusChangedAt() != null &&
+                    checkNickname.getAccountStatusChangedAt().plusDays(3).isBefore(LocalDateTime.now())) {
+                checkNickname.setNickname("차단_" + user.getUserId());
+                checkNickname.setUpdatedBy("SYSTEM");
+                authMapper.updateUserNickname(checkNickname);
+            }
             throw new CustomException(ErrorCode.NICKNAME_ALREADY_EXISTS);
         }
-
         // 닉네임 변경 후 10일 이내 재변경 불가 체크
         if (user.getNicknameChangedAt() != null) {
             long daysSinceChange = ChronoUnit.DAYS.between(user.getNicknameChangedAt(), LocalDateTime.now());
@@ -194,19 +214,5 @@ public class AuthService {
         } catch (Exception e) {
             throw new CustomException(ErrorCode.INTERNAL_SERVER_ERROR, "내 계정 조회 중 오류: " + Arrays.toString(e.getStackTrace()));
         }
-    }
-
-    private String extractClientIp(HttpServletRequest request) {
-        String ip = request.getHeader("X-Forwarded-For");
-        if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip)) {
-            ip = request.getHeader("X-Real-IP");
-        }
-        if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip)) {
-            ip = request.getRemoteAddr();
-        } else {
-            // X-Forwarded-For can contain multiple IPs, take the first one.
-            ip = ip.split(",")[0].trim();
-        }
-        return ip;
     }
 }

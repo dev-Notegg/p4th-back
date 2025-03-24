@@ -87,10 +87,11 @@ public class AdminBannerService {
     }
 
     @Transactional
-    public void updateActiveBannerOrder(List<String> order) {
+    public void updateActiveBannerOrder(List<String> order, String userId) {
         for (int i = 0; i < order.size(); i++) {
             Map<String, Object> params = new HashMap<>();
             params.put("bannerId", order.get(i));
+            params.put("userId", userId);
             params.put("seq", i + 1);
             adminBannerMapper.updateBannerSeq(params);
         }

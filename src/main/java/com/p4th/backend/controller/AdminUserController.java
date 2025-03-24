@@ -7,7 +7,6 @@ import com.p4th.backend.dto.response.admin.UserListResponse;
 import com.p4th.backend.dto.response.user.UserProfileResponse;
 import com.p4th.backend.security.JwtProvider;
 import com.p4th.backend.service.AdminUserService;
-import com.p4th.backend.security.Authorization;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -31,7 +30,6 @@ import org.springframework.web.bind.annotation.*;
 public class AdminUserController {
 
     private final AdminUserService adminUserService;
-    private final Authorization authorization;
     private final JwtProvider jwtProvider;
 
     @Operation(summary = "회원 목록 조회", description = "회원목록을 조회하며, 회원ID 또는 닉네임으로 검색 가능.")
@@ -47,10 +45,8 @@ public class AdminUserController {
             @RequestParam(value = "userId", required = false) String userId,
             @Parameter(name = "nickname", description = "검색할 닉네임 (옵션)")
             @RequestParam(value = "nickname", required = false) String nickname,
-            HttpServletRequest request,
             @Parameter(hidden = true) @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
     ) {
-        authorization.checkAdmin(request);
         Page<UserProfileResponse> users = adminUserService.getUserList(userId, nickname, pageable);
         return ResponseEntity.ok(users);
     }
@@ -67,7 +63,6 @@ public class AdminUserController {
             @RequestBody MembershipLevelUpdateRequest request,
             HttpServletRequest httpRequest
     ) {
-        authorization.checkAdmin(httpRequest);
         String currentUserId = jwtProvider.resolveUserId(httpRequest);
         adminUserService.updateMembershipLevel(currentUserId, userId, request.getMembershipLevel());
     }
@@ -84,7 +79,6 @@ public class AdminUserController {
             @RequestBody AdminRoleUpdateRequest request,
             HttpServletRequest httpRequest
     ) {
-        authorization.checkAdmin(httpRequest);
         String currentUserId = jwtProvider.resolveUserId(httpRequest);
         adminUserService.updateAdminRole(currentUserId, userId, request.getAdminRole());
     }
