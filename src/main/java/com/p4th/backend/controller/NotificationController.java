@@ -1,7 +1,6 @@
 package com.p4th.backend.controller;
 
-import com.p4th.backend.common.exception.CustomException;
-import com.p4th.backend.common.exception.ErrorCode;
+import com.p4th.backend.annotation.RequireLogin;
 import com.p4th.backend.common.exception.ErrorResponse;
 import com.p4th.backend.dto.response.NotificationResponse;
 import com.p4th.backend.dto.response.UnreadCountResponse;
@@ -40,14 +39,12 @@ public class NotificationController {
             @ApiResponse(responseCode = "403", description = "로그인 후 이용가능한 메뉴",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
+    @RequireLogin
     @GetMapping
     public ResponseEntity<Page<NotificationResponse>> getNotifications(
             HttpServletRequest request,
             @Parameter(hidden = true) @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
         String userId = jwtProvider.resolveUserId(request);
-        if (userId == null) {
-            throw new CustomException(ErrorCode.LOGIN_REQUIRED);
-        }
         Page<NotificationResponse> notifications = notificationService.getNotifications(userId, pageable);
         return ResponseEntity.ok(notifications);
     }
@@ -60,15 +57,11 @@ public class NotificationController {
             @ApiResponse(responseCode = "500", description = "알림 읽음 처리 중 내부 서버 오류",
                     content = @Content(schema = @Schema(implementation = com.p4th.backend.dto.response.ErrorResponse.class)))
     })
+    @RequireLogin
     @PutMapping(value = "/{notificationId}/read")
     public ResponseEntity<?> markNotificationAsRead(
             @Parameter(name = "notificationId", description = "알림 ID", required = true)
-            @PathVariable("notificationId") String notificationId,
-            HttpServletRequest request) {
-        String userId = jwtProvider.resolveUserId(request);
-        if (userId == null) {
-            throw new CustomException(ErrorCode.LOGIN_REQUIRED);
-        }
+            @PathVariable("notificationId") String notificationId) {
         boolean updated = notificationService.markNotificationAsRead(notificationId);
         return ResponseEntity.ok("{\"updated\": " + updated + "}");
     }

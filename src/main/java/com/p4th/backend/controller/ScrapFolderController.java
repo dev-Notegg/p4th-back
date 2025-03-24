@@ -1,7 +1,6 @@
 package com.p4th.backend.controller;
 
-import com.p4th.backend.common.exception.CustomException;
-import com.p4th.backend.common.exception.ErrorCode;
+import com.p4th.backend.annotation.RequireLogin;
 import com.p4th.backend.common.exception.ErrorResponse;
 import com.p4th.backend.domain.ScrapFolder;
 import com.p4th.backend.dto.request.ScrapFolderNameRequest;
@@ -39,12 +38,10 @@ public class ScrapFolderController {
             @ApiResponse(responseCode = "403", description = "로그인 후 이용가능한 메뉴",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
+    @RequireLogin
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<ScrapFolderResponse>> getScrapFolders(HttpServletRequest request) {
         String userId = jwtProvider.resolveUserId(request);
-        if (userId == null) {
-            throw new CustomException(ErrorCode.LOGIN_REQUIRED);
-        }
         List<ScrapFolderResponse> responses = scrapFolderService.getScrapFolders(userId);
         return ResponseEntity.ok(responses);
     }
@@ -58,14 +55,12 @@ public class ScrapFolderController {
             @ApiResponse(responseCode = "500", description = "스크랩 폴더 생성 중 내부 서버 오류",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
+    @RequireLogin
     @PostMapping
     public ResponseEntity<ScrapFolderResponse> createScrapFolder(
             @RequestBody ScrapFolderNameRequest requestBody,
             HttpServletRequest request) {
         String userId = jwtProvider.resolveUserId(request);
-        if (userId == null) {
-            throw new CustomException(ErrorCode.LOGIN_REQUIRED);
-        }
         ScrapFolder folder = scrapFolderService.createScrapFolder(userId, requestBody.getFolderName());
         return ResponseEntity.ok(ScrapFolderResponse.from(folder));
     }
@@ -81,15 +76,13 @@ public class ScrapFolderController {
             @ApiResponse(responseCode = "500", description = "스크랩 폴더명 변경 중 내부 서버 오류",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
+    @RequireLogin
     @PutMapping(value = "/{scrapFolderId}")
     public ResponseEntity<?> updateScrapFolderName(
             @PathVariable("scrapFolderId") String scrapFolderId,
             @RequestBody ScrapFolderNameRequest requestBody,
             HttpServletRequest request) {
         String userId = jwtProvider.resolveUserId(request);
-        if (userId == null) {
-            throw new CustomException(ErrorCode.LOGIN_REQUIRED);
-        }
         boolean updated = scrapFolderService.updateScrapFolderName(scrapFolderId, requestBody.getFolderName(), userId);
         return ResponseEntity.ok("{\"updated\": " + updated + "}");
     }
@@ -105,14 +98,12 @@ public class ScrapFolderController {
             @ApiResponse(responseCode = "500", description = "스크랩 폴더 순서 변경 중 내부 서버 오류",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
+    @RequireLogin
     @PutMapping(value = "/order")
     public ResponseEntity<?> updateScrapFolderOrder(
             @RequestBody ScrapFolderOrderUpdateRequest requestDto,
             HttpServletRequest request) {
         String userId = jwtProvider.resolveUserId(request);
-        if (userId == null) {
-            throw new CustomException(ErrorCode.LOGIN_REQUIRED);
-        }
         boolean updated = scrapFolderService.updateScrapFolderOrder(requestDto.getOrder(), userId);
         return ResponseEntity.ok("{\"updated\": " + updated + "}");
     }
@@ -128,14 +119,12 @@ public class ScrapFolderController {
             @ApiResponse(responseCode = "500", description = "스크랩 폴더 삭제 중 내부 서버 오류",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
+    @RequireLogin
     @DeleteMapping(value = "/{scrapFolderId}")
     public ResponseEntity<?> deleteScrapFolder(
             @PathVariable("scrapFolderId") String scrapFolderId,
             HttpServletRequest request) {
         String userId = jwtProvider.resolveUserId(request);
-        if (userId == null) {
-            throw new CustomException(ErrorCode.LOGIN_REQUIRED);
-        }
         boolean deleted = scrapFolderService.deleteScrapFolder(scrapFolderId, userId);
         return ResponseEntity.ok("{\"deleted\": " + deleted + "}");
     }

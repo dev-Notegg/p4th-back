@@ -9,6 +9,8 @@ public enum ErrorCode {
     AUTHENTICATION_FAILED(HttpStatus.UNAUTHORIZED, 10100, "error.authenticationFailed"),
     UNAUTHORIZED_ACCESS(HttpStatus.FORBIDDEN, 10101, "error.unauthorizedAccess"),
     LOGIN_REQUIRED(HttpStatus.FORBIDDEN, 10102, "error.loginRequired"),
+    BLOCKED_USER(HttpStatus.FORBIDDEN, 10103, "error.blockedUser"),
+    BLOCKED_IP(HttpStatus.FORBIDDEN, 10104, "error.blockedIp"),
 
     // 회원가입/로그인 관련
     USER_NOT_FOUND(HttpStatus.BAD_REQUEST, 10200, "error.userNotFound"),

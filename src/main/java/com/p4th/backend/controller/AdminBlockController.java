@@ -5,6 +5,7 @@ import com.p4th.backend.security.JwtProvider;
 import com.p4th.backend.service.AdminBlockService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springdoc.core.annotations.ParameterObject;
@@ -13,6 +14,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+@Tag(name = "회원 차단 관리 API", description = "회원 차단 관리 관련 API")
 @RestController
 @RequestMapping("/api/admin/blocks")
 @RequiredArgsConstructor

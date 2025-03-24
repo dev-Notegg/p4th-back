@@ -1,7 +1,6 @@
 package com.p4th.backend.controller;
 
-import com.p4th.backend.common.exception.CustomException;
-import com.p4th.backend.common.exception.ErrorCode;
+import com.p4th.backend.annotation.RequireLogin;
 import com.p4th.backend.common.exception.ErrorResponse;
 import com.p4th.backend.dto.response.scrap.ScrapPostListResponse;
 import com.p4th.backend.dto.response.scrap.ScrapResponse;
@@ -46,6 +45,7 @@ public class ScrapController {
             @ApiResponse(responseCode = "500", description = "스크랩 게시글 목록 조회 중 내부 서버 오류",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
+    @RequireLogin
     @GetMapping(value = "/users/scraps")
     public ResponseEntity<Page<ScrapPostListResponse>> getScrapPosts(
             @Parameter(name = "scrapFolderId", description = "스크랩 폴더 ID (옵션)")
@@ -53,9 +53,6 @@ public class ScrapController {
             @Parameter(hidden = true) @PageableDefault(sort = "scrappedAt", direction = Sort.Direction.DESC) Pageable pageable,
             HttpServletRequest request) {
         String userId = jwtProvider.resolveUserId(request);
-        if (userId == null) {
-            throw new CustomException(ErrorCode.LOGIN_REQUIRED);
-        }
         Page<ScrapPostListResponse> response = scrapService.getScrapPosts(userId, scrapFolderId, pageable);
         return ResponseEntity.ok(response);
     }
@@ -71,15 +68,13 @@ public class ScrapController {
             @ApiResponse(responseCode = "500", description = "게시글 스크랩 삭제 중 내부 서버 오류",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
+    @RequireLogin
     @DeleteMapping(value = "/users/scraps/{scrapId}")
     public ResponseEntity<?> deleteScrap(
             @Parameter(name = "scrapId", description = "스크랩 ID", required = true)
             @PathVariable("scrapId") String scrapId,
             HttpServletRequest request) {
         String userId = jwtProvider.resolveUserId(request);
-        if (userId == null) {
-            throw new CustomException(ErrorCode.LOGIN_REQUIRED);
-        }
         String deletedScrapId = scrapService.deleteScrap(scrapId, userId);
         return ResponseEntity.ok("{\"deleted\": \"" + deletedScrapId + "\"}");
     }
@@ -97,6 +92,7 @@ public class ScrapController {
             @ApiResponse(responseCode = "500", description = "게시글 스크랩 중 내부 서버 오류",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
+    @RequireLogin
     @PostMapping(value = "/posts/{postId}/scrap")
     public ResponseEntity<ScrapResponse> createScrap(
             @Parameter(name = "postId", description = "게시글 ID", required = true)
@@ -105,9 +101,6 @@ public class ScrapController {
             @RequestParam(value = "scrapFolderId", required = false) String scrapFolderId,
             HttpServletRequest request) {
         String userId = jwtProvider.resolveUserId(request);
-        if (userId == null) {
-            throw new CustomException(ErrorCode.LOGIN_REQUIRED);
-        }
         String scrapId = scrapService.createScrap(postId, scrapFolderId, userId);
         ScrapResponse response = ScrapResponse.from(scrapId, postId, scrapFolderId);
         return ResponseEntity.ok(response);

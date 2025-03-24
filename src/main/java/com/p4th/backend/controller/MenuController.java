@@ -1,7 +1,6 @@
 package com.p4th.backend.controller;
 
-import com.p4th.backend.common.exception.CustomException;
-import com.p4th.backend.common.exception.ErrorCode;
+import com.p4th.backend.annotation.RequireLogin;
 import com.p4th.backend.common.exception.ErrorResponse;
 import com.p4th.backend.domain.Category;
 import com.p4th.backend.dto.response.board.BoardResponse;
@@ -43,13 +42,11 @@ public class MenuController {
             @ApiResponse(responseCode = "500", description = "내부 서버 오류",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
+    @RequireLogin
     @GetMapping(value = "/recent-posts")
     public ResponseEntity<List<PostListResponse>> getRecentPosts(
             HttpServletRequest httpRequest) {
         String userId = jwtProvider.resolveUserId(httpRequest);
-        if (userId == null) {
-            throw new CustomException(ErrorCode.LOGIN_REQUIRED);
-        }
         List<PostListResponse> posts = menuService.getRecentPosts(userId);
         return ResponseEntity.ok(posts);
     }
@@ -61,14 +58,12 @@ public class MenuController {
             @ApiResponse(responseCode = "500", description = "내부 서버 오류",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
+    @RequireLogin
     @GetMapping(value = "/{userId}/posts")
     public ResponseEntity<Page<PostListResponse>> getUserPosts(
             @Parameter(hidden = true) @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
             HttpServletRequest httpRequest) {
         String userId = jwtProvider.resolveUserId(httpRequest);
-        if (userId == null) {
-            throw new CustomException(ErrorCode.LOGIN_REQUIRED);
-        }
         Page<PostListResponse> posts = menuService.getUserPosts(userId, pageable);
         return ResponseEntity.ok(posts);
     }
@@ -81,14 +76,12 @@ public class MenuController {
             @ApiResponse(responseCode = "500", description = "내부 서버 오류",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
+    @RequireLogin
     @GetMapping(value = "/{userId}/comments")
     public ResponseEntity<Page<UserCommentPostResponse>> getUserComments(
             @Parameter(hidden = true) Pageable pageable,
             HttpServletRequest httpRequest) {
         String userId = jwtProvider.resolveUserId(httpRequest);
-        if (userId == null) {
-            throw new CustomException(ErrorCode.LOGIN_REQUIRED);
-        }
         Page<UserCommentPostResponse> responses = menuService.getUserComments(userId, pageable);
         return ResponseEntity.ok(responses);
     }

@@ -1,7 +1,6 @@
 package com.p4th.backend.controller;
 
-import com.p4th.backend.common.exception.CustomException;
-import com.p4th.backend.common.exception.ErrorCode;
+import com.p4th.backend.annotation.RequireLogin;
 import com.p4th.backend.common.exception.ErrorResponse;
 import com.p4th.backend.dto.request.ReportRequest;
 import com.p4th.backend.dto.response.block.BlockResponse;
@@ -45,14 +44,12 @@ public class ReportBlockController {
             @ApiResponse(responseCode = "500", description = "신고 중 내부 서버 오류",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
+    @RequireLogin
     @PostMapping(value = "/report")
     public ResponseEntity<ReportResponse> report(
             @RequestBody ReportRequest reportRequest,
             HttpServletRequest request) {
         String reporterId = jwtProvider.resolveUserId(request);
-        if (reporterId == null) {
-            throw new CustomException(ErrorCode.LOGIN_REQUIRED);
-        }
         String reportId = reportService.report(reporterId, reportRequest);
         ReportResponse response = new ReportResponse(reportId);
         return ResponseEntity.ok(response);
@@ -67,15 +64,13 @@ public class ReportBlockController {
         @ApiResponse(responseCode = "500", description = "작성자 차단 중 내부 서버 오류",
                 content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
+    @RequireLogin
     @PostMapping(value = "/block/{targetUserId}")
     public ResponseEntity<BlockResponse> blockUser(
             @Parameter(name = "targetUserId", description = "차단할 사용자 ID", required = true)
             @PathVariable("targetUserId") String targetUserId,
             HttpServletRequest request) {
         String userId = jwtProvider.resolveUserId(request);
-        if (userId == null) {
-            throw new CustomException(ErrorCode.LOGIN_REQUIRED);
-        }
         String blockId = blockService.blockUser(userId, targetUserId);
         BlockResponse response = new BlockResponse(blockId);
         return ResponseEntity.ok(response);

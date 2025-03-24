@@ -27,9 +27,15 @@ public class AuthService {
 
     private final AuthMapper authMapper;
     private final JwtProvider jwtProvider;
+    private final AdminBlockService adminBlockService;
 
     // 회원가입: 회원가입 요청 후 바로 SignUpResponse 반환
-    public SignUpResponse signUp(String userId, String password, String nickname) {
+    public SignUpResponse signUp(String userId, String password, String nickname, HttpServletRequest request) {
+        //차단된 IP 체크
+        String ip = IpUtil.extractClientIp(request);
+        if (adminBlockService.isIpBlocked(ip)) {
+            throw new CustomException(ErrorCode.BLOCKED_IP);
+        }
         User user = new User();
         user.setUserId(userId);
         user.setPassword(PasswordUtil.encode(password));
@@ -83,6 +89,15 @@ public class AuthService {
         }
         if (!PasswordUtil.matches(rawPassword, user.getPassword())) {
             throw new CustomException(ErrorCode.INVALID_PASSWORD);
+        }
+        //차단된 회원 체크
+        if (user.getAccountStatus() == AccountStatus.BLOCKED) {
+            throw new CustomException(ErrorCode.BLOCKED_USER);
+        }
+        //차단된 IP 체크
+        String ip = IpUtil.extractClientIp(request);
+        if (adminBlockService.isIpBlocked(ip)) {
+            throw new CustomException(ErrorCode.BLOCKED_IP);
         }
         String accessToken = jwtProvider.generateAccessToken(user);
         String refreshToken = jwtProvider.generateRefreshToken(user);

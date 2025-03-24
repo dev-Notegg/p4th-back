@@ -1,10 +1,7 @@
 package com.p4th.backend.config;
 
 import com.p4th.backend.interceptor.AdminAuthorizationInterceptor;
-import com.p4th.backend.interceptor.AuthenticationInterceptor;
 import com.p4th.backend.mapper.AdminUserMapper;
-import com.p4th.backend.mapper.AuthMapper;
-import com.p4th.backend.service.AdminBlockService;
 import com.p4th.backend.security.JwtProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
@@ -20,8 +17,6 @@ public class WebConfig implements WebMvcConfigurer {
 
     private final JwtProvider jwtProvider;
     private final AdminUserMapper adminUserMapper;
-    private final AuthMapper authMapper;
-    private final AdminBlockService adminBlockService;
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {
@@ -55,9 +50,5 @@ public class WebConfig implements WebMvcConfigurer {
         // 관리자 전용 API에 대해 관리자 인증 인터셉터 적용
         registry.addInterceptor(new AdminAuthorizationInterceptor(jwtProvider, adminUserMapper))
                 .addPathPatterns("/api/admin/**");
-
-        // 모든 API에 대해 일반 인증 인터셉터 적용
-        registry.addInterceptor(new AuthenticationInterceptor(jwtProvider, authMapper, adminBlockService))
-                .addPathPatterns("/api/**");
     }
 }

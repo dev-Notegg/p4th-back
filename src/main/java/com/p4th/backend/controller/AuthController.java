@@ -1,7 +1,6 @@
 package com.p4th.backend.controller;
 
-import com.p4th.backend.common.exception.CustomException;
-import com.p4th.backend.common.exception.ErrorCode;
+import com.p4th.backend.annotation.RequireLogin;
 import com.p4th.backend.common.exception.ErrorResponse;
 import com.p4th.backend.dto.request.*;
 import com.p4th.backend.dto.response.auth.*;
@@ -40,8 +39,9 @@ public class AuthController {
     @PostMapping("/signup")
     public ResponseEntity<SignUpResponse> signUp(
             @Parameter(name = "SignupRequestDto", description = "회원가입 요청 DTO (userId, password, nickname)", required = true)
-            @RequestBody SignupRequest request) {
-        SignUpResponse response = authService.signUp(request.getUserId(), request.getPassword(), request.getNickname());
+            @RequestBody SignupRequest request,
+            HttpServletRequest httpRequest) {
+        SignUpResponse response = authService.signUp(request.getUserId(), request.getPassword(), request.getNickname(), httpRequest);
         return ResponseEntity.ok().body(response);
     }
 
@@ -154,14 +154,12 @@ public class AuthController {
             @ApiResponse(responseCode = "403", description = "로그인 후 이용가능한 메뉴",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
+    @RequireLogin
     @PutMapping("/nickname")
     public ResponseEntity<UserProfileResponse> changeNickname(
             @Valid @RequestBody NicknameChangeRequest request,
             HttpServletRequest httpRequest) {
         String currentUserId = jwtProvider.resolveUserId(httpRequest);
-        if (currentUserId == null) {
-            throw new CustomException(ErrorCode.LOGIN_REQUIRED);
-        }
         UserProfileResponse updatedProfile = authService.changeNickname(currentUserId, request.getNickname());
         return ResponseEntity.ok(updatedProfile);
     }
@@ -175,14 +173,12 @@ public class AuthController {
             @ApiResponse(responseCode = "403", description = "로그인 후 이용가능한 메뉴",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
+    @RequireLogin
     @PutMapping("/password")
     public ResponseEntity<UserProfileResponse> changePassword(
             @Valid @RequestBody PasswordChangeRequest request,
             HttpServletRequest httpRequest) {
         String currentUserId = jwtProvider.resolveUserId(httpRequest);
-        if (currentUserId == null) {
-            throw new CustomException(ErrorCode.LOGIN_REQUIRED);
-        }
         UserProfileResponse updatedProfile = authService.changePassword(currentUserId, request.getOldPassword(), request.getNewPassword());
         return ResponseEntity.ok(updatedProfile);
     }
@@ -196,12 +192,10 @@ public class AuthController {
             @ApiResponse(responseCode = "500", description = "회원 탈퇴 중 내부 서버 오류",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
+    @RequireLogin
     @DeleteMapping
     public ResponseEntity<UserProfileResponse> deleteAccount(HttpServletRequest httpRequest) {
         String currentUserId = jwtProvider.resolveUserId(httpRequest);
-        if (currentUserId == null) {
-            throw new CustomException(ErrorCode.LOGIN_REQUIRED);
-        }
         UserProfileResponse response = authService.deleteAccount(currentUserId);
         return ResponseEntity.ok(response);
     }
@@ -216,12 +210,10 @@ public class AuthController {
             @ApiResponse(responseCode = "500", description = "내부 서버 오류",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
+    @RequireLogin
     @GetMapping("/profile")
     public ResponseEntity<UserProfileResponse> getProfile(HttpServletRequest httpRequest) {
         String userId = jwtProvider.resolveUserId(httpRequest);
-        if (userId == null) {
-            throw new CustomException(ErrorCode.LOGIN_REQUIRED);
-        }
         UserProfileResponse profile = authService.getUserProfile(userId);
         return ResponseEntity.ok(profile);
     }
