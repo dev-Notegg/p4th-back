@@ -111,19 +111,19 @@ public class JwtProvider {
     public String resolveUserId(HttpServletRequest request) {
         try {
             String header = request.getHeader("Authorization");
-            if (header != null && !header.isBlank()) {
+            if (header != null) {
                 header = header.trim();
-                String token = header.startsWith("Bearer ") ?
-                        header.substring("Bearer ".length()).trim() : header;
-                if (validateToken(token)) {
+                // "Bearer " 접두사가 있으면 제거하고 토큰 추출
+                if (header.startsWith("Bearer ")) {
+                    String token = header.substring("Bearer ".length()).trim();
                     return getUserIdFromToken(token);
-                } else {
-                    return null; // invalid token
                 }
+                // 만약 접두사가 없다면, 그대로 토큰으로 간주
+                return getUserIdFromToken(header);
             }
         } catch (Exception e) {
-            // 로그는 찍되, 인증 실패는 interceptor 쪽에서 처리하게 넘김
-            logger.warn("Failed to resolve user ID from token: {}", e.getMessage());
+            System.out.println(e.getMessage());
+            throw new CustomException(ErrorCode.AUTHENTICATION_FAILED);
         }
         return null;
     }
