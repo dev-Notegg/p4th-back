@@ -136,21 +136,26 @@ public class AuthService {
      * 토큰 갱신: userId와 전달받은 리프레쉬 토큰을 이용하여 토큰 갱신을 수행한다.
      */
     public LoginResponse refreshTokenForMember(String userId, String refreshToken) {
-        User user = authMapper.selectByUserId(userId);
-        if (user == null) {
-            throw new CustomException(ErrorCode.USER_NOT_FOUND);
+        try {
+            User user = authMapper.selectByUserId(userId);
+            if (user == null) {
+                throw new CustomException(ErrorCode.USER_NOT_FOUND);
+            }
+            if (!jwtProvider.validateToken(refreshToken)) {
+                // 리프레쉬 토큰 만료: 새 토큰 발급
+                String newRefreshToken = jwtProvider.generateRefreshToken(user);
+                String newAccessToken = jwtProvider.generateAccessToken(user);
+                user.setRefreshToken(newRefreshToken);
+                authMapper.updateTokens(user);
+                return new LoginResponse(newAccessToken, newRefreshToken, new UserProfileResponse(user));
+            } else {
+                String newAccessToken = jwtProvider.generateAccessToken(user);
+                return new LoginResponse(newAccessToken, refreshToken, new UserProfileResponse(user));
+            }
+        }catch (Exception e) {
+            e.getStackTrace();
         }
-        if (!jwtProvider.validateToken(refreshToken)) {
-            // 리프레쉬 토큰 만료: 새 토큰 발급
-            String newRefreshToken = jwtProvider.generateRefreshToken(user);
-            String newAccessToken = jwtProvider.generateAccessToken(user);
-            user.setRefreshToken(newRefreshToken);
-            authMapper.updateTokens(user);
-            return new LoginResponse(newAccessToken, newRefreshToken, new UserProfileResponse(user));
-        } else {
-            String newAccessToken = jwtProvider.generateAccessToken(user);
-            return new LoginResponse(newAccessToken, refreshToken, new UserProfileResponse(user));
-        }
+        return null;
     }
 
     @Transactional
