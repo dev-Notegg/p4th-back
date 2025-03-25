@@ -56,11 +56,13 @@ public class AdminCategoryService {
 
     @Transactional
     public String createCategory(String userId, String categoryName) {
+        if(categoryName == null || categoryName.trim().isEmpty()){
+            throw new CustomException(ErrorCode.INVALID_INPUT, "카테고리명은 필수입니다.");
+        }
         Category existingCategory = adminCategoryMapper.findByCategoryName(categoryName);
         if (existingCategory != null) {
             throw new CustomException(ErrorCode.DUPLICATE_CATEGORY_NAME);
         }
-
         Category category = new Category();
         category.setCategoryId(ULIDUtil.getULID());
         category.setCategoryName(categoryName);
@@ -127,9 +129,14 @@ public class AdminCategoryService {
             throw new CustomException(ErrorCode.CATEGORY_NOT_FOUND);
 
         }
-        Category existingCategory = adminCategoryMapper.findByCategoryName(newCategoryName);
-        if (existingCategory != null) {
-            throw new CustomException(ErrorCode.DUPLICATE_CATEGORY_NAME);
+        if(newCategoryName == null || newCategoryName.trim().isEmpty()){
+            throw new CustomException(ErrorCode.INVALID_INPUT, "카테고리명은 필수입니다.");
+        }
+        if(!category.getCategoryName().equals(newCategoryName)) {
+            Category existingCategory = adminCategoryMapper.findByCategoryName(newCategoryName);
+            if (existingCategory != null) {
+                throw new CustomException(ErrorCode.DUPLICATE_CATEGORY_NAME);
+            }
         }
         category.setCategoryName(newCategoryName);
         category.setUpdatedBy(userId);

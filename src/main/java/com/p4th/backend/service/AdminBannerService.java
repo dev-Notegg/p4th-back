@@ -42,6 +42,19 @@ public class AdminBannerService {
     @Transactional
     public String createBanner(String userId, String bannerName, String linkUrl,
             LocalDate startDate, LocalDate endDate, MultipartFile imageFile) {
+        // 0) 필수값 검증
+        if (bannerName == null || bannerName.trim().isEmpty()) {
+            throw new CustomException(ErrorCode.INVALID_INPUT, "배너 이름은 필수입니다.");
+        }
+        if (startDate == null) {
+            throw new CustomException(ErrorCode.INVALID_INPUT, "시작일은 필수입니다.");
+        }
+        if (endDate == null) {
+            throw new CustomException(ErrorCode.INVALID_INPUT, "종료일은 필수입니다.");
+        }
+        if (imageFile == null || imageFile.isEmpty()) {
+            throw new CustomException(ErrorCode.INVALID_INPUT, "이미지 파일은 필수입니다.");
+        }
         // 1) ULID 생성
         String bannerId = ULIDUtil.getULID();
         // 2) 이미지 업로드 (S3)

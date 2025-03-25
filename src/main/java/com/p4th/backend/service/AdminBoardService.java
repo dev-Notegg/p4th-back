@@ -49,6 +49,9 @@ public class AdminBoardService {
 
     @Transactional
     public String createBoard(String userId, String boardName, String categoryId, int boardLevel) {
+        if (boardName == null || boardName.trim().isEmpty()) {
+            throw new CustomException(ErrorCode.INVALID_INPUT, "게시판명은 필수입니다.");
+        }
         Board existing = adminBoardMapper.findByBoardNameAndCategoryId(boardName, categoryId);
         if (existing != null) {
             throw new CustomException(ErrorCode.DUPLICATE_BOARD_NAME);
@@ -68,6 +71,9 @@ public class AdminBoardService {
 
     @Transactional
     public void updateBoard(String userId, String boardId, String boardName, String categoryId, int boardLevel) {
+        if (boardName == null || boardName.trim().isEmpty()) {
+            throw new CustomException(ErrorCode.INVALID_INPUT, "게시판명은 필수입니다.");
+        }
         Board board = adminBoardMapper.selectBoardById(boardId);
         if (board == null) {
             throw new CustomException(ErrorCode.BOARD_NOT_FOUND);
