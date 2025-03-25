@@ -92,7 +92,7 @@ public class PostController {
     @Operation(summary = "게시글 수정", description = "게시글 수정 API. 토큰의 회원ID와 게시글 작성자가 일치해야 수정 가능하다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "게시글 수정 성공"),
-            @ApiResponse(responseCode = "403", description = "권한 없음",
+            @ApiResponse(responseCode = "401", description = "권한 없음",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "404", description = "게시글을 찾을 수 없음",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
@@ -119,7 +119,7 @@ public class PostController {
     @RequireLogin
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "게시글 삭제 성공"),
-            @ApiResponse(responseCode = "403", description = "권한 없음",
+            @ApiResponse(responseCode = "401", description = "권한 없음",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "404", description = "게시글을 찾을 수 없음",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class))),

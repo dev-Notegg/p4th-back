@@ -36,7 +36,7 @@ public class AdminCategoryController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "카테고리 목록 조회 성공",
                     content = @Content(schema = @Schema(implementation = CategoryResponse.class))),
-            @ApiResponse(responseCode = "403", description = "관리자 권한 필요",
+            @ApiResponse(responseCode = "401", description = "관리자 권한 필요",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @GetMapping
@@ -53,7 +53,7 @@ public class AdminCategoryController {
     @Operation(summary = "메인 노출 설정 변경", description = "특정 카테고리의 메인 노출 설정을 변경한다.")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "메인 노출 설정 변경 성공"),
-        @ApiResponse(responseCode = "403", description = "관리자 권한 필요",
+        @ApiResponse(responseCode = "401", description = "관리자 권한 필요",
                 content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
         @ApiResponse(responseCode = "404", description = "해당 카테고리를 찾을 수 없음",
                 content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
@@ -75,7 +75,7 @@ public class AdminCategoryController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "카테고리 추가 성공",
                     content = @Content(schema = @Schema(implementation = CategoryCreationResponse.class))),
-            @ApiResponse(responseCode = "403", description = "관리자 권한 필요",
+            @ApiResponse(responseCode = "401", description = "관리자 권한 필요",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "400", description = "카테고리명 중복",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
@@ -94,7 +94,7 @@ public class AdminCategoryController {
     @Operation(summary = "카테고리 순서 변경", description = "전체 카테고리의 노출 순서를 변경한다. 모든 카테고리의 ID를 순서대로 전송해야 한다.")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "카테고리 순서 변경 성공"),
-            @ApiResponse(responseCode = "403", description = "관리자 권한 필요",
+            @ApiResponse(responseCode = "401", description = "관리자 권한 필요",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
         @ApiResponse(responseCode = "400", description = "입력값 오류",
                 content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
@@ -114,7 +114,7 @@ public class AdminCategoryController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "게시판 목록 조회 성공",
                     content = @Content(schema = @Schema(implementation = BoardListResponse.class))),
-            @ApiResponse(responseCode = "403", description = "관리자 권한 필요",
+            @ApiResponse(responseCode = "401", description = "관리자 권한 필요",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "500", description = "내부 서버 오류",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
@@ -131,7 +131,7 @@ public class AdminCategoryController {
             "정렬 타입이 'postCount'인 경우 게시글 수 기준으로 자동 정렬된다. 기본 수동 정렬은 'normal'로 요청한다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "게시판 순서 변경 성공"),
-            @ApiResponse(responseCode = "403", description = "관리자 권한 필요",
+            @ApiResponse(responseCode = "401", description = "관리자 권한 필요",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "400", description = "입력값 오류",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
@@ -152,7 +152,7 @@ public class AdminCategoryController {
     @Operation(summary = "카테고리명 수정", description = "특정 카테고리의 이름을 수정한다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "카테고리명 수정 성공"),
-            @ApiResponse(responseCode = "403", description = "관리자 권한 필요",
+            @ApiResponse(responseCode = "401", description = "관리자 권한 필요",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "404", description = "해당 카테고리를 찾을 수 없음",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
@@ -175,7 +175,7 @@ public class AdminCategoryController {
     @Operation(summary = "카테고리 삭제", description = "특정 카테고리를 삭제한다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "카테고리 삭제 성공"),
-            @ApiResponse(responseCode = "403", description = "관리자 권한 필요",
+            @ApiResponse(responseCode = "401", description = "관리자 권한 필요",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "404", description = "해당 카테고리를 찾을 수 없음",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class))),

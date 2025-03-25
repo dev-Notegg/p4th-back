@@ -42,7 +42,7 @@ public class AdminBannerController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "배너 목록 조회 성공",
                     content = @Content(schema = @Schema(implementation = BannerResponse.class))),
-            @ApiResponse(responseCode = "403", description = "관리자 권한 필요",
+            @ApiResponse(responseCode = "401", description = "관리자 권한 필요",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @GetMapping
@@ -57,7 +57,7 @@ public class AdminBannerController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "배너 등록 성공",
                     content = @Content(schema = @Schema(implementation = BannerCreationResponse.class))),
-            @ApiResponse(responseCode = "403", description = "관리자 권한 필요",
+            @ApiResponse(responseCode = "401", description = "관리자 권한 필요",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "500", description = "내부 서버 오류",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
@@ -85,7 +85,7 @@ public class AdminBannerController {
     @Operation(summary = "배너 삭제", description = "특정 배너를 삭제한다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "배너 삭제 성공"),
-            @ApiResponse(responseCode = "403", description = "관리자 권한 필요",
+            @ApiResponse(responseCode = "401", description = "관리자 권한 필요",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "500", description = "내부 서버 오류", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
@@ -102,7 +102,7 @@ public class AdminBannerController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "활성 배너 목록 조회 성공",
                     content = @Content(schema = @Schema(implementation = BannerResponse.class))),
-            @ApiResponse(responseCode = "403", description = "관리자 권한 필요",
+            @ApiResponse(responseCode = "401", description = "관리자 권한 필요",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @GetMapping("/active")
@@ -115,7 +115,7 @@ public class AdminBannerController {
             description = "광고기간 종료일이 지나지 않은 배너의 노출 순서를 변경한다. (배너 ID 목록을 순서대로 전달)")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "배너 순서 변경 성공"),
-            @ApiResponse(responseCode = "403", description = "관리자 권한 필요",
+            @ApiResponse(responseCode = "401", description = "관리자 권한 필요",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "500", description = "내부 서버 오류",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))

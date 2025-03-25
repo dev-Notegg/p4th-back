@@ -36,7 +36,7 @@ public class AdminUserController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "회원 목록 조회 성공",
                     content = @Content(schema = @Schema(implementation = UserListResponse.class))),
-            @ApiResponse(responseCode = "403", description = "관리자 권한 필요",
+            @ApiResponse(responseCode = "401", description = "관리자 권한 필요",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @GetMapping
@@ -54,7 +54,7 @@ public class AdminUserController {
     @Operation(summary = "회원 등급 변경", description = "특정 회원의 회원 등급을 변경한다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "회원 등급 변경 성공"),
-            @ApiResponse(responseCode = "403", description = "관리자 권한 필요",
+            @ApiResponse(responseCode = "401", description = "관리자 권한 필요",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @PutMapping("/{userId}/membership-level")
@@ -70,7 +70,7 @@ public class AdminUserController {
     @Operation(summary = "관리자 권한 변경", description = "특정 회원의 관리자 권한을 변경한다. (0=해제, 1=설정)")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "관리자 권한 변경 성공"),
-            @ApiResponse(responseCode = "403", description = "관리자 권한 필요",
+            @ApiResponse(responseCode = "401", description = "관리자 권한 필요",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @PutMapping("/{userId}/admin-role")

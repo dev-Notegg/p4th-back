@@ -38,7 +38,7 @@ public class AdminBoardController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "게시판 목록 조회 성공",
                     content = @Content(schema = @Schema(implementation = BoardResponse.class))),
-            @ApiResponse(responseCode = "403", description = "관리자 권한 필요",
+            @ApiResponse(responseCode = "401", description = "관리자 권한 필요",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @GetMapping
@@ -56,7 +56,7 @@ public class AdminBoardController {
 
     @Operation(summary = "게시판 추가", description = "새 게시판을 추가한다.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "403", description = "관리자 권한 필요",
+            @ApiResponse(responseCode = "401", description = "관리자 권한 필요",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "400", description = "해당 카테고리 내에 이미 동일한 게시판명 존재",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
@@ -72,7 +72,7 @@ public class AdminBoardController {
 
     @Operation(summary = "게시판 수정", description = "특정 게시판의 정보를 수정한다. (게시판명, 카테고리, 게시판 레벨 변경)")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "403", description = "관리자 권한 필요",
+            @ApiResponse(responseCode = "401", description = "관리자 권한 필요",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "404", description = "해당 게시판을 찾을 수 없음",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
@@ -92,7 +92,7 @@ public class AdminBoardController {
 
     @Operation(summary = "게시판 삭제 전 정보 조회", description = "삭제 전 확인을 위해 해당 게시판의 이름, 게시글 수, 댓글 수를 조회한다.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "403", description = "관리자 권한 필요",
+            @ApiResponse(responseCode = "401", description = "관리자 권한 필요",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "404", description = "해당 게시판을 찾을 수 없음",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
@@ -107,7 +107,7 @@ public class AdminBoardController {
 
     @Operation(summary = "게시판 삭제", description = "확인 후 해당 게시판을 삭제한다. (삭제 후 복구 불가능)")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "403", description = "관리자 권한 필요",
+            @ApiResponse(responseCode = "401", description = "관리자 권한 필요",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "404", description = "해당 게시판을 찾을 수 없음",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))

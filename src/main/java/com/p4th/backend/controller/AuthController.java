@@ -154,7 +154,7 @@ public class AuthController {
                     content = @Content(schema = @Schema(implementation = UserProfileResponse.class))),
             @ApiResponse(responseCode = "400", description = "입력값 오류 또는 10일 이내 재변경 불가",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-            @ApiResponse(responseCode = "403", description = "로그인 후 이용가능한 메뉴",
+            @ApiResponse(responseCode = "401", description = "로그인 후 이용가능한 메뉴",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @RequireLogin
@@ -173,7 +173,7 @@ public class AuthController {
                     content = @Content(schema = @Schema(implementation = UserProfileResponse.class))),
             @ApiResponse(responseCode = "400", description = "입력값 오류 또는 현재 비밀번호 불일치",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-            @ApiResponse(responseCode = "403", description = "로그인 후 이용가능한 메뉴",
+            @ApiResponse(responseCode = "401", description = "로그인 후 이용가능한 메뉴",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @RequireLogin
@@ -190,7 +190,7 @@ public class AuthController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "회원 탈퇴 성공",
                     content = @Content(schema = @Schema(implementation = UserProfileResponse.class))),
-            @ApiResponse(responseCode = "403", description = "로그인 후 이용가능한 메뉴",
+            @ApiResponse(responseCode = "401", description = "로그인 후 이용가능한 메뉴",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "500", description = "회원 탈퇴 중 내부 서버 오류",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
@@ -208,7 +208,7 @@ public class AuthController {
             @ApiResponse(responseCode = "200", description = "내 계정 조회 성공"),
             @ApiResponse(responseCode = "400", description = "사용자를 찾을 수 없는 경우",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-            @ApiResponse(responseCode = "403", description = "로그인 후 이용가능한 메뉴",
+            @ApiResponse(responseCode = "401", description = "로그인 후 이용가능한 메뉴",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "500", description = "내부 서버 오류",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))

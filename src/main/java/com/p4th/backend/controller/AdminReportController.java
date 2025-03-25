@@ -31,7 +31,7 @@ public class AdminReportController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "신고 목록 조회 성공",
                     content = @Content(schema = @Schema(implementation = ReportListResponse.class))),
-            @ApiResponse(responseCode = "403", description = "관리자 권한 필요",
+            @ApiResponse(responseCode = "401", description = "관리자 권한 필요",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @GetMapping
@@ -55,7 +55,7 @@ public class AdminReportController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "신고 상세 조회 성공",
                     content = @Content(schema = @Schema(implementation = ReportDetailResponse.class))),
-            @ApiResponse(responseCode = "403", description = "관리자 권한 필요",
+            @ApiResponse(responseCode = "401", description = "관리자 권한 필요",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "404", description = "신고 내역 없음",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))

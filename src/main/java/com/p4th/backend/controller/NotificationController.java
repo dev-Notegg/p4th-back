@@ -36,7 +36,7 @@ public class NotificationController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "알림 목록 조회 성공",
                     content = @Content(schema = @Schema(implementation = NotificationResponse.class))),
-            @ApiResponse(responseCode = "403", description = "로그인 후 이용가능한 메뉴",
+            @ApiResponse(responseCode = "401", description = "로그인 후 이용가능한 메뉴",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
     @RequireLogin
@@ -52,7 +52,7 @@ public class NotificationController {
     @Operation(summary = "알림 읽음 처리", description = "알림을 읽음 처리한다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "알림 읽음 처리 성공"),
-            @ApiResponse(responseCode = "403", description = "로그인 후 이용가능한 메뉴",
+            @ApiResponse(responseCode = "401", description = "로그인 후 이용가능한 메뉴",
                     content = @Content(schema = @Schema(implementation = com.p4th.backend.dto.response.ErrorResponse.class))),
             @ApiResponse(responseCode = "500", description = "알림 읽음 처리 중 내부 서버 오류",
                     content = @Content(schema = @Schema(implementation = com.p4th.backend.dto.response.ErrorResponse.class)))

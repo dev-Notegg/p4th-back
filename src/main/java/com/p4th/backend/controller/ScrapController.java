@@ -40,7 +40,7 @@ public class ScrapController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "게시글 스크랩 목록 조회 성공",
                     content = @Content(schema = @Schema(implementation = ScrapPostListResponse.class))),
-            @ApiResponse(responseCode = "403", description = "로그인 후 이용가능한 메뉴",
+            @ApiResponse(responseCode = "401", description = "로그인 후 이용가능한 메뉴",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "500", description = "스크랩 게시글 목록 조회 중 내부 서버 오류",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
@@ -61,7 +61,7 @@ public class ScrapController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "게시글 스크랩 삭제 성공",
                     content = @Content(schema = @Schema(implementation = Boolean.class))),
-            @ApiResponse(responseCode = "403", description = "로그인 후 이용가능한 메뉴",
+            @ApiResponse(responseCode = "401", description = "로그인 후 이용가능한 메뉴",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "404", description = "스크랩을 찾을 수 없음",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
@@ -83,7 +83,7 @@ public class ScrapController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "게시글 스크랩 성공",
                     content = @Content(schema = @Schema(implementation = ScrapResponse.class))),
-            @ApiResponse(responseCode = "403", description = "로그인 후 이용가능한 메뉴",
+            @ApiResponse(responseCode = "401", description = "로그인 후 이용가능한 메뉴",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "404", description = "게시글을 찾을 수 없음",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class))),

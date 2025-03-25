@@ -37,7 +37,7 @@ public class ReportBlockController {
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "신고 성공",
                     content = @Content(schema = @Schema(implementation = ReportResponse.class))),
-            @ApiResponse(responseCode = "403", description = "로그인 후 이용가능한 메뉴",
+            @ApiResponse(responseCode = "401", description = "로그인 후 이용가능한 메뉴",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "400", description = "유효하지 않은 신고 대상 타입인 경우",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
@@ -59,7 +59,7 @@ public class ReportBlockController {
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "작성자 차단 성공",
                 content = @Content(schema = @Schema(implementation = BlockResponse.class))),
-        @ApiResponse(responseCode = "403", description = "로그인 후 이용가능한 메뉴",
+        @ApiResponse(responseCode = "401", description = "로그인 후 이용가능한 메뉴",
                 content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
         @ApiResponse(responseCode = "500", description = "작성자 차단 중 내부 서버 오류",
                 content = @Content(schema = @Schema(implementation = ErrorResponse.class)))

@@ -69,7 +69,7 @@ public class CommentController {
     @Operation(summary = "댓글 수정", description = "댓글 수정 API. 작성자 본인만 수정할 수 있다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "댓글 수정 성공"),
-            @ApiResponse(responseCode = "403", description = "권한 없음", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "401", description = "권한 없음", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "404", description = "댓글을 찾을 수 없음", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "400", description = "이미 삭제된 댓글", content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
     })
@@ -88,7 +88,7 @@ public class CommentController {
     @Operation(summary = "댓글 삭제", description = "댓글 삭제 API. 작성자 본인 또는 관리자는 삭제 가능하다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "댓글 삭제 성공"),
-            @ApiResponse(responseCode = "403", description = "권한 없음", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "401", description = "권한 없음", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "404", description = "댓글을 찾을 수 없음", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "400", description = "이미 삭제된 댓글", content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "500", description = "내부 서버 오류",
