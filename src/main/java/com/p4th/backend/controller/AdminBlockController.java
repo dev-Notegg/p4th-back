@@ -33,16 +33,16 @@ public class AdminBlockController {
                description = "전체 회원 목록에서 IP, 회원ID, 닉네임으로 검색하며, 'blockedOnly' 플래그에 따라 차단된 회원만 필터링할 수 있다.")
     @GetMapping
     public ResponseEntity<Page<BlockUserResponse>> getBlockList(
+            @Parameter(description = "차단된 회원만 조회할 경우 true")
+            @RequestParam(value="blockedOnly", defaultValue="false") boolean blockedOnly,
             @Parameter(description = "IP 주소 검색")
             @RequestParam(value="ip", required=false) String ip,
             @Parameter(description = "회원 ID 검색")
             @RequestParam(value="userId", required=false) String userId,
             @Parameter(description = "닉네임 검색")
             @RequestParam(value="nickname", required=false) String nickname,
-            @Parameter(description = "차단된 회원만 조회할 경우 true")
-            @RequestParam(value="blockedOnly", defaultValue="false") boolean blockedOnly,
             @Parameter(hidden = true) @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
-        Page<BlockUserResponse> page = adminBlockService.getBlockList(ip, userId, nickname, blockedOnly, pageable);
+        Page<BlockUserResponse> page = adminBlockService.getBlockList(blockedOnly, ip, userId, nickname, pageable);
         return ResponseEntity.ok(page);
     }
 

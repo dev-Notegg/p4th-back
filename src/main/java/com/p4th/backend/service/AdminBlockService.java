@@ -27,7 +27,7 @@ public class AdminBlockService {
     private final IpBlacklistMapper ipBlacklistMapper;
 
     @Transactional(readOnly = true)
-    public Page<BlockUserResponse> getBlockList(String ip, String userId, String nickname, boolean blockedOnly, Pageable pageable) {
+    public Page<BlockUserResponse> getBlockList(boolean blockedOnly, String ip, String userId, String nickname, Pageable pageable) {
         Specification<User> spec = (root, query, cb) -> {
             Predicate p = cb.conjunction();
             if (ip != null && !ip.trim().isEmpty()) {
