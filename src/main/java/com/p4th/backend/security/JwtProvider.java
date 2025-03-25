@@ -14,14 +14,10 @@ import jakarta.servlet.http.HttpServletRequest;
 import java.security.Key;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @Component
 @RequiredArgsConstructor
 public class JwtProvider {
-
-    private static final Logger logger = LoggerFactory.getLogger(JwtProvider.class);
 
     @Value("${p4th.jwt.secret}")
     private String secretKey;
@@ -75,7 +71,7 @@ public class JwtProvider {
             Jwts.parserBuilder().setSigningKey(hmacKey).build().parseClaimsJws(token);
             return true;
         } catch(Exception e) {
-            logger.error("JWT validation failed: {}", e.getMessage());
+//            logger.error("JWT validation failed: {}", e.getMessage());
             return false;
         }
     }
@@ -89,20 +85,8 @@ public class JwtProvider {
                     .parseClaimsJws(token)
                     .getBody();
             return claims.getSubject();
-        } catch (SecurityException e) {
-//            logger.error("Invalid JWT signature.");
-            throw new CustomException(ErrorCode.AUTHENTICATION_FAILED);
-        } catch (MalformedJwtException e) {
-//            logger.error("Invalid JWT token: {}", token);
-            throw new CustomException(ErrorCode.AUTHENTICATION_FAILED);
-        } catch (ExpiredJwtException e) {
-//            logger.error("Expired JWT token.");
-            throw new CustomException(ErrorCode.AUTHENTICATION_FAILED);
-        } catch (UnsupportedJwtException e) {
-//            logger.error("Unsupported JWT token.");
-            throw new CustomException(ErrorCode.AUTHENTICATION_FAILED);
-        } catch (IllegalArgumentException e) {
-//            logger.error("JWT token compact of handler are invalid.");
+        } catch (SecurityException | MalformedJwtException | ExpiredJwtException | UnsupportedJwtException |
+                 IllegalArgumentException e) {
             throw new CustomException(ErrorCode.AUTHENTICATION_FAILED);
         }
     }
@@ -122,7 +106,6 @@ public class JwtProvider {
                 return getUserIdFromToken(header);
             }
         } catch (Exception e) {
-            System.out.println(e.getMessage());
             throw new CustomException(ErrorCode.AUTHENTICATION_FAILED);
         }
         return null;
