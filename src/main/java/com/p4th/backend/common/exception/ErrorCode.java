@@ -7,8 +7,8 @@ import org.springframework.http.HttpStatus;
 public enum ErrorCode {
     // JWT, 인증 관련
     AUTHENTICATION_FAILED(HttpStatus.UNAUTHORIZED, 10100, "error.authenticationFailed"),
-    UNAUTHORIZED_ACCESS(HttpStatus.FORBIDDEN, 10101, "error.unauthorizedAccess"),
-    LOGIN_REQUIRED(HttpStatus.FORBIDDEN, 10102, "error.loginRequired"),
+    UNAUTHORIZED_ACCESS(HttpStatus.UNAUTHORIZED, 10101, "error.unauthorizedAccess"),
+    LOGIN_REQUIRED(HttpStatus.UNAUTHORIZED, 10102, "error.loginRequired"),
     BLOCKED_USER(HttpStatus.FORBIDDEN, 10103, "error.blockedUser"),
     BLOCKED_IP(HttpStatus.FORBIDDEN, 10104, "error.blockedIp"),
 
