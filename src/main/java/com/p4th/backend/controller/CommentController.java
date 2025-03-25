@@ -60,8 +60,8 @@ public class CommentController {
             @PathVariable("postId") String postId,
             @Valid @RequestBody CommentCreateRequest request,
             HttpServletRequest httpRequest) {
-        String userId = jwtProvider.resolveUserId(httpRequest);
-        String commentId = commentService.createComment(postId, userId, request);
+        String currentUserId = (String) httpRequest.getAttribute("currentUserId");
+        String commentId = commentService.createComment(postId, currentUserId, request);
         CommentCreateResponse response = new CommentCreateResponse(commentId);
         return ResponseEntity.ok().body(response);
     }

@@ -162,7 +162,7 @@ public class AuthController {
     public ResponseEntity<UserProfileResponse> changeNickname(
             @Valid @RequestBody NicknameChangeRequest request,
             HttpServletRequest httpRequest) {
-        String currentUserId = jwtProvider.resolveUserId(httpRequest);
+        String currentUserId = (String) httpRequest.getAttribute("currentUserId");
         UserProfileResponse updatedProfile = authService.changeNickname(currentUserId, request.getNickname());
         return ResponseEntity.ok(updatedProfile);
     }
@@ -181,7 +181,7 @@ public class AuthController {
     public ResponseEntity<UserProfileResponse> changePassword(
             @Valid @RequestBody PasswordChangeRequest request,
             HttpServletRequest httpRequest) {
-        String currentUserId = jwtProvider.resolveUserId(httpRequest);
+        String currentUserId = (String) httpRequest.getAttribute("currentUserId");
         UserProfileResponse updatedProfile = authService.changePassword(currentUserId, request.getOldPassword(), request.getNewPassword());
         return ResponseEntity.ok(updatedProfile);
     }
@@ -198,7 +198,7 @@ public class AuthController {
     @RequireLogin
     @DeleteMapping
     public ResponseEntity<UserProfileResponse> deleteAccount(HttpServletRequest httpRequest) {
-        String currentUserId = jwtProvider.resolveUserId(httpRequest);
+        String currentUserId = (String) httpRequest.getAttribute("currentUserId");
         UserProfileResponse response = authService.deleteAccount(currentUserId);
         return ResponseEntity.ok(response);
     }
@@ -216,8 +216,8 @@ public class AuthController {
     @RequireLogin
     @GetMapping("/profile")
     public ResponseEntity<UserProfileResponse> getProfile(HttpServletRequest httpRequest) {
-        String userId = jwtProvider.resolveUserId(httpRequest);
-        UserProfileResponse profile = authService.getUserProfile(userId);
+        String currentUserId = (String) httpRequest.getAttribute("currentUserId");
+        UserProfileResponse profile = authService.getUserProfile(currentUserId);
         return ResponseEntity.ok(profile);
     }
 }

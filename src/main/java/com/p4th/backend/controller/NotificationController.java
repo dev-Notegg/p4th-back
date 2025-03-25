@@ -44,8 +44,8 @@ public class NotificationController {
     public ResponseEntity<Page<NotificationResponse>> getNotifications(
             HttpServletRequest request,
             @Parameter(hidden = true) @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
-        String userId = jwtProvider.resolveUserId(request);
-        Page<NotificationResponse> notifications = notificationService.getNotifications(userId, pageable);
+        String currentUserId = (String) request.getAttribute("currentUserId");
+        Page<NotificationResponse> notifications = notificationService.getNotifications(currentUserId, pageable);
         return ResponseEntity.ok(notifications);
     }
 

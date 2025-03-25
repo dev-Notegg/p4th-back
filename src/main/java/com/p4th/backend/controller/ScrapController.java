@@ -4,7 +4,6 @@ import com.p4th.backend.annotation.RequireLogin;
 import com.p4th.backend.common.exception.ErrorResponse;
 import com.p4th.backend.dto.response.scrap.ScrapPostListResponse;
 import com.p4th.backend.dto.response.scrap.ScrapResponse;
-import com.p4th.backend.security.JwtProvider;
 import com.p4th.backend.service.ScrapService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -30,7 +29,6 @@ import jakarta.servlet.http.HttpServletRequest;
 public class ScrapController {
 
     private final ScrapService scrapService;
-    private final JwtProvider jwtProvider;
 
     @Operation(
             summary = "게시글 스크랩 목록 조회",
@@ -52,8 +50,8 @@ public class ScrapController {
             @RequestParam(value = "scrapFolderId", required = false) String scrapFolderId,
             @Parameter(hidden = true) @PageableDefault(sort = "scrappedAt", direction = Sort.Direction.DESC) Pageable pageable,
             HttpServletRequest request) {
-        String userId = jwtProvider.resolveUserId(request);
-        Page<ScrapPostListResponse> response = scrapService.getScrapPosts(userId, scrapFolderId, pageable);
+        String currentUserId = (String) request.getAttribute("currentUserId");
+        Page<ScrapPostListResponse> response = scrapService.getScrapPosts(currentUserId, scrapFolderId, pageable);
         return ResponseEntity.ok(response);
     }
 
@@ -74,8 +72,8 @@ public class ScrapController {
             @Parameter(name = "scrapId", description = "스크랩 ID", required = true)
             @PathVariable("scrapId") String scrapId,
             HttpServletRequest request) {
-        String userId = jwtProvider.resolveUserId(request);
-        String deletedScrapId = scrapService.deleteScrap(scrapId, userId);
+        String currentUserId = (String) request.getAttribute("currentUserId");
+        String deletedScrapId = scrapService.deleteScrap(scrapId, currentUserId);
         return ResponseEntity.ok("{\"deleted\": \"" + deletedScrapId + "\"}");
     }
 
@@ -100,8 +98,8 @@ public class ScrapController {
             @Parameter(name = "scrapFolderId", description = "스크랩 폴더 ID (옵션)")
             @RequestParam(value = "scrapFolderId", required = false) String scrapFolderId,
             HttpServletRequest request) {
-        String userId = jwtProvider.resolveUserId(request);
-        String scrapId = scrapService.createScrap(postId, scrapFolderId, userId);
+        String currentUserId = (String) request.getAttribute("currentUserId");
+        String scrapId = scrapService.createScrap(postId, scrapFolderId, currentUserId);
         ScrapResponse response = ScrapResponse.from(scrapId, postId, scrapFolderId);
         return ResponseEntity.ok(response);
     }

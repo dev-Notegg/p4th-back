@@ -83,8 +83,8 @@ public class PostController {
             @Parameter(name = "RegisterPostRequest", description = "게시글 등록 요청 DTO", required = true)
             @RequestBody RegisterPostRequest request,
             HttpServletRequest httpRequest) {
-        String userId = jwtProvider.resolveUserId(httpRequest);
-        String postId = postService.registerPost(request.getBoardId(), userId, request.getTitle(), request.getContent());
+        String currentUserId = (String) httpRequest.getAttribute("currentUserId");
+        String postId = postService.registerPost(request.getBoardId(), currentUserId, request.getTitle(), request.getContent());
         CreatePostResponse response = new CreatePostResponse(postId);
         return ResponseEntity.ok().body(response);
     }
@@ -109,8 +109,8 @@ public class PostController {
             @Parameter(name = "UpdatePostRequest", description = "게시글 수정 요청 DTO", required = true)
             @RequestBody UpdatePostRequest request,
             HttpServletRequest httpRequest) {
-        String userId = jwtProvider.resolveUserId(httpRequest);
-        postService.updatePost(postId, userId, request.getTitle(), request.getContent());
+        String currentUserId = (String) httpRequest.getAttribute("currentUserId");
+        postService.updatePost(postId, currentUserId, request.getTitle(), request.getContent());
         UpdatePostResponse response = new UpdatePostResponse(postId);
         return ResponseEntity.ok().body(response);
     }

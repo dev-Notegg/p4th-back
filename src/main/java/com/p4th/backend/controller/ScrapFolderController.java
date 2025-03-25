@@ -6,7 +6,6 @@ import com.p4th.backend.domain.ScrapFolder;
 import com.p4th.backend.dto.request.ScrapFolderNameRequest;
 import com.p4th.backend.dto.request.ScrapFolderOrderUpdateRequest;
 import com.p4th.backend.dto.response.scrap.ScrapFolderResponse;
-import com.p4th.backend.security.JwtProvider;
 import com.p4th.backend.service.ScrapFolderService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -29,7 +28,6 @@ import java.util.List;
 public class ScrapFolderController {
 
     private final ScrapFolderService scrapFolderService;
-    private final JwtProvider jwtProvider;
 
     @Operation(summary = "스크랩 폴더 목록 조회", description = "사용자의 스크랩 폴더 목록을 조회한다. 각 폴더에는 해당 폴더에 속한 스크랩 게시글 개수가 포함된다.")
     @ApiResponses(value = {
@@ -41,8 +39,8 @@ public class ScrapFolderController {
     @RequireLogin
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<ScrapFolderResponse>> getScrapFolders(HttpServletRequest request) {
-        String userId = jwtProvider.resolveUserId(request);
-        List<ScrapFolderResponse> responses = scrapFolderService.getScrapFolders(userId);
+        String currentUserId = (String) request.getAttribute("currentUserId");
+        List<ScrapFolderResponse> responses = scrapFolderService.getScrapFolders(currentUserId);
         return ResponseEntity.ok(responses);
     }
 
@@ -60,8 +58,8 @@ public class ScrapFolderController {
     public ResponseEntity<ScrapFolderResponse> createScrapFolder(
             @RequestBody ScrapFolderNameRequest requestBody,
             HttpServletRequest request) {
-        String userId = jwtProvider.resolveUserId(request);
-        ScrapFolder folder = scrapFolderService.createScrapFolder(userId, requestBody.getFolderName());
+        String currentUserId = (String) request.getAttribute("currentUserId");
+        ScrapFolder folder = scrapFolderService.createScrapFolder(currentUserId, requestBody.getFolderName());
         return ResponseEntity.ok(ScrapFolderResponse.from(folder));
     }
 
@@ -82,8 +80,8 @@ public class ScrapFolderController {
             @PathVariable("scrapFolderId") String scrapFolderId,
             @RequestBody ScrapFolderNameRequest requestBody,
             HttpServletRequest request) {
-        String userId = jwtProvider.resolveUserId(request);
-        boolean updated = scrapFolderService.updateScrapFolderName(scrapFolderId, requestBody.getFolderName(), userId);
+        String currentUserId = (String) request.getAttribute("currentUserId");
+        boolean updated = scrapFolderService.updateScrapFolderName(scrapFolderId, requestBody.getFolderName(), currentUserId);
         return ResponseEntity.ok("{\"updated\": " + updated + "}");
     }
 
@@ -103,8 +101,8 @@ public class ScrapFolderController {
     public ResponseEntity<?> updateScrapFolderOrder(
             @RequestBody ScrapFolderOrderUpdateRequest requestDto,
             HttpServletRequest request) {
-        String userId = jwtProvider.resolveUserId(request);
-        boolean updated = scrapFolderService.updateScrapFolderOrder(requestDto.getOrder(), userId);
+        String currentUserId = (String) request.getAttribute("currentUserId");
+        boolean updated = scrapFolderService.updateScrapFolderOrder(requestDto.getOrder(), currentUserId);
         return ResponseEntity.ok("{\"updated\": " + updated + "}");
     }
 
@@ -124,8 +122,8 @@ public class ScrapFolderController {
     public ResponseEntity<?> deleteScrapFolder(
             @PathVariable("scrapFolderId") String scrapFolderId,
             HttpServletRequest request) {
-        String userId = jwtProvider.resolveUserId(request);
-        boolean deleted = scrapFolderService.deleteScrapFolder(scrapFolderId, userId);
+        String currentUserId = (String) request.getAttribute("currentUserId");
+        boolean deleted = scrapFolderService.deleteScrapFolder(scrapFolderId, currentUserId);
         return ResponseEntity.ok("{\"deleted\": " + deleted + "}");
     }
 }

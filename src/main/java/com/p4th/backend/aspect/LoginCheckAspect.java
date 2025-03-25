@@ -46,6 +46,9 @@ public class LoginCheckAspect {
         if (adminBlockService.isIpBlocked(ip)) {
             throw new CustomException(ErrorCode.BLOCKED_IP);
         }
+        // userId를 request에 저장 (컨트롤러에서 재사용)
+        request.setAttribute("currentUserId", userId);
+
         return joinPoint.proceed();
     }
 }

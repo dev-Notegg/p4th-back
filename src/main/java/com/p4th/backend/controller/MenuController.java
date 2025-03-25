@@ -6,7 +6,6 @@ import com.p4th.backend.domain.Category;
 import com.p4th.backend.dto.response.board.BoardResponse;
 import com.p4th.backend.dto.response.user.UserCommentPostResponse;
 import com.p4th.backend.dto.response.post.PostListResponse;
-import com.p4th.backend.security.JwtProvider;
 import com.p4th.backend.service.MenuService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -33,7 +32,6 @@ import java.util.List;
 public class MenuController {
 
     private final MenuService menuService;
-    private final JwtProvider jwtProvider;
 
     @Operation(summary = "최근 본 게시물 목록 조회", description = "최근에 본 게시글(최대 15개)을 조회한다.")
     @ApiResponses({
@@ -46,8 +44,8 @@ public class MenuController {
     @GetMapping(value = "/recent-posts")
     public ResponseEntity<List<PostListResponse>> getRecentPosts(
             HttpServletRequest httpRequest) {
-        String userId = jwtProvider.resolveUserId(httpRequest);
-        List<PostListResponse> posts = menuService.getRecentPosts(userId);
+        String currentUserId = (String) httpRequest.getAttribute("currentUserId");
+        List<PostListResponse> posts = menuService.getRecentPosts(currentUserId);
         return ResponseEntity.ok(posts);
     }
 
@@ -63,8 +61,8 @@ public class MenuController {
     public ResponseEntity<Page<PostListResponse>> getUserPosts(
             @Parameter(hidden = true) @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
             HttpServletRequest httpRequest) {
-        String userId = jwtProvider.resolveUserId(httpRequest);
-        Page<PostListResponse> posts = menuService.getUserPosts(userId, pageable);
+        String currentUserId = (String) httpRequest.getAttribute("currentUserId");
+        Page<PostListResponse> posts = menuService.getUserPosts(currentUserId, pageable);
         return ResponseEntity.ok(posts);
     }
 
@@ -81,8 +79,8 @@ public class MenuController {
     public ResponseEntity<Page<UserCommentPostResponse>> getUserComments(
             @Parameter(hidden = true) Pageable pageable,
             HttpServletRequest httpRequest) {
-        String userId = jwtProvider.resolveUserId(httpRequest);
-        Page<UserCommentPostResponse> responses = menuService.getUserComments(userId, pageable);
+        String currentUserId = (String) httpRequest.getAttribute("currentUserId");
+        Page<UserCommentPostResponse> responses = menuService.getUserComments(currentUserId, pageable);
         return ResponseEntity.ok(responses);
     }
 

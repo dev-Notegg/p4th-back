@@ -5,7 +5,6 @@ import com.p4th.backend.common.exception.ErrorResponse;
 import com.p4th.backend.dto.request.ReportRequest;
 import com.p4th.backend.dto.response.block.BlockResponse;
 import com.p4th.backend.dto.response.report.ReportResponse;
-import com.p4th.backend.security.JwtProvider;
 import com.p4th.backend.service.BlockService;
 import com.p4th.backend.service.ReportService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -26,7 +25,6 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class ReportBlockController {
 
-    private final JwtProvider jwtProvider;
     private final ReportService reportService;
     private final BlockService blockService;
 
@@ -49,8 +47,8 @@ public class ReportBlockController {
     public ResponseEntity<ReportResponse> report(
             @RequestBody ReportRequest reportRequest,
             HttpServletRequest request) {
-        String reporterId = jwtProvider.resolveUserId(request);
-        String reportId = reportService.report(reporterId, reportRequest);
+        String currentUserId = (String) request.getAttribute("currentUserId");
+        String reportId = reportService.report(currentUserId, reportRequest);
         ReportResponse response = new ReportResponse(reportId);
         return ResponseEntity.ok(response);
     }
@@ -70,8 +68,8 @@ public class ReportBlockController {
             @Parameter(name = "targetUserId", description = "차단할 사용자 ID", required = true)
             @PathVariable("targetUserId") String targetUserId,
             HttpServletRequest request) {
-        String userId = jwtProvider.resolveUserId(request);
-        String blockId = blockService.blockUser(userId, targetUserId);
+        String currentUserId = (String) request.getAttribute("currentUserId");
+        String blockId = blockService.blockUser(currentUserId, targetUserId);
         BlockResponse response = new BlockResponse(blockId);
         return ResponseEntity.ok(response);
     }
