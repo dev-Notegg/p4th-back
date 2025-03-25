@@ -4,7 +4,6 @@ import com.p4th.backend.domain.Post;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -23,7 +22,6 @@ public interface PostRepository extends JpaRepository<Post, String> {
                                              Pageable pageable);
 
     // 내가 작성한 댓글이 포함된 게시글을 조회
-    @EntityGraph(attributePaths = {"comments"})
     @Query("SELECT p FROM Post p " +
             "WHERE EXISTS (SELECT 1 FROM Comment c WHERE c.post = p AND c.userId = :userId) " +
             "ORDER BY (SELECT MAX(c.createdAt) FROM Comment c WHERE c.post = p AND c.userId = :userId) DESC")

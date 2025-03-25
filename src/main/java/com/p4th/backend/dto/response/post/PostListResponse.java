@@ -65,11 +65,4 @@ public class PostListResponse {
         return dto;
     }
 
-
-
-
-
-
-
-
 }
