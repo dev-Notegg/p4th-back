@@ -15,9 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -30,19 +28,45 @@ public class AdminBannerService {
 
     @Transactional(readOnly = true)
     public Page<BannerResponse> getBanners(String search, Pageable pageable) {
-        Page<Banner> page;
-        if (search == null || search.trim().isEmpty()) {
-            page = adminBannerRepository.findAll(pageable);
-        } else {
-            page = adminBannerRepository.findByBannerNameContainingIgnoreCase(search, pageable);
-        }
+        Page<Banner> page = (search == null || search.trim().isEmpty())
+                ? adminBannerRepository.findAll(pageable)
+                : adminBannerRepository.findByBannerNameContainingIgnoreCase(search, pageable);
         return page.map(BannerResponse::from);
     }
 
     @Transactional
     public String createBanner(String userId, String bannerName, String linkUrl,
-            LocalDate startDate, LocalDate endDate, MultipartFile imageFile) {
-        // 0) 필수값 검증
+                               LocalDate startDate, LocalDate endDate, MultipartFile imageFile) {
+        // 1) 공통 입력값 검증
+        validateBannerInput(bannerName, startDate, endDate, imageFile);
+
+        // 2) 종료일 검증 (현재 날짜 이전이면 오류)
+        if (endDate.isBefore(LocalDate.now())) {
+            throw new CustomException(ErrorCode.INVALID_INPUT, "광고 종료일이 현재일 이전입니다.");
+        }
+
+        // 3) ULID 생성 및 이미지 업로드
+        String bannerId = ULIDUtil.getULID();
+        String fileName = ULIDUtil.getULID() + "_" + imageFile.getOriginalFilename();
+        String imageUrl = s3Service.upload(imageFile, "banners", fileName);
+
+        // 4) 배너 엔티티 생성 및 DB 저장
+        Banner banner = new Banner();
+        banner.setBannerId(bannerId);
+        banner.setBannerName(bannerName);
+        banner.setImageUrl(imageUrl);
+        banner.setLinkUrl(linkUrl);
+        banner.setStartDate(startDate);
+        banner.setEndDate(endDate);
+        banner.setCreatedBy(userId);
+        int maxSeq = adminBannerMapper.findMaxSeqForActiveBanners();
+        banner.setSeq(maxSeq + 1);
+        adminBannerMapper.insertBanner(banner);
+        return bannerId;
+    }
+
+    // 입력값 검증
+    private void validateBannerInput(String bannerName, LocalDate startDate, LocalDate endDate, MultipartFile imageFile) {
         if (bannerName == null || bannerName.trim().isEmpty()) {
             throw new CustomException(ErrorCode.INVALID_INPUT, "배너 이름은 필수입니다.");
         }
@@ -55,30 +79,6 @@ public class AdminBannerService {
         if (imageFile == null || imageFile.isEmpty()) {
             throw new CustomException(ErrorCode.INVALID_INPUT, "이미지 파일은 필수입니다.");
         }
-        // 1) ULID 생성
-        String bannerId = ULIDUtil.getULID();
-        // 2) 이미지 업로드 (S3)
-        String fileName = ULIDUtil.getULID() + "_" + imageFile.getOriginalFilename();
-        String imageUrl = s3Service.upload(imageFile, "banners", fileName);
-        // 3) 광고 종료일이 현재보다 과거라면 예외 처리
-        if(endDate.isBefore(LocalDate.now())){
-            throw new CustomException(ErrorCode.INVALID_INPUT, "광고 종료일이 현재일 이전입니다.");
-        }
-        // 4) 배너 엔티티 생성
-        Banner banner = new Banner();
-        banner.setBannerId(bannerId);
-        banner.setBannerName(bannerName);
-        banner.setImageUrl(imageUrl);
-        banner.setLinkUrl(linkUrl);
-        banner.setStartDate(startDate);
-        banner.setEndDate(endDate);
-        banner.setCreatedBy(userId);
-        // 5) 마지막 seq 값 부여
-        int maxSeq = adminBannerMapper.findMaxSeqForActiveBanners();
-        banner.setSeq(maxSeq + 1);
-        // 6) DB Insert
-        adminBannerMapper.insertBanner(banner);
-        return bannerId;
     }
 
     @Transactional
@@ -102,11 +102,7 @@ public class AdminBannerService {
     @Transactional
     public void updateActiveBannerOrder(List<String> order, String userId) {
         for (int i = 0; i < order.size(); i++) {
-            Map<String, Object> params = new HashMap<>();
-            params.put("bannerId", order.get(i));
-            params.put("userId", userId);
-            params.put("seq", i + 1);
-            adminBannerMapper.updateBannerSeq(params);
+            adminBannerMapper.updateBannerSeq(order.get(i), userId, i + 1);
         }
     }
 }

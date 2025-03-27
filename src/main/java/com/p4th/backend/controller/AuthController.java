@@ -1,7 +1,7 @@
 package com.p4th.backend.controller;
 
 import com.p4th.backend.annotation.RequireLogin;
-import com.p4th.backend.common.exception.ErrorResponse;
+import com.p4th.backend.dto.response.ErrorResponse;
 import com.p4th.backend.dto.request.*;
 import com.p4th.backend.dto.response.auth.*;
 import com.p4th.backend.dto.response.user.UserProfileResponse;

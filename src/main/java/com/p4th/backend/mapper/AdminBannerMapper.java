@@ -5,7 +5,6 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
-import java.util.Map;
 
 @Mapper
 public interface AdminBannerMapper {
@@ -17,7 +16,7 @@ public interface AdminBannerMapper {
 
     List<Banner> selectActiveBanners();
 
-    void updateBannerSeq(Map<String, Object> params);
+    void updateBannerSeq(String bannerId, String userId, int seq);
 
     int findMaxSeqForActiveBanners();
 }

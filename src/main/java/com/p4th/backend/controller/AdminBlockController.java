@@ -1,6 +1,6 @@
 package com.p4th.backend.controller;
 
-import com.p4th.backend.common.exception.ErrorResponse;
+import com.p4th.backend.dto.response.ErrorResponse;
 import com.p4th.backend.dto.response.admin.BlockUserResponse;
 import com.p4th.backend.security.JwtProvider;
 import com.p4th.backend.service.AdminBlockService;

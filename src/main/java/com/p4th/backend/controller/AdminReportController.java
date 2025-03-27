@@ -1,6 +1,6 @@
 package com.p4th.backend.controller;
 
-import com.p4th.backend.common.exception.ErrorResponse;
+import com.p4th.backend.dto.response.ErrorResponse;
 import com.p4th.backend.domain.ReportType;
 import com.p4th.backend.dto.response.report.ReportDetailResponse;
 import com.p4th.backend.dto.response.report.ReportListResponse;

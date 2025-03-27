@@ -1,37 +1,33 @@
 package com.p4th.backend.dto.response;
 
+import lombok.Builder;
 import lombok.Data;
-
 import java.time.LocalDateTime;
 
+/**
+ * 통합 에러 응답 DTO
+ * API 응답용 에러 정보를 담으며, 모든 에러 응답에 일관되게 사용됩니다.
+ */
 @Data
+@Builder
 public class ErrorResponse {
+    /**
+     * 에러 코드 (예: 10201, 10100 등)
+     */
     private int errorCode;
+
+    /**
+     * 에러 메시지
+     */
     private String errorMessage;
+
+    /**
+     * HTTP 상태 문자열 (예: "BAD_REQUEST", "INTERNAL_SERVER_ERROR")
+     */
     private String status;
+
+    /**
+     * 에러 발생 시각
+     */
     private LocalDateTime timestamp;
-
-    private ErrorResponse(Builder builder) {
-        this.errorCode = builder.errorCode;
-        this.errorMessage = builder.errorMessage;
-        this.status = builder.status;
-        this.timestamp = builder.timestamp;
-    }
-
-    public static Builder builder() {
-        return new Builder();
-    }
-
-    public static class Builder {
-        private int errorCode;
-        private String errorMessage;
-        private String status;
-        private LocalDateTime timestamp;
-
-        public Builder errorCode(int errorCode) { this.errorCode = errorCode; return this; }
-        public Builder errorMessage(String errorMessage) { this.errorMessage = errorMessage; return this; }
-        public Builder status(String status) { this.status = status; return this; }
-        public Builder timestamp(LocalDateTime timestamp) { this.timestamp = timestamp; return this; }
-        public ErrorResponse build() { return new ErrorResponse(this); }
-    }
 }

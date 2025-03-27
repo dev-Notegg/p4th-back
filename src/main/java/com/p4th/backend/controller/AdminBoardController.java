@@ -1,6 +1,6 @@
 package com.p4th.backend.controller;
 
-import com.p4th.backend.common.exception.ErrorResponse;
+import com.p4th.backend.dto.response.ErrorResponse;
 import com.p4th.backend.dto.request.BoardCreationRequest;
 import com.p4th.backend.dto.request.BoardUpdateRequest;
 import com.p4th.backend.dto.response.admin.BoardCreationResponse;

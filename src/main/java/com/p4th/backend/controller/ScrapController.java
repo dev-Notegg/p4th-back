@@ -1,7 +1,7 @@
 package com.p4th.backend.controller;
 
 import com.p4th.backend.annotation.RequireLogin;
-import com.p4th.backend.common.exception.ErrorResponse;
+import com.p4th.backend.dto.response.ErrorResponse;
 import com.p4th.backend.dto.response.scrap.ScrapPostListResponse;
 import com.p4th.backend.dto.response.scrap.ScrapResponse;
 import com.p4th.backend.service.ScrapService;
