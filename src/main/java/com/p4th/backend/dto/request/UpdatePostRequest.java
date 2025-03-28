@@ -1,9 +1,12 @@
 package com.p4th.backend.dto.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Data;
+import lombok.*;
 
-@Data
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Schema(description = "게시글 수정 요청 DTO")
 public class UpdatePostRequest {
     @Schema(description = "게시글 제목", example = "수정된 게시글 제목")

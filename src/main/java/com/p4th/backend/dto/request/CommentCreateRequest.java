@@ -1,9 +1,12 @@
 package com.p4th.backend.dto.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Data;
+import lombok.*;
 
-@Data
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Schema(description = "댓글 작성 요청 DTO")
 public class CommentCreateRequest {
     @Schema(description = "댓글 내용", example = "댓글 내용 작성...")

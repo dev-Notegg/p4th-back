@@ -1,9 +1,12 @@
 package com.p4th.backend.dto.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Data;
+import lombok.*;
 
-@Data
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Schema(description = "게시글 등록 요청 DTO")
 public class RegisterPostRequest {
     @Schema(description = "게시판 ID", example = "01HXYA4V8D5N1PZQF8KZBHY7XT")

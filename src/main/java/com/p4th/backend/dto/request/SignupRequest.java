@@ -1,9 +1,12 @@
 package com.p4th.backend.dto.request;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.Data;
+import lombok.*;
 
-@Data
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Schema(description = "회원가입 요청 DTO")
 public class SignupRequest {
     @Schema(description = "회원 ID", example = "id1234")

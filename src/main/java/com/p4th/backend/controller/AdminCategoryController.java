@@ -84,7 +84,7 @@ public class AdminCategoryController {
     })
     @PostMapping
     public ResponseEntity<CategoryCreationResponse> createCategory(
-            @RequestBody CategoryCreationRequest requestDto,
+            @RequestBody CategoryNameRequest requestDto,
             HttpServletRequest request) {
         String userId = jwtProvider.resolveUserId(request);
         String categoryId = adminCategoryService.createCategory(userId, requestDto.getCategoryName());
@@ -165,7 +165,7 @@ public class AdminCategoryController {
     public ResponseEntity<?> updateCategoryName(
             @Parameter(name = "categoryId", description = "수정할 카테고리 ID", required = true)
             @PathVariable("categoryId") String categoryId,
-            @RequestBody CategoryNameUpdateRequest requestDto,
+            @RequestBody CategoryNameRequest requestDto,
             HttpServletRequest request) {
         String userId = jwtProvider.resolveUserId(request);
         adminCategoryService.updateCategoryName(userId, categoryId, requestDto.getCategoryName());

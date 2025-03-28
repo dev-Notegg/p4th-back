@@ -1,8 +1,7 @@
 package com.p4th.backend.controller;
 
 import com.p4th.backend.dto.response.ErrorResponse;
-import com.p4th.backend.dto.request.BoardCreationRequest;
-import com.p4th.backend.dto.request.BoardUpdateRequest;
+import com.p4th.backend.dto.request.BoardBaseRequest;
 import com.p4th.backend.dto.response.admin.BoardCreationResponse;
 import com.p4th.backend.dto.response.admin.BoardDeletionInfoResponse;
 import com.p4th.backend.dto.response.admin.BoardResponse;
@@ -63,7 +62,7 @@ public class AdminBoardController {
     })
     @PostMapping
     public ResponseEntity<BoardCreationResponse> createBoard(
-            @RequestBody BoardCreationRequest requestDto,
+            @RequestBody BoardBaseRequest requestDto,
             HttpServletRequest request) {
         String userId = jwtProvider.resolveUserId(request);
         String boardId = adminBoardService.createBoard(userId, requestDto.getBoardName(), requestDto.getCategoryId(), requestDto.getBoardLevel());
@@ -83,7 +82,7 @@ public class AdminBoardController {
     public ResponseEntity<?> updateBoard(
             @Parameter(name = "boardId", description = "수정할 게시판 ID", required = true)
             @PathVariable("boardId") String boardId,
-            @RequestBody BoardUpdateRequest requestDto,
+            @RequestBody BoardBaseRequest requestDto,
             HttpServletRequest request) {
         String userId = jwtProvider.resolveUserId(request);
         adminBoardService.updateBoard(userId, boardId, requestDto.getBoardName(), requestDto.getCategoryId(), requestDto.getBoardLevel());
