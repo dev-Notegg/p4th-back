@@ -19,6 +19,8 @@ public class Comment {
     private String userId;
     @Transient
     private String nickname;
+    @Transient
+    private String targetNickname; // 대댓글의 댓글 대상 닉네임 (대대댓글인 경우)
     private String content;
     @Enumerated(EnumType.STRING)
     private CommentStatus status;  // NORMAL, REPORTED

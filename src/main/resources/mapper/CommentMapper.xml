@@ -19,10 +19,13 @@
             c.created_by,
             c.created_at,
             c.updated_by,
-            c.updated_at
+            c.updated_at,
+            pu.nickname AS target_nickname
         FROM comment c
             JOIN user_info u ON u.user_id = c.user_id
-        WHERE post_id = #{postId}
+            LEFT JOIN comment pc ON pc.comment_id = c.parent_comment_id
+            LEFT JOIN user_info pu ON pu.user_id = pc.user_id
+        WHERE c.post_id = #{postId}
         <if test="userId != null">
             AND c.user_id NOT IN (
                 SELECT target_user_id
@@ -30,7 +33,7 @@
                 WHERE user_id = #{userId}
             )
         </if>
-        ORDER BY created_at DESC
+        ORDER BY c.created_at DESC
     </select>
 
     <!-- 댓글 등록 -->

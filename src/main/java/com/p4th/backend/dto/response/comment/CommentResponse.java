@@ -21,6 +21,9 @@ public class CommentResponse {
 
     @Schema(description = "작성자 닉네임", example = "닉네임_001")
     private String nickname;
+
+    @Schema(description = "답글 대상자 닉네임 (대대댓글인 경우만)", example = "닉네임_002")
+    private String targetNickname;
     
     @Schema(description = "댓글 내용", example = "첫 번째 댓글입니다.")
     private String content;
@@ -43,6 +46,9 @@ public class CommentResponse {
         response.setParentCommentId(comment.getParentCommentId());
         response.setUserId(comment.getUserId());
         response.setNickname(comment.getNickname() != null ? comment.getNickname() : null);
+        if (comment.getParentCommentId() != null && comment.getTargetNickname() != null) {
+            response.setTargetNickname(comment.getTargetNickname());
+        }
         response.setContent(comment.getContent());
         response.setSecretYn(comment.getSecretYn());
         // 만약 댓글이 비밀 댓글이라면, 댓글 작성자 또는 게시글 작성자일 때만 공개, 아니면 false 설정
