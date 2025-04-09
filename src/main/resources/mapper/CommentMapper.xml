@@ -20,10 +20,12 @@
             c.created_at,
             c.updated_by,
             c.updated_at,
+            ppc.comment_id AS grand_parent_comment_id,
             pu.nickname AS target_nickname
         FROM comment c
             JOIN user_info u ON u.user_id = c.user_id
             LEFT JOIN comment pc ON pc.comment_id = c.parent_comment_id
+            LEFT JOIN comment ppc ON ppc.comment_id = pc.parent_comment_id
             LEFT JOIN user_info pu ON pu.user_id = pc.user_id
         WHERE c.post_id = #{postId}
         <if test="userId != null">

@@ -46,7 +46,7 @@ public class CommentResponse {
         response.setParentCommentId(comment.getParentCommentId());
         response.setUserId(comment.getUserId());
         response.setNickname(comment.getNickname() != null ? comment.getNickname() : null);
-        if (comment.getParentCommentId() != null && comment.getTargetNickname() != null) {
+        if (comment.getGrandParentCommentId() != null && comment.getTargetNickname() != null) {
             response.setTargetNickname(comment.getTargetNickname());
         }
         response.setContent(comment.getContent());
