@@ -2,6 +2,7 @@ package com.p4th.backend.service;
 
 import com.p4th.backend.domain.Board;
 import com.p4th.backend.domain.Category;
+import com.p4th.backend.domain.Comment;
 import com.p4th.backend.domain.Post;
 import com.p4th.backend.dto.response.board.BoardResponse;
 import com.p4th.backend.dto.response.post.PostListResponse;
@@ -20,6 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -68,7 +70,7 @@ public class MenuService {
                 UserCommentPostResponse dto = UserCommentPostResponse.from(post);
                 List<UserCommentResponse> myComments = post.getComments().stream()
                         .filter(comment -> userId.equals(comment.getUserId()))
-                        .sorted((c1, c2) -> c2.getCreatedAt().compareTo(c1.getCreatedAt()))
+                        .sorted(Comparator.comparing(Comment::getCreatedAt))
                         .map(UserCommentResponse::from)
                         .collect(Collectors.toList());
                 dto.setComments(myComments);
