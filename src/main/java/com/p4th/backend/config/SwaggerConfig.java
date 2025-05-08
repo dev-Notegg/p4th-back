@@ -35,19 +35,38 @@ public class SwaggerConfig {
                 .addSecurityItem(securityRequirement)
                 .info(info);
     }
+    /**
+     * 모든 API 경로를 포함한 그룹을 정의한다.
+     */
     @Bean
-    public GroupedOpenApi all(){
+    public GroupedOpenApi all() {
         String[] pathsToMatch = {"/api/**"};
         return GroupedOpenApi.builder()
                 .group("전체")
                 .pathsToMatch(pathsToMatch)
                 .build();
     }
+
+    /**
+     * 관리자 API 그룹을 정의한다.
+     */
     @Bean
-    public GroupedOpenApi adminManager(){
+    public GroupedOpenApi adminManager() {
         String[] pathsToMatch = {"/api/admin/**"};
         return GroupedOpenApi.builder()
                 .group("CMS")
+                .pathsToMatch(pathsToMatch)
+                .build();
+    }
+
+    /**
+     * 채팅 API 그룹을 정의한다.
+     */
+    @Bean
+    public GroupedOpenApi chatApi() {
+        String[] pathsToMatch = {"/api/chat/**"};
+        return GroupedOpenApi.builder()
+                .group("채팅")
                 .pathsToMatch(pathsToMatch)
                 .build();
     }

@@ -14,7 +14,7 @@ spring:
     date-format: "yyyy-MM-dd HH:mm:ss"
 
   datasource:
-    url: jdbc:mysql://192.168.0.6:3306/p4thdb
+    url: jdbc:mysql://223.130.159.146:3306/p4thdb
     username: p4th
     password: p4th12!@
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -60,8 +60,8 @@ springdoc:
   show-actuator: true
   default-consumes-media-type: application/json
   default-produces-media-type: application/json
-#  paths-to-match:
-#    - /v1/**
+  #  paths-to-match:
+  #    - /v1/**
   default-flat-param-object: true
 
 mybatis:
