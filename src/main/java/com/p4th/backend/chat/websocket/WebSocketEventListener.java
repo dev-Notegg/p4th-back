@@ -6,11 +6,14 @@ import org.springframework.context.event.EventListener;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.messaging.SessionConnectEvent;
+import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
 public class WebSocketEventListener {
+
+    private final ChatPresenceTracker chatPresenceTracker;
 
     @EventListener
     public void handleConnect(SessionConnectEvent event) {
@@ -21,7 +24,7 @@ public class WebSocketEventListener {
     }
 
     @EventListener
-    public void handleDisconnect() {
+    public void handleDisconnect(SessionDisconnectEvent event) {
         log.info("DISCONNECT");
     }
 }
