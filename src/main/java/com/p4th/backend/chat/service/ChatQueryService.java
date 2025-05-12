@@ -15,6 +15,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import org.springframework.data.domain.Sort;
 
 @Service
 @RequiredArgsConstructor
@@ -26,8 +27,8 @@ public class ChatQueryService {
     private final ChatPresenceTracker chatPresenceTracker;
 
     public Page<ChatMessageResponse> getMessages(String roomId, int page, int size) {
-        PageRequest pageable = PageRequest.of(page, size);
-        Page<ChatMessage> messagePage = chatMessageRepository.findByRoomIdOrderByCreatedAtAsc(roomId, pageable);
+        PageRequest pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+        Page<ChatMessage> messagePage = chatMessageRepository.findByRoomIdOrderByCreatedAtDesc(roomId, pageable);
         return ChatMessageResponse.fromPage(messagePage);
     }
 

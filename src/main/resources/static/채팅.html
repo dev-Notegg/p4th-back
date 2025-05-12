@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>로비 채팅 테스트</title>
+  <script src="https://cdn.jsdelivr.net/npm/sockjs-client/dist/sockjs.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/stompjs/lib/stomp.min.js"></script>
+  <style>
+    #chatBox {
+      border: 1px solid #ccc;
+      height: 300px;
+      overflow-y: scroll;
+      margin-bottom: 10px;
+      padding: 8px;
+    }
+    li {
+      list-style: none;
+      margin-bottom: 4px;
+    }
+    img.chat-image {
+      max-width: 150px;
+      display: block;
+      margin-top: 4px;
+    }
+  </style>
+</head>
+<body>
+<h2>로비 채팅</h2>
+<ul id="chatBox"></ul>
+<input type="text" id="nickname" value="체리버터" placeholder="닉네임" />
+<input type="text" id="message" placeholder="메시지 입력" />
+<input type="file" id="imageInput" accept="image/*" />
+<button id="sendBtn">전송</button>
+
+<script>
+  let stompClient = null;
+  const roomId = "lobby";
+  let page = 0;
+  const size = 20;
+  let isLoading = false;
+  let hasMore = true;
+
+  function appendMessage(msg, appendToTop = false) {
+    const type = msg.messageType?.toUpperCase?.();
+    const chatBox = document.getElementById("chatBox");
+    const li = document.createElement("li");
+
+    if (type === "IMAGE") {
+      const img = new Image();
+      img.src = msg.content;
+      img.className = "chat-image";
+      li.innerHTML = `${msg.senderNickname}:<br/>`;
+      li.appendChild(img);
+
+      if (!appendToTop) {
+        img.onload = () => {
+          chatBox.scrollTop = chatBox.scrollHeight;
+        };
+      }
+
+    } else {
+      li.textContent = `${msg.senderNickname}: ${msg.content}`;
+    }
+
+    if (appendToTop) {
+      chatBox.insertBefore(li, chatBox.firstChild);
+    } else {
+      chatBox.appendChild(li);
+
+      if (type !== "IMAGE") {
+        setTimeout(() => {
+          chatBox.scrollTop = chatBox.scrollHeight;
+        }, 0);
+      }
+    }
+  }
+
+  function fetchMessages(userId, appendToTop = false) {
+    if (isLoading || !hasMore) return;
+    isLoading = true;
+
+    const chatBox = document.getElementById("chatBox");
+    const prevScrollHeight = chatBox.scrollHeight;
+
+    fetch(`/api/chat/rooms/${roomId}/messages?page=${page}&size=${size}`, {
+      headers: { "X-USER-ID": encodeURIComponent(userId) }
+    })
+            .then(res => res.ok ? res.json() : Promise.reject(res.status))
+            .then(data => {
+              const messages = data.content || [];
+
+              messages.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+
+              if (messages.length === 0) {
+                hasMore = false;
+                return;
+              }
+
+              messages.forEach(m => appendMessage(m, appendToTop));
+              page++;
+
+              if (appendToTop) {
+                const scrollDiff = chatBox.scrollHeight - prevScrollHeight;
+                chatBox.scrollTop = scrollDiff;
+              } else {
+                chatBox.scrollTop = chatBox.scrollHeight;
+              }
+            })
+            .catch(err => console.warn("이전 메시지 불러오기 실패:", err))
+            .finally(() => isLoading = false);
+  }
+
+  function connectWebSocket(userId) {
+    const socket = new SockJS("/ws/chat/websocket");
+    stompClient = Stomp.over(socket);
+    stompClient.debug = null;
+
+    stompClient.connect({ "X-USER-ID": encodeURIComponent(userId), "X-ROOM-ID": roomId }, () => {
+      stompClient.subscribe(`/topic/chat.${roomId}`, (msg) => {
+        const body = JSON.parse(msg.body);
+        appendMessage(body);
+      });
+    });
+  }
+
+  function sendMessage() {
+    const nickname = document.getElementById("nickname").value.trim();
+    const content = document.getElementById("message").value.trim();
+    const file = document.getElementById("imageInput").files[0];
+
+    if (!nickname || !stompClient?.connected) return;
+
+    if (file) {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("roomId", roomId);
+
+      fetch("/api/chat/images", {
+        method: "POST",
+        body: formData
+      })
+              .then(res => res.json())
+              .then(data => {
+                sendPayload(nickname, data.url, "IMAGE");
+                document.getElementById("imageInput").value = "";
+              });
+    }
+
+    if (content.trim()) {
+      sendPayload(nickname, content, "TEXT");
+      document.getElementById("message").value = "";
+    }
+  }
+
+  function sendPayload(nickname, content, type) {
+    const payload = {
+      roomId,
+      senderId: nickname,
+      senderNickname: nickname,
+      content,
+      messageType: type
+    };
+    stompClient.send(`/app/chat.send.${roomId}`, {}, JSON.stringify(payload));
+  }
+
+  document.getElementById("sendBtn").addEventListener("click", sendMessage);
+
+  // 처음 메시지 불러오기
+  const nickname = document.getElementById("nickname").value;
+  fetchMessages(nickname);
+  connectWebSocket(nickname);
+
+  // 위로 스크롤하면 이전 메시지 더 불러오기
+  document.getElementById("chatBox").addEventListener("scroll", () => {
+    const chatBox = document.getElementById("chatBox");
+    if (chatBox.scrollTop < 20) {
+      fetchMessages(nickname, true);
+    }
+  });
+</script>
+</body>
+</html>

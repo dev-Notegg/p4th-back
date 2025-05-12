@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>DM 채팅 테스트 + 이미지 + 상태</title>
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+    <style>
+        #chatBox { border: 1px solid #ccc; height: 300px; overflow-y: scroll; padding: 8px; margin-bottom: 10px; }
+        li { margin-bottom: 5px; list-style: none; }
+        .status { font-size: 14px; color: gray; margin-left: 10px; }
+    </style>
+</head>
+<body>
+
+<h2> DM 채팅 테스트 (이미지 포함 + 접속 상태)</h2>
+<div>
+    내 ID: <input type="text" id="myId" value="yr0408" />
+    내 닉네임: <input type="text" id="myNickname" value="yr0408" /><br/>
+    상대 ID: <input type="text" id="opponentId" value="yr04082" />
+    상대 닉네임: <input type="text" id="opponentNickname" value="yr04082" />
+    <span id="onlineStatus" class="status">상태 확인 중...</span>
+    <button onclick="createOrEnterDmRoom()">채팅 시작</button>
+</div>
+
+<ul id="chatBox"></ul>
+<input type="text" id="messageInput" placeholder="메시지 입력" />
+<input type="file" id="imageInput" accept="image/*" />
+<button onclick="sendMessage()">전송</button>
+
+<script>
+    let stompClient = null;
+    let currentRoomId = null;
+
+    function appendMessage(prefix, msg) {
+        const li = document.createElement("li");
+        if (msg.messageType === "IMAGE") {
+            li.innerHTML = `${prefix}: ${msg.senderNickname} <br/><img src="${msg.content}" width="150" />`;
+        } else {
+            li.textContent = `${prefix}: ${msg.senderNickname} - ${msg.content}`;
+        }
+        document.getElementById("chatBox").appendChild(li);
+        document.getElementById("chatBox").scrollTop = document.getElementById("chatBox").scrollHeight;
+    }
+
+    function updateOpponentOnlineStatus(myId, opponentId) {
+        fetch("/api/chat/rooms", {
+            headers: { "X-USER-ID": myId }
+        })
+            .then(res => res.json())
+            .then(rooms => {
+                const room = rooms.find(r => r.opponentId === opponentId);
+                if (room) {
+                    document.getElementById("onlineStatus").innerText = room.online ? "온라인" : "오프라인";
+                } else {
+                    document.getElementById("onlineStatus").innerText = "정보 없음";
+                }
+            });
+    }
+
+    function createOrEnterDmRoom() {
+        const myId = document.getElementById("myId").value;
+        const opponentId = document.getElementById("opponentId").value;
+        const myNickname = document.getElementById("myNickname").value;
+        const opponentNickname = document.getElementById("opponentNickname").value;
+
+        fetch("/api/chat/dm-room", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-USER-ID": myId
+            },
+            body: JSON.stringify({
+                myNickname,
+                opponentId,
+                opponentNickname
+            })
+        })
+            .then(res => res.json())
+            .then(data => {
+                currentRoomId = data.roomId;
+                connectWebSocket(myId);
+                loadMessages(myId);
+                updateOpponentOnlineStatus(myId, opponentId);
+            });
+    }
+
+    function connectWebSocket(userId) {
+        const socket = new SockJS("/ws/chat/websocket");
+        stompClient = Stomp.over(socket);
+        stompClient.debug = null;
+        stompClient.connect({
+            "X-USER-ID": userId,
+            "X-ROOM-ID": currentRoomId
+        }, () => {
+            stompClient.subscribe(`/topic/chat.${currentRoomId}`, (msg) => {
+                const m = JSON.parse(msg.body);
+                appendMessage("실시간", m);
+            });
+
+            stompClient.subscribe(`/topic/presence.${currentRoomId}`, (msg) => {
+                const data = JSON.parse(msg.body);
+                const opponentId = document.getElementById("opponentId").value;
+                if (data.userId === opponentId) {
+                    document.getElementById("onlineStatus").innerText = data.online ? "온라인" : "오프라인";
+                }
+            });
+        });
+    }
+
+    function loadMessages(userId) {
+        fetch(`/api/chat/rooms/${currentRoomId}/messages`, {
+            headers: { "X-USER-ID": userId }
+        })
+            .then(res => res.json())
+            .then(data => {
+                data.content.forEach(m => appendMessage("이전", m));
+            });
+    }
+
+    function sendMessage() {
+        const myId = document.getElementById("myId").value;
+        const myNickname = document.getElementById("myNickname").value;
+        const content = document.getElementById("messageInput").value;
+        const file = document.getElementById("imageInput").files[0];
+
+        if (file) {
+            const formData = new FormData();
+            formData.append("file", file);
+            formData.append("roomId", currentRoomId);
+
+            fetch("/api/chat/images", {
+                method: "POST",
+                body: formData
+            })
+                .then(res => res.json())
+                .then(data => {
+                    sendPayload({
+                        roomId: currentRoomId,
+                        senderId: myId,
+                        senderNickname: myNickname,
+                        content: data.url,
+                        messageType: "IMAGE"
+                    });
+                    document.getElementById("imageInput").value = "";
+                });
+        }
+
+        if (content.trim()) {
+            sendPayload({
+                roomId: currentRoomId,
+                senderId: myId,
+                senderNickname: myNickname,
+                content,
+                messageType: "TEXT"
+            });
+            document.getElementById("messageInput").value = "";
+        }
+    }
+
+    function sendPayload(payload) {
+        stompClient.send(`/app/chat.send.${currentRoomId}`, {}, JSON.stringify(payload));
+    }
+</script>
+
+</body>
+</html>
